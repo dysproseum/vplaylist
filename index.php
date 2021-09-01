@@ -18,10 +18,11 @@ else {
 
 <?php if (isset($_REQUEST['filename'])): ?>
 	<?php $vid_file = $_REQUEST['filename']; ?>
-
-	<video autoplay controls width="320">
-		<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
-	</video>
+	<div class="player">
+		<video autoplay controls width="640">
+			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
+		</video>
+	</div>
 
 <?php endif; ?>
 
@@ -47,20 +48,23 @@ else {
 			$basename = basename($item['filename'], '.mp4');
 			$vid_param = base64_encode($item['filename']);
 			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename. '.jpg';
-			$vid_link = 'index.php?filename=' . $vid_param;
+			$vid_link = 'index.php?collection=' . $machine_name . '&filename=' . $vid_param;
 		?>
 
 		<div class="thumbnail">
 		<a href="<?php print $vid_link; ?>">
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
-		<a href="<?php print $vid_link; ?>">
+		<a class="label label-top" href="<?php print $vid_link; ?>">
 			<?php print $basename ?>
 		</a>
-		<?php print $item['size']; ?> bytes
+		<span class="label label-bottom">
+			<?php print human_filesize($item['size']); ?>
+		</span>
 		</div>
 
 	<?php endforeach; ?>
+
 <?php endif; ?>
 
 <?php require_once 'include/footer.php'; ?>

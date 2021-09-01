@@ -1,0 +1,54 @@
+.thumbnail {
+	position: relative;
+	float: left;
+	width: 320px;
+	height: 180px;
+	overflow: hidden;
+	margin: 10px;
+	border: 1px solid lightgray;
+}
+
+.thumbnail .label {
+	position: absolute;
+	margin: 10px;
+	color: white;
+	text-shadow: 2px 2px 2px black;
+	text-decoration: none;
+}
+
+.thumbnail .label-top {
+	top: 0px;
+	left: 0px;
+}
+
+.thumbnail .label-bottom {
+	bottom: 0px;
+	right: 0px;
+}
+
+.player {
+	float: left;
+	width: 100%;
+	background: black;
+}
+
+.player video {
+	display: inherit;
+	margin: 0 auto;
+}
+
+.header, .footer {
+	float: left;
+	width: 100%;
+	background: lightgray;
+	text-align: center;
+}
+
+.header h1 a {
+	color: black;
+}
+
+h2 {
+	float: left;
+	width: 100%;
+}
