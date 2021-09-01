@@ -14,14 +14,25 @@ if (isset($_REQUEST['collection'])) {
 else {
 	$machine_name = '';
 }
+
+$vid_player = FALSE;
+if (isset($_REQUEST['index']) && $machine_name != '') {
+	$index = $_REQUEST['index'];
+	$item = $collections[$machine_name]['items'][$index];
+	$vid_file = base64_encode($item['filename']);
+	$vid_title = basename($item['filename'], '.mp4');
+	$vid_player = TRUE;
+}
 ?>
 
-<?php if (isset($_REQUEST['filename'])): ?>
-	<?php $vid_file = $_REQUEST['filename']; ?>
+<?php if ($vid_player): ?>
 	<div class="player">
 		<video autoplay controls width="640">
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		</video>
+		<span class="label">
+			<?php print $vid_title; ?>
+		</span>
 	</div>
 
 <?php endif; ?>
@@ -43,12 +54,12 @@ else {
 
 	<h2><?php print $collections[$machine_name]['name']; ?></h2>
 
-	<?php foreach ($collections[$machine_name]['items'] as $item): ?>
+	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
 			$vid_param = base64_encode($item['filename']);
-			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename. '.jpg';
-			$vid_link = 'index.php?collection=' . $machine_name . '&filename=' . $vid_param;
+			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename . '.jpg';
+			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
 		?>
 
 		<div class="thumbnail">
@@ -56,7 +67,7 @@ else {
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">
-			<?php print $basename ?>
+			<?php print $basename; ?>
 		</a>
 		<span class="label label-bottom">
 			<?php print human_filesize($item['size']); ?>

@@ -1,3 +1,7 @@
+body {
+	background: #555555;
+}
+
 .thumbnail {
 	position: relative;
 	float: left;
@@ -5,14 +9,15 @@
 	height: 180px;
 	overflow: hidden;
 	margin: 10px;
-	border: 1px solid lightgray;
+	border: 2px solid white;
+	background: black;
 }
 
 .thumbnail .label {
 	position: absolute;
 	margin: 10px;
 	color: white;
-	text-shadow: 2px 2px 2px black;
+	text-shadow: 2px 1px 1px black;
 	text-decoration: none;
 }
 
@@ -35,20 +40,57 @@
 .player video {
 	display: inherit;
 	margin: 0 auto;
+	padding: 10px;
+	margin-top: -10px;
+	background: black;
+}
+
+.player .label {
+	color: white;
+	float: left;
+	text-align: center;
+	width: 100%;
+	padding: 10px 0 20px 0;
 }
 
 .header, .footer {
 	float: left;
 	width: 100%;
-	background: lightgray;
+	background: #555555;
 	text-align: center;
 }
 
 .header h1 a {
-	color: black;
+	color: white;
+	text-shadow: 3px 0px 2px black;
 }
 
 h2 {
 	float: left;
 	width: 100%;
+	color: white;
+	text-shadow: 2px 2px 2px black;
 }
+
+h6 a {
+	color: white;
+	text-shadow: 2px 0px 2px black;
+	padding: 10px;
+}
+
+form {
+	float: left;
+	width: 100%;
+	text-align: center;
+	background: lightyellow;
+	padding: 36px 0px 36px;
+}
+
+pre {
+	overflow-x: scroll;
+	background: white;
+	padding: 20px;
+	margin: 20px;
+	border: 1px solid black;
+}
+
