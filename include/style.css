@@ -53,6 +53,11 @@ body {
 	padding: 10px 0 20px 0;
 }
 
+.listing-box {
+	margin: 0 auto;
+	width: 75%;
+}
+
 .header, .footer {
 	float: left;
 	width: 100%;
@@ -67,15 +72,26 @@ body {
 
 h2 {
 	float: left;
-	width: 100%;
 	color: white;
-	text-shadow: 2px 2px 2px black;
+	text-shadow: -2px 0px 2px black;
+	padding-left: 20px;
+}
+
+h4 {
+	float: right;
+	color: white;
+	text-shadow: 2px 0px 2px black;
+	padding-right: 20px;
 }
 
 h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
+}
+
+ul {
+	float: left;
 }
 
 form {

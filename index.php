@@ -22,6 +22,10 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	$vid_file = base64_encode($item['filename']);
 	$vid_title = basename($item['filename'], '.mp4');
 	$vid_player = TRUE;
+
+	$autoplay = isset($_REQUEST['autoplay']) ? true : false;
+	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
+
 }
 ?>
 
@@ -53,7 +57,26 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 <?php else: ?>
 
 	<h2><?php print $collections[$machine_name]['name']; ?></h2>
+	<?php if ($vid_player): ?>
+		<h4>
+			<label for="vid_autoplay">Autoplay</label>
+			<input type="checkbox" name="vid_autoplay"
+			<?php if ($autoplay): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+		<h4>
+			<label for="vid_shuffle">Shuffle</label>
+			<input type="checkbox" name="vid_shuffle"
+			<?php if ($shuffle): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+	<?php endif; ?>
 
+	<div class="listing-box">
 	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
@@ -75,6 +98,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		</div>
 
 	<?php endforeach; ?>
+	</div>
 
 <?php endif; ?>
 
