@@ -56,6 +56,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 
 <?php else: ?>
 
+	<div class="subnav">
 	<h2><?php print $collections[$machine_name]['name']; ?></h2>
 	<?php if ($vid_player): ?>
 		<h4>
@@ -74,9 +75,11 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 			<?php endif; ?>
 			/>
 		</h4>
+	</div>
 	<?php endif; ?>
 
 	<div class="listing-box">
+	<div class="listing">
 	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
@@ -98,6 +101,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		</div>
 
 	<?php endforeach; ?>
+	</div>
 	</div>
 
 <?php endif; ?>

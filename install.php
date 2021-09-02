@@ -1,6 +1,6 @@
 <?php require_once 'include/header.php'; ?>
 
-<form action="install.php" method="post">
+<form class="install" action="install.php" method="post">
 
 <?php if (isset($_REQUEST['count'])):
 

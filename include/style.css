@@ -54,6 +54,12 @@ body {
 }
 
 .listing-box {
+	position: relative;
+	width: 100%;
+}
+
+.listing {
+	position: relative;
 	margin: 0 auto;
 	width: 75%;
 }
@@ -62,12 +68,33 @@ body {
 	float: left;
 	width: 100%;
 	background: #555555;
-	text-align: center;
+	text-align: left;
+}
+
+.header h1 {
+	margin: 0px 0px 10px 10px;
 }
 
 .header h1 a {
 	color: white;
 	text-shadow: 3px 0px 2px black;
+}
+
+form.search {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 10px 10px 0px 0px;
+	width:30%;
+	text-align: right;
+}
+
+form.search input[type=text] {
+	font-size: 1.25em;
+	font-family: "Times New Roman", Serif;
+	height: 36px;
+	border: 0 none;
+	padding: 0px 0px 0px 10px;
 }
 
 h2 {
@@ -84,6 +111,11 @@ h4 {
 	padding-right: 20px;
 }
 
+.subnav {
+	float: left;
+	width: 100%;
+}
+
 h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
@@ -94,7 +126,7 @@ ul {
 	float: left;
 }
 
-form {
+form.install {
 	float: left;
 	width: 100%;
 	text-align: center;
@@ -109,4 +141,3 @@ pre {
 	margin: 20px;
 	border: 1px solid black;
 }
-
