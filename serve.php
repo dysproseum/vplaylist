@@ -1,25 +1,43 @@
 <?php
 
-//define('IMAGEPATH', '/music/MusicVideosTest/mp4');
-
 if (isset($_REQUEST['filename'])) {
-  $filename = base64_decode($_REQUEST['filename']);
+  $filename = $_REQUEST['filename'];
+  $filepath = base64_decode($filename);
 }
 else {
   exit;
 }
 
-//$file = IMAGEPATH . '/' . $filename;
-$file = $filename;
-//echo "FILE: " . $file;
-$size = filesize($file);
-//echo "\nSIZE: " . $size;
-$fp = fopen($file, "rb");
+$file = basename($filepath);
+$size = filesize($filepath);
 
-header('Content-disposition: attachment;');\
-header('Content-type: video/mp4');
-header("Content-length: $size");
-fpassthru($fp);
+// Create M3U wrapper for mobile playback.
+if (!isset($_REQUEST['file'])) {
+	$op = '';
+	$op .= "#EXTM3U\n";
+	$op .= "#EXTINF:292,$file\n";
+	$op .= "https://dysproseum.com/vplaylist/serve.php?filename=$filename&file=.mp4";
 
-exit;
+	header('Connection: Keep-Alive');
+	header('Content-Disposition: inline; filename=vplaylist.m3u');
+	header('Content-Type: audio/x-mpegurl');
+	header('Content-Length: ' . (string) sizeof($op));
 
+	print $op;
+	exit;
+}
+
+$fp = fopen($filepath, "rb");
+if ($fp) {
+	header('Content-Disposition: attachment');
+	header('Content-Type: video/mp4');
+	header('Content-Transfer-Encoding: binary');
+	header("Content-Length: $size");
+
+	while (!feof($fp)) {
+		$buffer = fread($fp, 32 * 1024);
+		print $buffer;
+	}
+	fclose($fp);
+	exit;
+}

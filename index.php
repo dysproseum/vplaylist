@@ -32,7 +32,11 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 <?php if ($vid_player): ?>
 	<div class="player">
 		<video autoplay controls width="640">
+		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
+		<?php else: ?>
+			<source src="serve.php?filename=<?php print $vid_file; ?>&file=.mp4" type="video/mp4" />
+		<?php endif; ?>
 		</video>
 		<span class="label">
 			<?php print $vid_title; ?>
