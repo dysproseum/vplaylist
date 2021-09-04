@@ -27,13 +27,13 @@ foreach ($machine_names as $name) {
 
 	foreach ($collections[$name]['items'] as $item) {
 
-		$input = '/mnt/' . $item['filename'];
+		$input = '/mnt' . $item['filename'];
 		$output = $out_dir . '/' .  basename($input, '.mp4') . '.jpg';
 
-		$ffmpeg.= ' -ss 00:00:01.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
+		$cmd = $ffmpeg . ' -ss 00:00:01.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
 
-		print("\n" .$ffmpeg);
-		exec($ffmpeg);
+		print("\n" .$cmd);
+		exec($cmd);
 	}
 }
 #ffmpeg -loglevel error -ss 00:00:01.00 -i "$line" -vf 'scale=320:320:force_original_aspect_ratio=decrease' -vframes 1 "$OUT_DIR/`basename "$line"`.jpg"
