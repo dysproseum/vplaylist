@@ -52,9 +52,18 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	<div class="listing-box">
 	<div class="listing">
 	<?php foreach ($collections as $collection => $values): ?>
+		<?php
+			$total = sizeof($values['items']);
+			$index = rand(0, $total - 1);
+			$thumbnail = basename($collections[$collection]['items'][$index]['filename'], '.mp4') . '.jpg';
+		?>
+
 		<div class="thumbnail">
+		<a href="index.php?collection=<?php print $collection; ?>">
+		<img src="<?php print THUMBS_PATH . $collection . '/' . $thumbnail; ?>" width="320" />
+		</a>
 		<a class="label label-top" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
-		<span class="label label-bottom"><?php print sizeof($values['items']); ?> videos</span>
+		<span class="label label-bottom"><?php print $total; ?> videos</span>
 		</div>
 	<?php endforeach; ?>
 	</div>
