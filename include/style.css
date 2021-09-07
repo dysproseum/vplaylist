@@ -61,7 +61,7 @@ body {
 .listing {
 	position: relative;
 	margin: 0 auto;
-	width: 75%;
+	width: 80%;
 }
 
 .header, .footer {
@@ -116,14 +116,14 @@ h4 {
 	width: 100%;
 }
 
+.subnav a {
+	color: white;
+}
+
 h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
-}
-
-ul {
-	float: left;
 }
 
 form.install {
@@ -140,4 +140,5 @@ pre {
 	padding: 20px;
 	margin: 20px;
 	border: 1px solid black;
+	text-align: left;
 }

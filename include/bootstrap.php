@@ -25,3 +25,13 @@ function human_filesize($bytes, $dec = 2) {
 function is_mobile() {
 	return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|boost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
 }
+
+function analytics() {
+	$script = dirname(__FILE__) . '/analytics.php';
+	if (file_exists($script)) {
+		include($script);
+	}
+	else {
+		return false;
+	}
+}

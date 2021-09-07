@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="include/style.css">
 <script src="include/player.js"></script>
 <title>vplaylist</title>
+<?php print analytics(); ?>
 </head>
 
 <body>

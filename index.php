@@ -46,22 +46,24 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 <?php endif; ?>
 
 <?php if ($machine_name == ''): ?>
-	<h2>Collections</h2>
-	<ul>
+	<div class="subnav">
+		<h2>Collections</h2>
+	</div>
+	<div class="listing-box">
+	<div class="listing">
 	<?php foreach ($collections as $collection => $values): ?>
-		<li>
-		<a href="index.php?collection=<?php print $collection; ?>">
-			<?php print $values['name']; ?>
-		</a>
-		<?php print sizeof($values['items']); ?>
-		</li>
+		<div class="thumbnail">
+		<a class="label label-top" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
+		<span class="label label-bottom"><?php print sizeof($values['items']); ?> videos</span>
+		</div>
 	<?php endforeach; ?>
-	</ul>
+	</div>
+	</div>
 
 <?php else: ?>
 
 	<div class="subnav">
-	<h2><?php print $collections[$machine_name]['name']; ?></h2>
+	<h2><a href="index.php">Home</a> | <?php print $collections[$machine_name]['name']; ?></h2>
 	<?php if ($vid_player): ?>
 		<h4>
 			<label for="vid_autoplay">Autoplay</label>
@@ -79,8 +81,12 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 			<?php endif; ?>
 			/>
 		</h4>
-	</div>
+	<?php else: ?>
+		<h4>
+			<a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a>
+		</h4>
 	<?php endif; ?>
+	</div>
 
 	<div class="listing-box">
 	<div class="listing">

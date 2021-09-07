@@ -1,3 +1,4 @@
+<?php require_once 'include/bootstrap.php'; ?>
 <?php require_once 'include/header.php'; ?>
 
 <form class="install" action="install.php" method="post">
@@ -26,7 +27,7 @@
 				'thumbnail' => FALSE,
 			);
 		}
-		$json = json_encode($collection);
+		$json = json_encode($collection, JSON_PRETTY_PRINT);
 
 		// @todo write out collection.json to config path
 		$fp = fopen(CONFIG_PATH . $machine_name . '.json', 'w');
@@ -67,5 +68,10 @@
 
 <input type="submit" value="Continue" />
 </form>
+
+<script>
+// https://keestalkstech.com/2014/04/click-to-select-all-on-the-pre-element/
+!function(){let e=document;e.addEventListener("dblclick",t=>{let n=function(e,t){if(!(t=t&&t.toUpperCase())||!e)return null;do{if(e.nodeName===t)return e}while(e=e.parentNode);return null}(t.target,"PRE");if(n){let t=new Range;t.setStart(n,0),t.setEnd(n,1),e.getSelection().removeAllRanges(),e.getSelection().addRange(t)}})}();
+</script>
 
 <?php require_once 'include/footer.php'; ?>

@@ -2,14 +2,14 @@
 
 require_once 'include/bootstrap.php';
 
-$ffmpeg = 'ffmpeg';
 
 $machine_names[] = array();
 if (isset($argv[1])) {
 	$machine_names[] = $argv[1];
+	$ffmpeg = 'ffmpeg -n';
 }
 else if (isset($argv[1]) && $argv[1] == '--all') {
-	$ffmpeg .= ' -y ';
+	$ffmpeg .= ' -y';
 	foreach ($collections as $name => $items) {
 		$machine_names[] = $name;
 	}
