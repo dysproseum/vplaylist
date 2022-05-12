@@ -1,0 +1,39 @@
+vplaylist is an HTML5 video player for desktop and mobile
+
+for personal use
+
+- Demo link?
+- Screenshots?
+
+Server Setup
+- Docker
+- PHP/Apache
+- No database required
+- Share media volume outside docroot
+
+Generate/update collections
+- Web Interface
+- Command line
+
+Generate/update thumbnails
+- Command line
+
+
+Collections?
+
+1. Listing.txt?
+	a. Need path, and run find 
+2. Thumbnails?
+	a. Generate thumbnails
+3. Settings json?
+	a. Generate settings json
+		- create index number
+		- path to video
+		- file size
+		- length
+		- path to thumbnail
+4. Listing screen
+	a. with search functionality
+5. Playing screen
+
+
