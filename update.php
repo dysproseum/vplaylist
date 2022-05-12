@@ -8,14 +8,13 @@ if (isset($argv[1])) {
 }
 
 $machine_names = array();
-if (isset($argv[2])) {
-	$machine_names[] = $argv[2];
-}
-else if (isset($argv[2]) && $argv[2] == '--all') {
-	$ffmpeg .= ' -y ';
+if (isset($argv[2]) && $argv[2] == '--all') {
 	foreach ($collections as $name => $items) {
 		$machine_names[] = $name;
 	}
+}
+else if (isset($argv[2])) {
+	$machine_names[] = $argv[2];
 }
 else {
 	print "Usage: php update.php [diff|gen] [collection_id]\n\n";
@@ -23,7 +22,7 @@ else {
 	exit;
 }
 
-foreach ($machine_names as $index => $name) {
+foreach ($machine_names as $name) {
 
 	if ($action !== 'gen') {
 		print "Collection: $name";
@@ -32,11 +31,11 @@ foreach ($machine_names as $index => $name) {
 	// read directory and compare with json file.
 	$collection_path = '';
 	foreach ($collections[$name]['items'] as $item) {
-	$collection_path = dirname($item['filename']);
+		$collection_path = dirname($item['filename']);
 	}
 	$dir = '/mnt' . $collection_path;
-	//$files = scandir($dir);
-	$files = glob($dir.'/*.mp4');
+        if (DEBUG) print "\nCollection path: $collection_path\n";
+	$files = glob($dir.'/*.m*');
 	$files_copy = $files;
 
 	foreach ($files as $index => $file) {
@@ -58,10 +57,19 @@ foreach ($machine_names as $index => $name) {
 	// Added files:
 	// Leftover unmatched files to collection array.
 	foreach ($files as $index => $filename) {
+		// reuse logic from install.php
+		$filename = $collection_path . '/' . basename($filename);
+		$filename = $dir . '/' . basename($filename);
+		//$filesize = sprintf("%u", filesize($dir . '/' . basename($filename)));
+		$filesize = exec('stat -c %s "' . $filename . '"');
+		//if ((int) $filesize < 0) {
+		//	$filesize = exec("stat -c %s " . $filename);
+			//$filesize = sprintf("%u", $filesize + PHP_INT_MAX + PHP_INT_MAX + 2);
+		//}
+
 		$collections[$name]['items'][] = array(
-			// reuse logic from install.php
 			'filename' => $collection_path . '/' . basename($filename),
-			'size' => filesize($dir . '/' . basename($filename)),
+			'size' => $filesize,
 			'length' => FALSE,
 			'thumbnail' => FALSE,
 		);
@@ -110,6 +118,7 @@ foreach ($machine_names as $index => $name) {
 
 	if ($action == "gen") {
 		// Output updated json file for this collection.
+		$collections[$name]['items'] = array_reverse($collections[$name]['items']);
 		$out = array($name => $collections[$name]);
 		$json = json_encode($out, JSON_PRETTY_PRINT);
 		print $json . "\n";
