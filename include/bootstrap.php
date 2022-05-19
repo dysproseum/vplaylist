@@ -15,6 +15,17 @@ foreach(glob(CONFIG_PATH.'*.json') as $filename) {
 	}
 }
 
+function vlog($message, $override_action = '') {
+
+  global $action;
+  if (!isset($action)) {
+    $action = $override_action;
+  }
+  if ($action != 'gen') {
+    print $message;
+  }
+}
+
 function human_filesize($bytes, $dec = 2) {
     $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
     $factor = floor((strlen($bytes) - 1) / 3);

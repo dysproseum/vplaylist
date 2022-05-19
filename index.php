@@ -1,7 +1,6 @@
 <?php
 
 require_once 'include/bootstrap.php';
-require_once 'include/header.php';
 
 if (!isset($collections)) {
 	header('Location: install.php');
@@ -15,6 +14,7 @@ else {
 	$machine_name = '';
 }
 
+global $vid_player;
 $vid_player = FALSE;
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
@@ -27,11 +27,14 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
 
 }
+
+// Add'l body classes are set depending on vid_player.
+require_once 'include/header.php';
 ?>
 
 <?php if ($vid_player): ?>
 	<div class="player">
-		<video autoplay controls width="640">
+		<video autoplay controls width="640" id="background-video">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
