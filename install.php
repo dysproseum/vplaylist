@@ -19,7 +19,7 @@
 		$collection[$machine_name]['name'] = $name;
 		$collection[$machine_name]['items'] = array();
 
-		foreach(glob($path.'*') as $filename){
+		foreach(glob($path.'*.m*') as $filename){
 			$collection[$machine_name]['items'][] = array(
 				'filename' => $filename,
 				'size' => filesize($filename),
@@ -47,7 +47,7 @@
 
 	$path = trim($_REQUEST['path']);
 	$count = 0;
-	foreach(glob($path.'*') as $filename){
+	foreach(glob($path.'*.m*') as $filename){
 		$count++;
 	}
 ?>

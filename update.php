@@ -1,126 +1,145 @@
 <?php
 
-require_once 'include/bootstrap.php';
+// See also bootstrap.php:vlog().
 define('DEBUG', false);
 
+require_once 'include/bootstrap.php';
+global $collections;
+
 if (isset($argv[1])) {
-	$action = $argv[1];
+  $action = $argv[1];
 }
+global $action;
 
 $machine_names = array();
 if (isset($argv[2]) && $argv[2] == '--all') {
-	foreach ($collections as $name => $items) {
-		$machine_names[] = $name;
-	}
+  foreach ($collections as $name => $items) {
+    $machine_names[] = $name;
+  }
 }
 else if (isset($argv[2])) {
-	$machine_names[] = $argv[2];
+  $machine_names[] = $argv[2];
 }
 else {
-	print "Usage: php update.php [diff|gen] [collection_id]\n\n";
-	print "  gen --all	Update all collections.\n";
-	exit;
+  print "Usage: php update.php [diff|gen] [collection_id]\n\n";
+  print "  gen --all  Update all collections.\n";
+  exit;
 }
 
 foreach ($machine_names as $name) {
 
-	if ($action !== 'gen') {
-		print "Collection: $name";
-	}
 
-	// read directory and compare with json file.
-	$collection_path = '';
-	foreach ($collections[$name]['items'] as $item) {
-		$collection_path = dirname($item['filename']);
-	}
-	$dir = '/mnt' . $collection_path;
-        if (DEBUG) print "\nCollection path: $collection_path\n";
-	$files = glob($dir.'/*.m*');
-	$files_copy = $files;
+  // Grab the directory from filename path.
+  $collection_path = '';
+  foreach ($collections[$name]['items'] as $item) {
+    $collection_path = dirname($item['filename']);
+  }
 
-	foreach ($files as $index => $file) {
+  vlog("Collection: $name\n");
+  vlog("Collection path (app): $collection_path\n");
+  $dir = '/mnt' . $collection_path;
+  vlog("Directory to list (host): $dir\n");
+  $imm_files = glob($dir.'/*.m*');
+  vlog("Found files:    " . sizeof($imm_files) . "\n");
+  vlog("Existing items: " . sizeof($collections[$name]['items']) . "\n");
+  $mod_files = $imm_files;
 
-		if (DEBUG) {
-			print "\n$index. $file ";
-		}
+  // Find new files by removing existing items from the array.
+  foreach ($mod_files as $index => $file) {
+    if (DEBUG) vlog("\n $index. $file ");
 
-		foreach ($collections[$name]['items'] as $item) {
-			if (basename($item['filename']) == basename($file)) {
-				if (DEBUG) {
-					print " MATCH ";
-				}
-				unset($files[$index]);
-			}
-		}
-	}
+    foreach ($collections[$name]['items'] as $item) {
+      if (basename($item['filename']) == basename($file)) {
+        if (DEBUG) vlog("\n MATCH");
 
-	// Added files:
-	// Leftover unmatched files to collection array.
-	foreach ($files as $index => $filename) {
-		// reuse logic from install.php
-		$filename = $collection_path . '/' . basename($filename);
-		$filename = $dir . '/' . basename($filename);
-		//$filesize = sprintf("%u", filesize($dir . '/' . basename($filename)));
-		$filesize = exec('stat -c %s "' . $filename . '"');
-		//if ((int) $filesize < 0) {
-		//	$filesize = exec("stat -c %s " . $filename);
-			//$filesize = sprintf("%u", $filesize + PHP_INT_MAX + PHP_INT_MAX + 2);
-		//}
+        unset($mod_files[$index]);
+      }
+    }
+  }
+  vlog("Leftover files: " . sizeof($mod_files));
 
-		$collections[$name]['items'][] = array(
-			'filename' => $collection_path . '/' . basename($filename),
-			'size' => $filesize,
-			'length' => FALSE,
-			'thumbnail' => FALSE,
-		);
-	}
+  // Leftover unmatched files are added to the collection array.
+  foreach ($mod_files as $index => $filename) {
+    // reuse logic from install.php
+    $filename = $collection_path . '/' . basename($filename);
+    $filename = $dir . '/' . basename($filename);
+    //$filesize = sprintf("%u", filesize($dir . '/' . basename($filename)));
+    $filesize = exec('stat -c %s "' . $filename . '"');
+    //if ((int) $filesize < 0) {
+    //  $filesize = exec("stat -c %s " . $filename);
+      //$filesize = sprintf("%u", $filesize + PHP_INT_MAX + PHP_INT_MAX + 2);
+    //}
 
-	// Deleted files:
-	// Loop again through collections and compare to file list.
-	$items = $collections[$name]['items'];
-	foreach ($items as $index => $item) {
-		if (DEBUG) {
-			print $index . '. ' . basename($item['filename']);
-		}
-		foreach ($files_copy as $filename) {
-			if (basename($filename) == basename($item['filename'])) {
-				unset($items[$index]);
-			}
-		}
-	}
-	// Remove old files from collection.
-	foreach ($collections[$name]['items'] as $index => $collection_item) {
-		foreach ($items as $item) {
-			if ($item['filename'] == $collection_item['filename']) {
-				unset($collections[$name]['items'][$index]);
-			}
-		}
-	}
+    $build = array(
+      'filename' => $collection_path . '/' . basename($filename),
+      'size' => $filesize,
+      'length' => FALSE,
+      'thumbnail' => FALSE,
+    );
+    $collections[$name]['items'][] = $build;
+  }
 
-	if ($action == "diff") {
-		print "\nOld files: " . sizeof($items);
-		if (sizeof($items) > 0) {
-			foreach ($items as $item) {
-				print "\n  " . $item['filename'];
-			}
-		}
+  // Show any deleted files by 
+  // Loop again through collections and compare to file list.
+  $mod_items = $collections[$name]['items'];
+  if (DEBUG) vlog("\n\nDeleted files:");
 
-		print "\nNew files: " . sizeof($files);
-		if (sizeof($files) > 0) {
-			// @todo leftover files may need to be converted.
+  foreach ($mod_items as $index => $item) {
+    if (DEBUG) vlog("\n $index. " . basename($item['filename']));
 
-			foreach ($files as $file) {
-				print "\n  $file";
-			}
-		}
-		print "\n";
-	}
+    // If filename from directory matches one in the json, skip it.
+    // We only want to show items whose files may have been deleted.
+    foreach ($imm_files as $filename) {
+      if (basename($filename) == basename($item['filename'])) {
+        unset($mod_items[$index]);
+      }
+    }
+  }
+  vlog("\nOld/deleted files: " . sizeof($mod_items) . "\n");
 
-	if ($action == "gen") {
-		// Output updated json file for this collection.
-		$collections[$name]['items'] = array_reverse($collections[$name]['items']);
-		$out = array($name => $collections[$name]);
-		$json = json_encode($out, JSON_PRETTY_PRINT);
-		print $json . "\n";
-	}
+  // Old/deleted files are removed from the collection array.
+  foreach ($collections[$name]['items'] as $index => $collection_item) {
+    foreach ($mod_items as $item) {
+      if ($item['filename'] == $collection_item['filename']) {
+        unset($collections[$name]['items'][$index]);
+      }
+    }
+  }
+
+//  if ($action == "diff") {
+
+  // If no modifications, continue to next collection, if any.
+  if ($mod_items) {
+    vlog("\nTotal Old files: " . sizeof($mod_items));
+    if (sizeof($mod_items) > 0) {
+      foreach ($mod_items as $item) {
+        vlog("\n  " . $item['filename']);
+      }
+    }
+    vlog("\n");
+  }
+
+  if ($mod_files) {
+    vlog("\nNew files: " . sizeof($mod_files));
+    if (sizeof($mod_files) > 0) {
+      foreach ($mod_files as $file) {
+        vlog("\n  $file");
+      }
+    }
+    vlog("\n");
+  }
+  vlog("\n");
 }
+
+//  } // action == diff
+  
+  // @todo Convert new files to web mp4 format.
+
+  if ($action == "gen") {
+    // Output updated json file for this collection.
+    $collections[$name]['items'] = array_reverse($collections[$name]['items']);
+    $out = array($name => $collections[$name]);
+    $json = json_encode($out, JSON_PRETTY_PRINT);
+    print $json . "\n";
+    exit;
+  }

@@ -2,6 +2,11 @@ body {
 	background: #555555;
 }
 
+body.behind-video {
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
 .thumbnail {
 	position: relative;
 	float: left;
@@ -43,6 +48,18 @@ body {
 	padding: 10px;
 	margin-top: -10px;
 	background: black;
+}
+
+#background-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
 }
 
 .player .label {

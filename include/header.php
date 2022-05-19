@@ -1,12 +1,16 @@
 <html>
 <head>
-<link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="include/style.css?2">
 <script src="include/player.js"></script>
 <title>vplaylist</title>
 <?php print analytics(); ?>
 </head>
 
+<?php if ($vid_player): ?>
+<body class="behind-video">
+<?php else: ?>
 <body>
+<?php endif; ?>
 <div class="header">
 	<h1><a href="index.php">vplaylist</a></h1>
 
