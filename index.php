@@ -16,6 +16,7 @@ else {
 
 global $vid_player;
 $vid_player = FALSE;
+
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
 	$item = $collections[$machine_name]['items'][$index];
@@ -25,6 +26,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 
 	$autoplay = isset($_REQUEST['autoplay']) ? true : false;
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
+	$repeat = isset($_REQUEST['repeat']) ? true : false;
 
 }
 
@@ -89,6 +91,14 @@ require_once 'include/header.php';
 			<label for="vid_shuffle">Shuffle</label>
 			<input type="checkbox" name="vid_shuffle"
 			<?php if ($shuffle): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+		<h4>
+			<label for="vid_repeat">Repeat</label>
+			<input type="checkbox" name="vid_repeat"
+			<?php if ($repeat): ?>
 				checked="checked"
 			<?php endif; ?>
 			/>
