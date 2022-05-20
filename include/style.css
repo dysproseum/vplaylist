@@ -159,3 +159,33 @@ pre {
 	border: 1px solid black;
 	text-align: left;
 }
+
+form.video-editor, form.video-editor label, form.video-editor input {
+  display: block;
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+}
+
+form.video-editor, form.video-editor label {
+  background: black;
+  color: white;
+}
+
+form.video-editor input[type=submit] {
+  cursor: pointer;
+  font-size: 18px;
+  background: mediumpurple;
+  color: white;
+  font-size: 18px;
+  text-shadow: -2px 0 2px #000;
+}
+
+form.video-editor input {
+  padding: 20px;
+  border: 2px solid black;
+}
+
+form.video-editor {
+  padding: 20px;
+}

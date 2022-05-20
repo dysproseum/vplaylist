@@ -22,9 +22,13 @@ listener = function () {
 		index = Math.floor(Math.random() * index);
 		urlParams.set('shuffle', 1);
 	}
+	var repeat = document.querySelector('input[name=vid_repeat]');
+	if (repeat.checked == true) {
+		urlParams.set('repeat', 1);
+	}
 
 	urlParams.set('index', index);
-	urlParams.set('autoplay', 1);
+	//urlParams.set('autoplay', 1);
 	window.location.search = urlParams.toString();
 };
 
