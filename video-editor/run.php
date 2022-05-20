@@ -18,7 +18,7 @@ $rsync_target = 'pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/'
 
 // Check for job in progress.
 if (file_exists("$p.inprogress")) {
-  print "\nJob still in progress, waiting...";
+  print "\nJob still in progress, waiting to process new requests...";
   exit;
 }
 
@@ -35,20 +35,31 @@ if ($handle) {
 } else {
     error_log("Error opening $p");
     exit;
-} 
+}
 
-print "Found " . sizeof($urls) . " videos in queue\nn";
+$plural_maybe = "no requests";
+$cnt = sizeof($urls);
+if ($cnt == 0) {
+  print "\nQueue contained empty line";
+}
+else if ($cnt == 1) {
+  $plural_maybe = "There is 1 request";
+}
+else {
+  $plural_maybe = "There are $cnt requests";
+}
+print "\n$plural_maybe in the queue.";
+
 foreach ($urls as $index => $url) {
-  echo "\nVideo $index: $url";
+  echo "\nRequest " . ($index + 1) . " of $cnt: ";
+  echo $url;
 
   // Download.
   print "Downloading...";
   chdir("/mnt/uploads/video-editor");
-  $cmd = "yt-dlp --recode-video mp4 -q -v --no-warnings $url";
+  $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
   exec($cmd);
-  //$cmd = "yt-dlp --recode-video mp4 -v $url";
-  //system($cmd);
-  print "done.\n";
+  print "done.";
 }
 
 // Copy.
@@ -58,24 +69,22 @@ shell_exec("$cmd");
 print "done.";
 
 // Refresh.
-print "\nRefreshing file maps...\n";
+print "\nRefreshing metadata...";
 chdir($htmlpath);
 exec("php update.php diff video_editor");
 exec("php update.php gen video_editor > video_editor.json");
 exec("diff video_editor.json collections/video_editor.json");
 exec("cp video_editor.json collections/");
-print "\ndone.";
+print "done.";
 
 // Generate.
 print "\nGenerating thumbnails...";
 chdir($htmlpath);
 exec("php generate.php video_editor");
-print "done.\n\n";
+print "complete.\n";
 
 // @todo Delete links.txt if successful :-/
 unlink("$p.inprogress");
-
-print "\n\n=== Run completed ===\n\n";
 
 // @todo Email notifications
 
