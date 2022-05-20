@@ -79,6 +79,8 @@ require_once 'include/header.php';
 	<div class="subnav">
 	<h2><a href="index.php">Home</a> | <?php print $collections[$machine_name]['name']; ?></h2>
 	<?php if ($vid_player): ?>
+		<input type="hidden" name="vid_count" value="<?php print sizeof($collections[$machine_name]['items']); ?>" />
+
 		<h4>
 			<label for="vid_autoplay">Autoplay</label>
 			<input type="checkbox" name="vid_autoplay"
