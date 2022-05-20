@@ -18,7 +18,7 @@ $rsync_target = 'pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/'
 
 // Check for job in progress.
 if (file_exists("$p.inprogress")) {
-  print "Job already in progress. Exiting."
+  print "\nJob still in progress, waiting...";
   exit;
 }
 
@@ -44,10 +44,10 @@ foreach ($urls as $index => $url) {
   // Download.
   print "Downloading...";
   chdir("/mnt/uploads/video-editor");
-  //$cmd = "yt-dlp --recode-video mp4 -q -v --no-warnings $url";
-  //exec($cmd);
-  $cmd = "yt-dlp --recode-video mp4 -v $url";
-  system($cmd);
+  $cmd = "yt-dlp --recode-video mp4 -q -v --no-warnings $url";
+  exec($cmd);
+  //$cmd = "yt-dlp --recode-video mp4 -v $url";
+  //system($cmd);
   print "done.\n";
 }
 
@@ -58,13 +58,13 @@ shell_exec("$cmd");
 print "done.";
 
 // Refresh.
-print "\nRefreshing file maps...";
+print "\nRefreshing file maps...\n";
 chdir($htmlpath);
-system("php update.php diff video_editor");
+exec("php update.php diff video_editor");
 exec("php update.php gen video_editor > video_editor.json");
 exec("diff video_editor.json collections/video_editor.json");
 exec("cp video_editor.json collections/");
-print "done.";
+print "\ndone.";
 
 // Generate.
 print "\nGenerating thumbnails...";
