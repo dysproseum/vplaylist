@@ -18,8 +18,9 @@ Generate/update collections
 Generate/update thumbnails
 - Command line
 
-
-Collections?
+Upload/cron service
+# m h  dom mon dow   command
+*/5 *  *   *   *     /usr/bin/php /path/to/vplaylist/video-editor/run.php >> /var/log/vplaylist-cron.txt
 
 1. Listing.txt?
 	a. Need path, and run find 

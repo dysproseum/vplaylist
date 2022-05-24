@@ -1,17 +1,20 @@
 <html>
 <head>
-<link rel="stylesheet" href="include/style.css?2">
+<link rel="stylesheet" href="include/style.css">
 <script src="include/player.js"></script>
 <title>vplaylist</title>
 <?php print analytics(); ?>
 </head>
 
-<?php if ($vid_player): ?>
-<body class="behind-video">
+<?php if ($controls == ''): ?>
+  <body class="nocontrols">
+<?php elseif ($vid_player): ?>
+  <body class="behind-video">
 <?php else: ?>
-<body>
+  <body>
 <?php endif; ?>
-<div class="header">
+
+  <div class="header">
 	<h1><a href="index.php">vplaylist</a></h1>
 
 	<form class="search" action="search.php" method="get">

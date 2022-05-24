@@ -4,7 +4,11 @@ body {
 
 body.behind-video {
 	overflow-x: hidden;
-	overflow-y: hidden;
+	overflow-y: auto;
+}
+
+body.nocontrols {
+	overflow: hidden;
 }
 
 .thumbnail {
@@ -54,7 +58,7 @@ body.behind-video {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   top: 0;

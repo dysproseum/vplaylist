@@ -16,6 +16,8 @@ else {
 
 global $vid_player;
 $vid_player = FALSE;
+global $controls;
+$controls = 'controls';
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
@@ -25,8 +27,12 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	$vid_player = TRUE;
 
 	$autoplay = isset($_REQUEST['autoplay']) ? true : false;
+	if (isset($_REQUEST['controls'])) {
+		$controls = '';
+	}
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
 	$repeat = isset($_REQUEST['repeat']) ? true : false;
+	$muted = isset($_REQUEST['muted']) ? 'muted' : '';
 
 }
 
@@ -36,7 +42,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-		<video autoplay controls width="640" id="background-video">
+	<video autoplay <?php print $controls; ?> <?php print $muted; ?> width="640" id="background-video"  >
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
@@ -101,6 +107,14 @@ require_once 'include/header.php';
 			<label for="vid_repeat">Repeat</label>
 			<input type="checkbox" name="vid_repeat"
 			<?php if ($repeat): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+		<h4>
+			<label for="vid_muted">Muted</label>
+			<input type="checkbox" name="vid_muted"
+			<?php if ($muted !== ''): ?>
 				checked="checked"
 			<?php endif; ?>
 			/>

@@ -18,7 +18,7 @@ listener = function () {
 	}
 	else {
 	        var count = document.querySelector('input[name=vid_count]');
-		mod_index = Math.floor(Math.random() * count);
+		mod_index = Math.floor(Math.random() * count.value);
 		urlParams.set('shuffle', 1);
 	}
 	var repeat = document.querySelector('input[name=vid_repeat]');

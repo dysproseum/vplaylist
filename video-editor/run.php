@@ -12,13 +12,16 @@ else {
 }
 */
 
+// Define in bootstrap file?
 $p = "/mnt/uploads/video-editor/links.txt";
+// We know this should be the parent directory.
 $htmlpath = "/home/david/docker/php-apache/php/www/pi3omv5-apache-php/html/dysproseum.com/vplaylist";
+// Rsync optional, ex. files stored on a NAS.
 $rsync_target = 'pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/';
 
 // Check for job in progress.
 if (file_exists("$p.inprogress")) {
-  print "\nJob still in progress, waiting to process new requests...";
+  error_log("\nJob still in progress, waiting to process new requests...");
   exit;
 }
 
