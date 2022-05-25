@@ -67,40 +67,40 @@ foreach ($urls as $index => $url) {
   $cmd = "yt-dlp -q --no-warnings $url";
   exec($cmd);
   print "done.";
+
+  // @todo after each file to minimize overall delay
+  print "\nTransferring to media processor...";
+  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ david@192.168.1.44:/mnt/data/tmp/video-editor/";
+  shell_exec("$cmd");
+  print "done.";
+
+  // Convert.
+  print "\n[media_processor] Encoding media format...";
+  $cmd = 'ssh david@192.168.1.44 "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
+  shell_exec($cmd);
+  print "done.";
+
+  // Transfer from remote.
+  print "\n[media processor] Transferring to storage...";
+  $cmd = 'ssh david@192.168.1.44 "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/"';
+  shell_exec("$cmd");
+  print "done.";
+
+  // Transfer from local.
+  print "\nTransferring to storage...";
+  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/";
+  shell_exec("$cmd");
+  print "done.";
+
+  // Refresh.
+  print "\nRefreshing metadata...";
+  chdir($htmlpath);
+  exec("php update.php diff video_editor");
+  exec("php update.php gen video_editor > video_editor.json");
+  exec("diff video_editor.json collections/video_editor.json");
+  exec("cp video_editor.json collections/");
+  print "done.";
 }
-
-// @todo after each file to minimize overall delay
-print "\nTransferring to media processor...";
-$cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ david@192.168.1.44:/mnt/data/tmp/video-editor/";
-shell_exec("$cmd");
-print "done.";
-
-// Convert.
-print "\n[media_processor] Encoding media format...";
-$cmd = 'ssh david@192.168.1.44 "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
-shell_exec($cmd);
-print "done.";
-
-// Transfer from remote.
-print "\n[media processor] Transferring to storage...";
-$cmd = 'ssh david@192.168.1.44 "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/"';
-shell_exec("$cmd");
-print "done.";
-
-// Transfer from local.
-print "\nTransferring to storage...";
-$cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/";
-shell_exec("$cmd");
-print "done.";
-
-// Refresh.
-print "\nRefreshing metadata...";
-chdir($htmlpath);
-exec("php update.php diff video_editor");
-exec("php update.php gen video_editor > video_editor.json");
-exec("diff video_editor.json collections/video_editor.json");
-exec("cp video_editor.json collections/");
-print "done.";
 
 // Generate.
 print "\nGenerating thumbnails...";

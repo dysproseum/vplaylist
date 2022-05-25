@@ -27,6 +27,10 @@ listener = function () {
 		urlParams.set('repeat', 1);
 	}
 
+	var muted = document.querySelector('input[name=vid_muted]');
+	if (muted.checked == true) {
+		urlParams.set('muted', 1);
+	}
 	urlParams.set('index', mod_index);
 	urlParams.set('autoplay', 1);
 	window.location.search = urlParams.toString();

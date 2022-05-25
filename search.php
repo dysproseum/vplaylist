@@ -14,11 +14,12 @@ $matches = array();
 foreach ($collections as $name => $values) {
 
 	foreach ($collections[$name] as $index => $values) {
-		foreach ($values as $index => $item) {
+		if ($index == "name") continue;
+		foreach ($values as $key => $item) {
 			$filename = strtolower(basename($item['filename']));
 			if (strstr($filename, $q) !== false) {
 				$item['machine_name'] = $name;
-				$item['index'] = $index;
+				$item['index'] = $key;
 				$matches[] = $item;
 			}
 		}
@@ -26,9 +27,12 @@ foreach ($collections as $name => $values) {
 }
 
 ?>
-
+<div class="subnav">
+  <h2>Search results</h2>
+</div>
 <div class="listing-box">
 <?php foreach ($matches as $item): ?>
+  <div class="listing">
 	<?php
 	        $basename = basename($item['filename'], '.mp4');
 	        $vid_param = base64_encode($item['filename']);
@@ -47,6 +51,6 @@ foreach ($collections as $name => $values) {
 		<?php print human_filesize($item['size']); ?>
 	</span>
 	</div>
-
+  </div>
 <?php endforeach; ?>
 </div>
