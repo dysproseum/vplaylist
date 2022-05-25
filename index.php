@@ -59,6 +59,7 @@ require_once 'include/header.php';
 <?php if ($machine_name == ''): ?>
 	<div class="subnav">
 		<h2>Collections</h2>
+		<h4><a href="video-editor/index.php">Add more videos</a></h4>
 	</div>
 	<div class="listing-box">
 	<div class="listing">
@@ -120,9 +121,8 @@ require_once 'include/header.php';
 			/>
 		</h4>
 	<?php else: ?>
-		<h4>
-			<a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a>
-		</h4>
+		<h4><a href="video-editor/index.php">Add more videos</a></h4>
+		<h4><a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a></h4>
 	<?php endif; ?>
 	</div>
 

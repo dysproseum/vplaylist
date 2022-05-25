@@ -25,15 +25,20 @@ if ($handle) {
 else {
   // error opening the file.
 }
-
 ?>
 
-<p>Check back soon!<p>
+<link rel="stylesheet" href="../include/style.css">
 
-<p>
-  <a href="index.php">Another Video</a>
-</p>
+<div class="subnav">
+</div>
+<div class="listing-box">
+  <div class="listing">
+    <form action="post.php" class="video-editor">
+      <h2>Check back soon!</h2>
 
-<p>
-  <a href="/vplaylist/index.php?collection=video_editor">Watch Videos</a>
-</p>
+      <h4><a href="index.php">Add Another Video</a></h4>
+
+      <h4><a href="/vplaylist/index.php?collection=video_editor">View Uploaded Videos</a></h4>
+    </form>
+  </div>
+</div>
