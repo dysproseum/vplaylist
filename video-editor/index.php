@@ -3,7 +3,7 @@ include("../include/bootstrap.php");
 include("../include/header.php");
 ?>
 
-<link rel="stylesheet" href="../include/style.css?8">
+<link rel="stylesheet" href="../include/style.css">
 
 <div class="subnav">
 </div>

@@ -25,6 +25,7 @@ if (file_exists("$p.inprogress")) {
   exit;
 }
 
+// Check pending requests.
 $urls = [];
 $handle = fopen($p, "r");
 if ($handle) {
@@ -39,7 +40,6 @@ if ($handle) {
     error_log("Error opening $p");
     exit;
 }
-
 $plural_maybe = "no requests";
 $cnt = sizeof($urls);
 if ($cnt == 0) {
@@ -53,20 +53,42 @@ else {
 }
 print "\n$plural_maybe in the queue.";
 
+// Download.
 foreach ($urls as $index => $url) {
-  echo "\nRequest " . ($index + 1) . " of $cnt: ";
-  echo $url;
+  $numeral = $index + 1;
+  echo "\n  [$numeral/$cnt] $url";
 
-  // Download.
-  print "Downloading...";
+  print "\nDownloading...";
   chdir("/mnt/uploads/video-editor");
-  $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
+
+  // @todo if external media processor is used,
+  // no 'recode-video' parameter is needed.
+  // $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
+  $cmd = "yt-dlp -q --no-warnings $url";
   exec($cmd);
   print "done.";
 }
 
-// Copy.
-print "\nCopying files...";
+// @todo after each file to minimize overall delay
+print "\nTransferring to media processor...";
+$cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ david@192.168.1.44:/mnt/data/tmp/video-editor/";
+shell_exec("$cmd");
+print "done.";
+
+// Convert.
+print "\n[media_processor] Encoding media format...";
+$cmd = 'ssh david@192.168.1.44 "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
+shell_exec($cmd);
+print "done.";
+
+// Transfer from remote.
+print "\n[media processor] Transferring to storage...";
+$cmd = 'ssh david@192.168.1.44 "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/"';
+shell_exec("$cmd");
+print "done.";
+
+// Transfer from local.
+print "\nTransferring to storage...";
 $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/";
 shell_exec("$cmd");
 print "done.";
@@ -86,10 +108,8 @@ chdir($htmlpath);
 exec("php generate.php video_editor");
 print "complete.\n";
 
-// @todo Delete links.txt if successful :-/
+// Delete links.txt
+// @todo only if successful
 unlink("$p.inprogress");
 
 // @todo Email notifications
-
-// @todo Run ffmpeg to combine
-// ??

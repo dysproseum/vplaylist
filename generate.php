@@ -29,7 +29,7 @@ foreach ($machine_names as $name) {
 		$input = '/mnt' . $item['filename'];
 		$output = $out_dir . '/' .  basename($input, '.mp4') . '.jpg';
 
-		$cmd = $ffmpeg . ' -ss 00:00:06.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
+		$cmd = $ffmpeg . ' -ss 00:00:03.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
 
 		print("\n" .$cmd);
 		exec($cmd);
