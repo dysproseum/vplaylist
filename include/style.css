@@ -5,8 +5,14 @@ body {
 body.behind-video {
 	overflow-x: hidden;
 	overflow-y: auto;
+	margin-top: 100vh;
+	padding-top: 20px;
 }
 
+body.behind-video video .label {
+	position: absolute;
+	top: 0;
+}
 body.nocontrols {
 	overflow: hidden;
 }
