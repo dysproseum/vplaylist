@@ -31,7 +31,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$controls = '';
 	}
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
-	$repeat = isset($_REQUEST['repeat']) ? true : false;
+	$repeat = isset($_REQUEST['repeat']) ? 'loop' : '';
 	$muted = isset($_REQUEST['muted']) ? 'muted' : '';
 
 }
@@ -42,7 +42,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video autoplay <?php print $controls; ?> <?php print $muted; ?> width="640" id="background-video"  >
+	<video <?php print $repeat; ?><?php print $controls; ?> <?php print $muted; ?> autoplay width="640" id="background-video">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
@@ -68,11 +68,13 @@ require_once 'include/header.php';
 			$total = sizeof($values['items']);
 			$index = rand(0, $total - 1);
 			$thumbnail = basename($collections[$collection]['items'][$index]['filename'], '.mp4') . '.jpg';
+			$thumbnail = rawurlencode($thumbnail);
+			$url = THUMBS_PATH . "$collection/$thumbnail";
 		?>
 
 		<div class="thumbnail">
 		<a href="index.php?collection=<?php print $collection; ?>">
-		<img src="<?php print THUMBS_PATH . $collection . '/' . $thumbnail; ?>" width="320" />
+		<img src="<?php print $url; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
 		<span class="label label-bottom"><?php print $total; ?> videos</span>

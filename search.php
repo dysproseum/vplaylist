@@ -54,3 +54,4 @@ foreach ($collections as $name => $values) {
   </div>
 <?php endforeach; ?>
 </div>
+<?php require_once 'include/footer.php'; ?>
