@@ -23,7 +23,7 @@ include("../include/header.php");
         <input type="text" name="video3" disabled placeholder="Coming Soon" />
       
         <label for="email">Email (optional) for notification when complete</label>
-        <input type="text" name="email" />
+        <input type="text" name="email" disabled placeholder="Coming Soon" />
         
         <input type="submit" />
       

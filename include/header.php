@@ -17,7 +17,7 @@
   <div class="header">
 	<h1><a href="/vplaylist/index.php">vplaylist</a></h1>
 
-	<form class="search" action="search.php" method="get">
+	<form class="search" action="/vplaylist/search.php" method="get">
 		<input type="text" maxlength="64" name="q" placeholder="search" />
 	</form>
 </div>
