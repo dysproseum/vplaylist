@@ -14,7 +14,7 @@ include("../include/header.php");
         <h2>Video Editor</h2>
       
         <label for="video1">Video URL</label>
-        <input type="text" name="video1" />
+        <input type="text" name="video1" autocomplete="off" />
         
         <label for="video2">Video 2</label>
         <input type="text" name="video2" disabled placeholder="Coming Soon" />

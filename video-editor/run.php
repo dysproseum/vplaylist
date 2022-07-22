@@ -12,6 +12,17 @@ else {
 }
 */
 
+function dlog($message, $override_newline = FALSE) {
+  $timestamp = date('Y-m-d h:ia');
+  if ($override_newline) {
+    $output = $message . " ";
+  }
+  else {
+    print PHP_EOL . "$timestamp  $message";
+  }
+}
+
+
 // Define in bootstrap file?
 $p = "/mnt/uploads/video-editor/links.txt";
 // We know this should be the parent directory.
@@ -51,7 +62,7 @@ else if ($cnt == 1) {
 else {
   $plural_maybe = "There are $cnt requests";
 }
-print "\n$plural_maybe in the queue.";
+dlog("$plural_maybe in the queue.");
 
 // Download.
 foreach ($urls as $index => $url) {
@@ -83,7 +94,7 @@ foreach ($urls as $index => $url) {
   // Transfer from remote.
   print "\n[media processor] Transferring to storage...";
   $cmd = 'ssh david@192.168.1.44 "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/"';
-  shell_exec("$cmd");
+  system("$cmd");
   print "done.";
 
   // Transfer from local.
@@ -106,7 +117,8 @@ foreach ($urls as $index => $url) {
 print "\nGenerating thumbnails...";
 chdir($htmlpath);
 exec("php generate.php video_editor");
-print "complete.\n";
+print "done.";
+dlog("Job completed.\n");
 
 // Delete links.txt
 // @todo only if successful
