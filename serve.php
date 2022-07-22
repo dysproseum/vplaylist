@@ -2,11 +2,14 @@
 
 if (isset($_REQUEST['filename'])) {
   $filename = $_REQUEST['filename'];
-  $filepath = base64_decode($filename);
+  $filepath = stripslashes(base64_decode($filename));
 }
 else {
   exit;
 }
+
+// @todo base64 doesn't play nice with quotes and emojis in the name.
+$dir = glob('/overflow/vplaylist_mp4/video_editor/mp4/*.mp4');
 
 $file = basename($filepath);
 $size = filesize($filepath);

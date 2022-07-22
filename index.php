@@ -22,7 +22,7 @@ $controls = 'controls';
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
 	$item = $collections[$machine_name]['items'][$index];
-	$vid_file = base64_encode($item['filename']);
+	$vid_file = base64_encode(addslashes($item['filename']));
 	$vid_title = basename($item['filename'], '.mp4');
 	$vid_player = TRUE;
 

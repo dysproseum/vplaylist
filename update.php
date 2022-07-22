@@ -122,6 +122,7 @@ foreach ($machine_names as $name) {
   if ($mod_files) {
     vlog("\nNew files: " . sizeof($mod_files));
     if (sizeof($mod_files) > 0) {
+      $mod_files = array_reverse($mod_files);
       foreach ($mod_files as $file) {
         vlog("\n  $file");
       }

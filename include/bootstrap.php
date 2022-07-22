@@ -26,6 +26,16 @@ function vlog($message, $override_action = '') {
   }
 }
 
+function dlog($message, $override_newline = FALSE) {
+  $timestamp = date('Y-m-d h:ia');
+  if ($override_newline) {
+    $output = $message . " ";
+  }
+  else {
+    print PHP_EOL . "$timestamp  $message";
+  }
+}
+
 function human_filesize($bytes, $dec = 2) {
     $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
     $factor = floor((strlen($bytes) - 1) / 3);
