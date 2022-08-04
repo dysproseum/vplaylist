@@ -1,5 +1,8 @@
 body {
-	background: #555555;
+	background: url(bg.jpg) no-repeat fixed;
+	background-position: center;
+	background-size: cover;
+	font-size: 14pt;
 }
 
 body.behind-video {
@@ -28,22 +31,41 @@ body.nocontrols {
 	background: black;
 }
 
+.thumbnail:hover {
+	border: 2px solid mediumpurple;
+}
+
 .thumbnail .label {
 	position: absolute;
 	margin: 10px;
+	padding: 5px;
 	color: white;
-	text-shadow: 2px 1px 1px black;
+	text-shadow: 2px 2px 0px black;
 	text-decoration: none;
+	border-radius: 2px;
+	font-size: 14pt;
+	font-weight: bold;
 }
 
 .thumbnail .label-top {
 	top: 0px;
-	left: 0px;
+	right: 0px;
+	background: #9370dbAA;
+}
+
+.thumbnail:hover .label-top {
+	background: none;
 }
 
 .thumbnail .label-bottom {
 	bottom: 0px;
 	right: 0px;
+	background: #00000088;
+	pointer-events: none;
+}
+
+.thumbnail:hover .label-bottom {
+	background: #9370db;
 }
 
 .player {
@@ -107,6 +129,13 @@ body.nocontrols {
 	text-shadow: 3px 0px 2px black;
 }
 
+.footer {
+ 	height: 50%;
+	overflow: hidden;
+	margin-top: 20px;
+	padding-left: 20px;
+}
+
 form.search {
 	position: absolute;
 	top: 0;
@@ -151,10 +180,11 @@ h4 a {
 	color: white;
 }
 
-h6 a {
+h6, h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
+	font-size: 18pt;
 }
 
 form.install {
@@ -188,7 +218,6 @@ form.video-editor, form.video-editor label {
 
 form.video-editor input[type=submit] {
   cursor: pointer;
-  font-size: 18px;
   background: mediumpurple;
   color: white;
   font-size: 18px;

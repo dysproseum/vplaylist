@@ -143,10 +143,10 @@ require_once 'include/header.php';
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">
-			<?php print $basename; ?>
+			<?php print human_filesize($item['size']); ?>
 		</a>
 		<span class="label label-bottom">
-			<?php print human_filesize($item['size']); ?>
+			<?php print $basename; ?>
 		</span>
 		</div>
 
