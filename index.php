@@ -18,6 +18,7 @@ global $vid_player;
 $vid_player = FALSE;
 global $controls;
 $controls = 'controls';
+$vid_player_id = '';
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
@@ -26,14 +27,19 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	$vid_title = basename($item['filename'], '.mp4');
 	$vid_player = TRUE;
 
-	$autoplay = isset($_REQUEST['autoplay']) ? true : false;
+	// No controls: kiosk mode, autoplay.
 	if (isset($_REQUEST['controls'])) {
 		$controls = '';
+	        $vid_player_id = 'background-video';
+		$autoplay = true;
 	}
+	else {
+		$autoplay = isset($_REQUEST['autoplay']) ? true : false;
+	}
+
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
 	$repeat = isset($_REQUEST['repeat']) ? 'loop' : '';
 	$muted = isset($_REQUEST['muted']) ? 'muted' : '';
-
 }
 
 // Add'l body classes are set depending on vid_player.
@@ -42,7 +48,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video <?php print $repeat; ?><?php print $controls; ?> <?php print $muted; ?> autoplay width="640" id="background-video">
+	<video <?php print $repeat; ?><?php print $controls; ?> <?php print $muted; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
