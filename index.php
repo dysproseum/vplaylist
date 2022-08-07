@@ -141,7 +141,7 @@ require_once 'include/header.php';
 			$basename = basename($item['filename'], '.mp4');
 			$vid_param = base64_encode($item['filename']);
 			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename . '.jpg';
-			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
+			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index . '&' . $muted;
 		?>
 
 		<div class="thumbnail">

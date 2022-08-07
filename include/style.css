@@ -23,15 +23,19 @@ body.nocontrols {
 	width: 320px;
 	height: 180px;
 	overflow: hidden;
-	margin: 18px;
+	margin: 16px;
 	background: black;
-	border: 2px solid #555555;
 	border-radius: 10px;
+	border: 1px solid #aaaaaa;
+	box-shadow: 0 0 10px white;
 }
 
 .thumbnail:hover {
-	border: 2px solid white;
-	box-shadow: -1px 4px gray;
+	border-color: mediumpurple;
+}
+
+.thumbnail img {
+	zoom: 1.1;
 }
 
 .thumbnail .label {
