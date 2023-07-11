@@ -24,14 +24,25 @@ body.nocontrols {
 	height: 180px;
 	overflow: hidden;
 	margin: 16px;
-	background: black;
 	border-radius: 10px;
-	border: 1px solid #aaaaaa;
-	box-shadow: 0 0 10px white;
+	border: 4px outset gray;
+	background: url(videotape.jpg) no-repeat;
+	background-size: contain;
 }
 
 .thumbnail:hover {
-	border-color: mediumpurple;
+	border: 4px outset white;
+}
+
+.thumbnail:active {
+	border: 4px solid white;
+	background: white;
+	box-shadow: 0 0 20px white;
+}
+
+.thumbnail:active img {
+	opacity: 0.6;
+
 }
 
 .thumbnail img {
@@ -73,7 +84,6 @@ body.nocontrols {
 .player {
 	float: left;
 	width: 100%;
-	background: black;
 }
 
 .player video {
@@ -103,7 +113,10 @@ body.nocontrols {
 	float: left;
 	text-align: center;
 	width: 100%;
-	padding: 10px 0 20px 0;
+	padding: 20px 0 20px 0;
+	background: #00000088;
+	text-shadow: -2px 0px black;
+	font-size: 14pt;
 }
 
 .listing-box {
@@ -114,7 +127,7 @@ body.nocontrols {
 .listing {
 	position: relative;
 	margin: 0 auto;
-	width: 80%;
+	width: 85%;
 }
 
 .header, .footer {
@@ -208,7 +221,10 @@ pre {
 	text-align: left;
 }
 
-form.video-editor, form.video-editor label, form.video-editor input {
+form.video-editor,
+form.video-editor label,
+form.video-editor input,
+form.video-editor select {
   display: block;
   float: left;
   width: 100%;
@@ -228,7 +244,7 @@ form.video-editor input[type=submit] {
   text-shadow: -2px 0 2px #000;
 }
 
-form.video-editor input {
+form.video-editor input, form.video-editor select {
   padding: 20px;
   border: 2px solid black;
 }
