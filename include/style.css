@@ -2,14 +2,11 @@ body {
 	background: url(bg.jpg) no-repeat fixed;
 	background-position: center;
 	background-size: cover;
-	font-size: 14pt;
 }
 
 body.behind-video {
 	overflow-x: hidden;
 	overflow-y: auto;
-	margin-top: 100vh;
-	padding-top: 20px;
 }
 
 body.behind-video video .label {
@@ -26,13 +23,30 @@ body.nocontrols {
 	width: 320px;
 	height: 180px;
 	overflow: hidden;
-	margin: 10px;
-	border: 2px solid white;
-	background: black;
+	margin: 16px;
+	border-radius: 10px;
+	border: 4px outset gray;
+	background: url(videotape.jpg) no-repeat;
+	background-size: contain;
 }
 
 .thumbnail:hover {
-	border: 2px solid mediumpurple;
+	border: 4px outset white;
+}
+
+.thumbnail:active {
+	border: 4px solid white;
+	background: white;
+	box-shadow: 0 0 20px white;
+}
+
+.thumbnail:active img {
+	opacity: 0.6;
+
+}
+
+.thumbnail img {
+	zoom: 1.1;
 }
 
 .thumbnail .label {
@@ -44,13 +58,12 @@ body.nocontrols {
 	text-decoration: none;
 	border-radius: 2px;
 	font-size: 14pt;
-	font-weight: bold;
 }
 
 .thumbnail .label-top {
 	top: 0px;
 	right: 0px;
-	background: #9370dbAA;
+	background: #0000088;
 }
 
 .thumbnail:hover .label-top {
@@ -65,13 +78,12 @@ body.nocontrols {
 }
 
 .thumbnail:hover .label-bottom {
-	background: #9370db;
+	background: #555555;
 }
 
 .player {
 	float: left;
 	width: 100%;
-	background: black;
 }
 
 .player video {
@@ -80,6 +92,8 @@ body.nocontrols {
 	padding: 10px;
 	margin-top: -10px;
 	background: black;
+	border-radius: 8px;
+	box-shadow: 0 0 10px white;
 }
 
 #background-video {
@@ -99,7 +113,10 @@ body.nocontrols {
 	float: left;
 	text-align: center;
 	width: 100%;
-	padding: 10px 0 20px 0;
+	padding: 20px 0 20px 0;
+	background: #00000088;
+	text-shadow: -2px 0px black;
+	font-size: 14pt;
 }
 
 .listing-box {
@@ -110,7 +127,7 @@ body.nocontrols {
 .listing {
 	position: relative;
 	margin: 0 auto;
-	width: 80%;
+	width: 85%;
 }
 
 .header, .footer {
@@ -184,7 +201,7 @@ h6, h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
-	font-size: 18pt;
+	font-size: 14pt;
 }
 
 form.install {
@@ -204,7 +221,10 @@ pre {
 	text-align: left;
 }
 
-form.video-editor, form.video-editor label, form.video-editor input {
+form.video-editor,
+form.video-editor label,
+form.video-editor input,
+form.video-editor select {
   display: block;
   float: left;
   width: 100%;
@@ -224,7 +244,7 @@ form.video-editor input[type=submit] {
   text-shadow: -2px 0 2px #000;
 }
 
-form.video-editor input {
+form.video-editor input, form.video-editor select {
   padding: 20px;
   border: 2px solid black;
 }

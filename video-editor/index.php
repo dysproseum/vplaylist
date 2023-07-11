@@ -16,16 +16,20 @@ include("../include/header.php");
         <label for="video1">Video URL</label>
         <input type="text" name="video1" autocomplete="off" />
         
+        <label for="select_collection_name">Choose collection</label>
+	<select name="select_collection_name">
+          <option selected value="video_editor">Video Editor</option>
+          <option value="ambient">Ambient</option>
+        </select>
+
+        <input type="submit" />
+
         <label for="video2">Video 2</label>
         <input type="text" name="video2" disabled placeholder="Coming Soon" />
-        
-        <label for="video3">Video 3</label>
-        <input type="text" name="video3" disabled placeholder="Coming Soon" />
       
         <label for="email">Email (optional) for notification when complete</label>
         <input type="text" name="email" disabled placeholder="Coming Soon" />
         
-        <input type="submit" />
       
       </form>
   </div>
