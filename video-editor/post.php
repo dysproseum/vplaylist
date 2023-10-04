@@ -12,7 +12,7 @@ $urls[] = $_REQUEST['video1'];
 // check for needed file write locations
 
 // @todo pull paths from config file.
-$p = '/uploads/video-editor/links.txt';
+$p = '/overflow/links.txt';
 $handle = fopen($p, 'a');
 if ($handle) {
 
@@ -24,6 +24,7 @@ if ($handle) {
 }
 else {
   // error opening the file.
+  die("Error opening the file.");
 }
 ?>
 

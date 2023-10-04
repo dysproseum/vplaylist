@@ -37,9 +37,11 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$autoplay = isset($_REQUEST['autoplay']) ? true : false;
 	}
 
+	$muted = isset($_REQUEST['unmuted']) ? '' : 'muted';
+	$loop = isset($_REQUEST['loop']) ? 'loop' : '';
+
 	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
-	$repeat = isset($_REQUEST['repeat']) ? 'loop' : '';
-	$muted = isset($_REQUEST['muted']) ? 'muted' : '';
+	$repeat = isset($_REQUEST['autoplay']) ? 'next_please' : '';
 }
 
 // Add'l body classes are set depending on vid_player.
@@ -48,7 +50,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video <?php print $repeat; ?><?php print $controls; ?> <?php print $muted; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
+	<video <?php print $repeat; ?> <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
@@ -141,7 +143,7 @@ require_once 'include/header.php';
 			$basename = basename($item['filename'], '.mp4');
 			$vid_param = base64_encode($item['filename']);
 			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename . '.jpg';
-			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index . '&' . $muted;
+			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
 		?>
 
 		<div class="thumbnail">

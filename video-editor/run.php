@@ -1,5 +1,9 @@
 <?php
 
+define('MEDIA_HOSTNAME', '');
+define('STORE_HOSTNAME', '');
+define('STORE_TARGET', '');
+
 /* @todo load host paths from config.
 $config_path = dirname(__FILE__) . "../vplaylist.conf";
 if (file_exists($config_path)) {
@@ -12,6 +16,20 @@ else {
 }
 */
 
+// @todo Define in bootstrap file?
+$p = "/mnt/video/vplaylist/links.txt";
+
+// Download path on host.
+chdir("/mnt/data/hpz400_4tb/data/tmp/video-editor/");
+
+// We know this should be the parent directory.
+$htmlpath = "/home/david/docker/php-apache/php/www/pi3omv5-apache-php/html/dysproseum.com/vplaylist";
+
+// Rsync optional, ex. files stored on a NAS.
+// @todo If optional, allow for this to run on one system
+// without rsync.
+$rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
+
 function dlog($message, $override_newline = FALSE) {
   $timestamp = date('Y-m-d h:ia');
   if ($override_newline) {
@@ -22,21 +40,15 @@ function dlog($message, $override_newline = FALSE) {
   }
 }
 
+/***************************************************/
 
-// Define in bootstrap file?
-$p = "/mnt/uploads/video-editor/links.txt";
-// We know this should be the parent directory.
-$htmlpath = "/home/david/docker/php-apache/php/www/pi3omv5-apache-php/html/dysproseum.com/vplaylist";
-// Rsync optional, ex. files stored on a NAS.
-$rsync_target = 'pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/';
-
-// Check for job in progress.
+// 1. Check for job in progress.
 if (file_exists("$p.inprogress")) {
   error_log("\nJob still in progress, waiting to process new requests...");
   exit;
 }
 
-// Check pending requests.
+// 2. Check pending requests.
 $urls = [];
 $handle = fopen($p, "r");
 if ($handle) {
@@ -64,46 +76,56 @@ else {
 }
 dlog("$plural_maybe in the queue.");
 
-// Download.
+// 3. Download.
 foreach ($urls as $index => $url) {
   $numeral = $index + 1;
   echo "\n  [$numeral/$cnt] $url";
 
   print "\nDownloading...";
-  chdir("/mnt/uploads/video-editor");
+  chdir("/mnt/data/hpz400_4tb/data/tmp/video-editor/");
 
-  // @todo if external media processor is used,
+  // If external media processor is used,
   // no 'recode-video' parameter is needed.
-  // $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
-  $cmd = "yt-dlp -q --no-warnings $url";
+  if (MEDIA_HOSTNAME != '') {
+    $cmd = "yt-dlp -q --no-warnings $url";
+  }
+  else {
+    $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
+  }
   exec($cmd);
   print "done.";
 
-  // @todo after each file to minimize overall delay
-  print "\nTransferring to media processor...";
-  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ david@192.168.1.44:/mnt/data/tmp/video-editor/";
-  shell_exec("$cmd");
-  print "done.";
+  if (MEDIA_HOSTNAME != '') {
+    print "\nTransferring to media processor...";
+    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . MEDIA_HOSTNAME . ":/mnt/data/tmp/video-editor/";
+    system($cmd);
+    print "done.";
+  }
 
-  // Convert.
-  print "\n[media_processor] Encoding media format...";
-  $cmd = 'ssh david@192.168.1.44 "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
-  shell_exec($cmd);
-  print "done.";
+  // 4. Convert.
+  if (MEDIA_HOSTNAME != '') {
+    print "\n[media_processor] Encoding media format...";
+    $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
+    shell_exec($cmd);
+    print "done.";
+  }
 
-  // Transfer from remote.
-  print "\n[media processor] Transferring to storage...";
-  $cmd = 'ssh david@192.168.1.44 "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/"';
-  system("$cmd");
-  print "done.";
+  // 5. Transfer to storage from media processor.
+  if (MEDIA_HOSTNAME != '') {
+    print "\n[media processor] Transferring to storage...";
+    $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
+    system($cmd);
+    print "done.";
+  }
 
-  // Transfer from local.
-  print "\nTransferring to storage...";
-  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ pi@192.168.1.82:/mnt/data/overflow/vplaylist_mp4/video_editor/";
-  shell_exec("$cmd");
-  print "done.";
+  if (STORE_HOSTNAME != '') {
+    print "\nTransferring to storage...";
+    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . STORE_HOSTNAME . ":" . STORE_TARGET;
+    system($cmd);
+    print "done.";
+  }
 
-  // Refresh.
+  // 6. Refresh.
   print "\nRefreshing metadata...";
   chdir($htmlpath);
   exec("php update.php diff video_editor");
@@ -113,7 +135,7 @@ foreach ($urls as $index => $url) {
   print "done.";
 }
 
-// Generate.
+// 7. Generate.
 print "\nGenerating thumbnails...";
 chdir($htmlpath);
 exec("php generate.php video_editor");
@@ -125,3 +147,4 @@ dlog("Job completed.\n");
 unlink("$p.inprogress");
 
 // @todo Email notifications
+
