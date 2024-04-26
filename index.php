@@ -19,13 +19,21 @@ $vid_player = FALSE;
 global $controls;
 $controls = 'controls';
 $vid_player_id = '';
+$muted = 'muted';
+$loop = '';
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
-	$item = $collections[$machine_name]['items'][$index];
-	$vid_file = base64_encode(addslashes($item['filename']));
-	$vid_title = basename($item['filename'], '.mp4');
-	$vid_player = TRUE;
+	if (!isset($collections[$machine_name]['items'][$index])) {
+		$item = false;
+		header("HTTP/1.0 404 Not Found");
+	}
+	else {
+		$item = $collections[$machine_name]['items'][$index];
+		$vid_file = base64_encode(addslashes($item['filename']));
+		$vid_title = basename($item['filename'], '.mp4');
+		$vid_player = TRUE;
+	}
 
 	// No controls: kiosk mode, autoplay.
 	if (isset($_REQUEST['controls'])) {
@@ -37,20 +45,24 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$autoplay = isset($_REQUEST['autoplay']) ? true : false;
 	}
 
-	$muted = isset($_REQUEST['unmuted']) ? '' : 'muted';
-	$loop = isset($_REQUEST['loop']) ? 'loop' : '';
-
-	$shuffle = isset($_REQUEST['shuffle']) ? true : false;
-	$repeat = isset($_REQUEST['autoplay']) ? 'next_please' : '';
+	if (isset($_REQUEST['muted']))
+	       $muted = ($_REQUEST['muted'] == 1) ? 'muted' : '';
+	if (isset($_REQUEST['loop']))
+	       $loop = ($_REQUEST['loop'] == 1) ? 'loop' : '';
+	if (isset($_REQUEST['shuffle']))
+	       $shuffle = ($_REQUEST['shuffle'] == 1) ? true : false;
+	if (isset($_REQUEST['repeat']))
+	       $repeat = ($_REQUEST['repeat'] == 1) ? 'repeat' : '';
 }
 
 // Add'l body classes are set depending on vid_player.
 require_once 'include/header.php';
+
 ?>
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video <?php print $repeat; ?> <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
+	<video <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
@@ -91,6 +103,13 @@ require_once 'include/header.php';
 	</div>
 	</div>
 
+<?php elseif (!(isset($collections[$machine_name]))): ?>
+
+	<div class="subnav">
+		<h2>Collection not found</h2>
+		<?php header("HTTP/1.0 404 Not Found"); ?>
+	</div>
+
 <?php else: ?>
 
 	<div class="subnav">
@@ -115,9 +134,17 @@ require_once 'include/header.php';
 			/>
 		</h4>
 		<h4>
-			<label for="vid_repeat">Repeat</label>
+			<label for="vid_repeat">Repeat All</label>
 			<input type="checkbox" name="vid_repeat"
 			<?php if ($repeat): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+		<h4>
+			<label for="vid_loop">Loop</label>
+			<input type="checkbox" name="vid_loop"
+			<?php if ($loop): ?>
 				checked="checked"
 			<?php endif; ?>
 			/>
