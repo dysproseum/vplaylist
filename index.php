@@ -113,7 +113,7 @@ require_once 'include/header.php';
 <?php else: ?>
 
 	<div class="subnav">
-	<h2><a href="index.php">Home</a> | <a href="index.php?collection=<?php print $collection; ?>"><?php print $collections[$machine_name]['name']; ?></a></h2>
+	<h2><a href="index.php">Home</a> | <a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h2>
 	<?php if ($vid_player): ?>
 		<input type="hidden" name="vid_count" value="<?php print sizeof($collections[$machine_name]['items']); ?>" />
 
