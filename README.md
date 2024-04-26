@@ -1,29 +1,31 @@
-Nosotros
-te vemos
+vplaylist is an HTML5 video player for desktop and mobile for personal use
 
-vplaylist is an HTML5 video player for desktop and mobile
+"Nosotros te vemos"
 
-for personal use
+## Project requirements
+- Simple, lightweight interface
+- Convert all videos into web playable format
+- Customizable playback options
+- Stream media from outside docroot
+- No database needed
 
-- Demo link?
-- Screenshots?
-
-Server Setup
-- Docker
-- PHP/Apache
-- No database required
-- Share media volume outside docroot
-
-Generate/update collections
+## Generate/update collections
 - Web Interface
 - Command line
 
-Generate/update thumbnails
+## Generate/update thumbnails
 - Command line
 
-Upload/cron service
+## Server options
+- Docker
+- PHP/Apache
+
+## Upload/cron service
+
+````
 # m h  dom mon dow   command
 */5 *  *   *   *     /usr/bin/php /path/to/vplaylist/video-editor/run.php >> /var/log/vplaylist-cron.txt
+````
 
 1. Listing.txt?
 	a. Need path, and run find 
@@ -41,3 +43,6 @@ Upload/cron service
 5. Playing screen
 
 
+Things to add:
+- Demo link?
+- Screenshots?
