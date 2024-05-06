@@ -12,7 +12,29 @@ else {
 $dir = glob('/overflow/vplaylist_mp4/video_editor/mp4/*.mp4');
 
 $file = basename($filepath);
-$size = filesize($filepath);
+$filesize = filesize($filepath);
+$offset = 0;
+$length = $filesize;
+$buffer_size = 1024 * 1024;
+
+// Allow seeking.
+header("Accept-Ranges: bytes");
+if (isset($_SERVER['HTTP_RANGE'])) {
+  preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+  $offset = intval($matches[1]);
+  if (!isset($matches[2])) {
+	  $end = $offset + $buffer_size;
+	  if ($end > $filesize - 1) {
+		  $end = $filesize - 1;
+	  }
+  }
+  else {
+	  $end = $matches[2];
+  }
+  $length = $end + 1 - $offset;
+  header ("HTTP/1.1 206 Partial content");
+  header("Content-Range: bytes $offset-$end/$filesize");
+}
 
 // Create M3U wrapper for mobile playback.
 if (!isset($_REQUEST['file'])) {
@@ -35,8 +57,9 @@ if ($fp) {
 	header('Content-Disposition: attachment');
 	header('Content-Type: video/mp4');
 	header('Content-Transfer-Encoding: binary');
-	header("Content-Length: $size");
+	header("Content-Length: $length");
 
+	fseek($fp, $offset);
 	while (!feof($fp)) {
 		$buffer = fread($fp, 32 * 1024);
 		print $buffer;
