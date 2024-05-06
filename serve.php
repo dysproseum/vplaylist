@@ -8,7 +8,6 @@ else {
   exit;
 }
 
-
 // @todo base64 doesn't play nice with quotes and emojis in the name.
 $dir = glob('/overflow/vplaylist_mp4/video_editor/mp4/*.mp4');
 
