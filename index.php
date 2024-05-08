@@ -21,6 +21,8 @@ $controls = 'controls';
 $vid_player_id = '';
 $muted = 'muted';
 $loop = '';
+$shuffle = false;
+$repeat = '';
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
@@ -46,13 +48,13 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	}
 
 	if (isset($_REQUEST['muted']))
-	       $muted = ($_REQUEST['muted'] == 1) ? 'muted' : '';
+		$muted = ($_REQUEST['muted'] == 1) ? 'muted' : '';
 	if (isset($_REQUEST['loop']))
-	       $loop = ($_REQUEST['loop'] == 1) ? 'loop' : '';
+		$loop = ($_REQUEST['loop'] == 1) ? 'loop' : '';
 	if (isset($_REQUEST['shuffle']))
-	       $shuffle = ($_REQUEST['shuffle'] == 1) ? true : false;
+		$shuffle = ($_REQUEST['shuffle'] == 1) ? true : false;
 	if (isset($_REQUEST['repeat']))
-	       $repeat = ($_REQUEST['repeat'] == 1) ? 'repeat' : '';
+		$repeat = ($_REQUEST['repeat'] == 1) ? 'repeat' : '';
 }
 
 // Add'l body classes are set depending on vid_player.
