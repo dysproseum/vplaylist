@@ -71,7 +71,7 @@ require_once 'include/header.php';
 			<source src="serve.php?filename=<?php print $vid_file; ?>&file=.mp4" type="video/mp4" />
 		<?php endif; ?>
 		</video>
-		<span class="label">
+		<span id="vid_title" class="label">
 			<?php print $vid_title; ?>
 		</span>
 	</div>

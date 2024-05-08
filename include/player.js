@@ -1,4 +1,22 @@
 var player;
+var ajax = true;
+
+function loadDoc(url) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var data = JSON.parse(this.responseText);
+	  var vidSrc = '/vplaylist/serve.php?filename=' + data.base64 + '&file=.mp4';
+	  player.src = vidSrc;
+          var label = document.querySelector("#vid_title");
+          label.innerText = data.filename;
+      }
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+    return true;
+}
+
 listener = function () {
 
 	var url = window.location.href;
@@ -51,7 +69,18 @@ listener = function () {
 	}
 
 	urlParams.set('index', mod_index);
-	window.location.search = urlParams.toString();
+	if (ajax == false) {
+	  window.location.search = urlParams.toString();
+        }
+
+	// Load next video via ajax.
+	var stateObj = '';
+	var newUrl = "/vplaylist/index.php?" + urlParams.toString();
+        window.history.pushState(stateObj, "vplaylist", newUrl);
+
+	const collection = urlParams.get('collection');
+	var ajaxUrl = '/vplaylist/getnextvideo.php?collection=' + collection + '&index=' + mod_index;
+	loadDoc(ajaxUrl);
 };
 
 addListener = function() {
