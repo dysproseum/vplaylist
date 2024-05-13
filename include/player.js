@@ -52,7 +52,7 @@ function prepareVidLinks() {
 	}
 }
 
-videoEndedListener = function () {
+videoEndedListener = function () 
 
 	var url = window.location.href;
 	var urlParams = new URLSearchParams(window.location.search);
@@ -104,9 +104,10 @@ videoEndedListener = function () {
 	}
 
 	urlParams.set('index', mod_index);
+
 	if (use_ajax == false) {
 	  window.location.search = urlParams.toString();
-        }
+  }
 
 	// Load next video via ajax.
 	var stateObj = '';
