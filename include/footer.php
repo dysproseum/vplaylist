@@ -7,5 +7,6 @@
 			powered by <a target="_blank" href="https://github.com/dysproseum/vplaylist">vplaylist on github</a>
 			</h6>
 		</div>
+		<?php print analytics(); ?>
 	</body>
 </html>

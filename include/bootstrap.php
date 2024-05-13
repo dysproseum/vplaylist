@@ -1,5 +1,10 @@
 <?php
 
+$script = dirname(__FILE__) . '/../config.php';
+if (file_exists($script)) {
+	require_once($script);
+}
+
 define('CONFIG_PATH', './collections/');
 define('THUMBS_PATH', './thumbnails/');
 
