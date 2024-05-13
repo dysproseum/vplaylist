@@ -1,6 +1,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<script src="include/util.js"></script>
 <script src="include/player.js"></script>
 <script type="text/javascript">
   const start_muted = <?php print $conf['start_muted']; ?>;
