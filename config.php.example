@@ -1,0 +1,12 @@
+<?php
+
+global $conf;
+
+// Unmuting failed and the element was paused instead because the user didn't interact with the document before. https://goo.gl/xX8pDD
+$conf['start_muted'] = true;
+
+// Load next video via ajax.
+$conf['use_ajax'] = true;
+
+// Path to directory containing video files.
+$conf['video_dir'] = '';
