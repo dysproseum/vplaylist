@@ -1,9 +1,13 @@
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<script src="include/util.js"></script>
 <script src="include/player.js"></script>
+<script type="text/javascript">
+  const start_muted = <?php print $conf['start_muted']; ?>;
+  const use_ajax = <?php print $conf['use_ajax']; ?>;
+</script>
 <title>vplaylist</title>
-<?php print analytics(); ?>
 </head>
 
 <?php if ($controls == ''): ?>

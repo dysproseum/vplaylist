@@ -19,10 +19,15 @@ $vid_player = FALSE;
 global $controls;
 $controls = 'controls';
 $vid_player_id = '';
-$muted = 'muted';
 $loop = '';
 $shuffle = false;
 $repeat = '';
+if ($conf['start_muted']) {
+	$muted = 'muted';
+}
+else {
+	$muted = '';
+}
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
 	$index = $_REQUEST['index'];
@@ -64,16 +69,16 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> autoplay width="640" id="<?php print $vid_player_id; ?>">
+	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
 		<?php else: ?>
 			<source src="serve.php?filename=<?php print $vid_file; ?>&file=.mp4" type="video/mp4" />
 		<?php endif; ?>
-		</video>
-		<span id="vid_title" class="label">
-			<?php print $vid_title; ?>
-		</span>
+	</video>
+	<span id="vid_title" class="label">
+		<?php print $vid_title; ?>
+	</span>
 	</div>
 
 <?php endif; ?>
@@ -176,7 +181,7 @@ require_once 'include/header.php';
 		?>
 
 		<div class="thumbnail">
-		<a href="<?php print $vid_link; ?>">
+		<a class="vid-link" data-id="<?php print $index; ?>" href="<?php print $vid_link; ?>">
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">
