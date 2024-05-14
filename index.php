@@ -126,7 +126,7 @@ require_once 'include/header.php';
 
 		<h4>
 			<label for="vid_autoplay">Autoplay</label>
-			<input type="checkbox" name="vid_autoplay"
+			<input type="checkbox" name="vid_autoplay" id="vid_autoplay"
 			<?php if ($autoplay): ?>
 				checked="checked"
 			<?php endif; ?>
@@ -134,7 +134,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_shuffle">Shuffle</label>
-			<input type="checkbox" name="vid_shuffle"
+			<input type="checkbox" name="vid_shuffle" id="vid_shuffle"
 			<?php if ($shuffle): ?>
 				checked="checked"
 			<?php endif; ?>
@@ -142,7 +142,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_repeat">Repeat All</label>
-			<input type="checkbox" name="vid_repeat"
+			<input type="checkbox" name="vid_repeat" id="vid_repeat"
 			<?php if ($repeat): ?>
 				checked="checked"
 			<?php endif; ?>
@@ -150,7 +150,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_loop">Loop</label>
-			<input type="checkbox" name="vid_loop"
+			<input type="checkbox" name="vid_loop" id="vid_loop"
 			<?php if ($loop): ?>
 				checked="checked"
 			<?php endif; ?>
@@ -158,7 +158,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_muted">Muted</label>
-			<input type="checkbox" name="vid_muted"
+			<input type="checkbox" name="vid_muted" id="vid_muted"
 			<?php if ($muted !== ''): ?>
 				checked="checked"
 			<?php endif; ?>

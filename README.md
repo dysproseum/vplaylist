@@ -24,8 +24,13 @@ vplaylist is an HTML5 video player for desktop and mobile for personal use
 
 ````
 # m h  dom mon dow   command
-*/5 *  *   *   *     /usr/bin/php /path/to/vplaylist/video-editor/run.php >> /var/log/vplaylist-cron.txt
+*/5 *  *   *   *     /usr/bin/php /path/to/vplaylist/video-editor/run.php
 ````
+
+## Features
+
+* Fullscreen autoplay mode in shuffle and sequential playback
+* Keep the user's volume setting on each video
 
 1. Listing.txt?
 	a. Need path, and run find 
