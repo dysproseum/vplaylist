@@ -21,7 +21,7 @@ if (isset($argv[2]) && $argv[2] == '--all') {
 else if (isset($argv[2])) {
   $machine_names[] = $argv[2];
 }
-else {
+else if ($action != "list") {
   print "Usage: php update.php [diff|gen|create|list] [collection_id]\n\n";
   print "  gen --all           Update all collections.\n";
   print "  create \"New Vids\"   Create new collection.\n";
@@ -29,7 +29,10 @@ else {
 }
 
 if ($action == "list") {
-  dlog("Listing...");
+  foreach ($collections as $name => $object) {
+    print $object['name'] . " (" . $name . ") " . sizeof($object['items']);
+    print PHP_EOL;
+  }
   exit;
 }
 else if ($action == "create") {
@@ -80,6 +83,8 @@ else if ($action == "create") {
   exit;
 }
 
+// Actions for diff & gen.
+// Messages are hidden by vlog if $action == gen.
 foreach ($machine_names as $name) {
 
   // Grab the directory from filename path.
@@ -156,8 +161,6 @@ foreach ($machine_names as $name) {
     }
   }
 
-//  if ($action == "diff") {
-
   // If no modifications, continue to next collection, if any.
   if ($mod_items) {
     vlog("\nTotal Old files: " . sizeof($mod_items));
@@ -182,15 +185,11 @@ foreach ($machine_names as $name) {
   vlog("\n");
 }
 
-//  } // action == diff
-  
-  // @todo Convert new files to web mp4 format.
-
-  if ($action == "gen") {
-    // Output updated json file for this collection.
-    $collections[$name]['items'] = array_reverse($collections[$name]['items']);
-    $out = array($name => $collections[$name]);
-    $json = json_encode($out, JSON_PRETTY_PRINT);
-    print $json . "\n";
-    exit;
-  }
+if ($action == "gen") {
+  // Output updated json file for this collection.
+  $collections[$name]['items'] = array_reverse($collections[$name]['items']);
+  $out = array($name => $collections[$name]);
+  $json = json_encode($out, JSON_PRETTY_PRINT);
+  print $json . "\n";
+  exit;
+}
