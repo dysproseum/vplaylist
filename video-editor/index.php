@@ -10,7 +10,7 @@ include("../include/header.php");
 <div class="listing-box">
    <div class="listing">
 
-      <form action="post.php" class="video-editor">
+      <form action="post.php" method="post" class="video-editor">
         <h2>Video Editor</h2>
       
         <label for="video1">Video URL</label>

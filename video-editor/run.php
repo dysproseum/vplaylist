@@ -1,35 +1,21 @@
 <?php
 
-/* @todo load host paths from config.
-$config_path = dirname(__FILE__) . "../vplaylist.conf";
-if (file_exists($config_path)) {
-  require_once($config_path);
-}
-else {
-  print "Could not load host paths from config_path.\n";
-  print "Expected: $config_path\n";
-  exit;
-}
-*/
+require_once '../include/bootstrap.php';
+global $collections;
+global $conf;
 
-function dlog($message, $override_newline = FALSE) {
-  $timestamp = date('Y-m-d h:ia');
-  if ($override_newline) {
-    $output = $message . " ";
-  }
-  else {
-    print PHP_EOL . "$timestamp  $message";
-  }
-}
-
+define('COLLECTION_NAME', 'Imported Videos');
+define('MACHINE_NAME', 'imported_videos');
+define('EXTERNAL_MEDIA', false);
 define('MEDIA_HOSTNAME', 'david@192.168.1.237');
 define('STORE_HOSTNAME', 'pi@192.168.1.241');
 define('STORE_TARGET', '/mnt/data/overflow/vplaylist_mp4/video_editor/');
 
-// Define in bootstrap file?
-$p = "/mnt/uploads/video-editor/links.txt";
+// Define directories.
+$video_editor_dir = $conf['video_dir'] . "/video-editor";
+$p = $video_editor_dir . "/links.txt";
 // We know this should be the parent directory.
-$htmlpath = "/home/david/docker/php-apache/php/www/pi3omv5-apache-php/html/dysproseum.com/vplaylist";
+$htmlpath = dirname(__FILE__) . "/../";
 // Rsync optional, ex. files stored on a NAS.
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
@@ -45,9 +31,12 @@ if (file_exists("$p.inprogress")) {
 
 // 2. Check pending requests.
 $urls = [];
-$handle = fopen($p, "r");
+if (!file_exists($p)) {
+  exit;
+}
+rename($p, "$p.inprogress");
+$handle = fopen("$p.inprogress", "r");
 if ($handle) {
-    rename($p, "$p.inprogress", $handle);
 
     while (($line = fgets($handle)) !== false) {
         $urls[] = $line;
@@ -77,7 +66,7 @@ foreach ($urls as $index => $url) {
   echo "\n  [$numeral/$cnt] $url";
 
   print "\nDownloading...";
-  chdir("/mnt/uploads/video-editor");
+  chdir($video_editor_dir . "/download");
 
   // @todo if external media processor is used,
   // no 'recode-video' parameter is needed.
@@ -87,42 +76,73 @@ foreach ($urls as $index => $url) {
   print "done.";
 
   // @todo after each file to minimize overall delay
-  print "\nTransferring to media processor...";
-  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . MEDIA_HOSTNAME . ":/mnt/data/tmp/video-editor/";
-  system($cmd);
-  print "done.";
+  if (EXTERNAL_MEDIA) {
+    print "\nTransferring to media processor...";
+    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . MEDIA_HOSTNAME . ":/mnt/data/tmp/video-editor/";
+    system($cmd);
+    print "done.";
 
-  // 4. Convert.
-  print "\n[media_processor] Encoding media format...";
-  $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
-  shell_exec($cmd);
-  print "done.";
+    // 4. Convert.
+    print "\n[media_processor] Encoding media format...";
+    $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
+    shell_exec($cmd);
+    print "done.";
 
-  // 5. Transfer to storage.
-  print "\n[media processor] Transferring to storage...";
-  $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
-  system($cmd);
-  print "done.";
+    // 5. Transfer to storage.
+    print "\n[media processor] Transferring to storage...";
+    $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
+    system($cmd);
+    print "done.";
 
-  print "\nTransferring to storage...";
-  $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . STORE_HOSTNAME . ":/mnt/data/overflow/vplaylist_mp4/video_editor/";
-  system($cmd);
-  print "done.";
+    print "\nTransferring to storage...";
+    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . STORE_HOSTNAME . ":/mnt/data/overflow/vplaylist_mp4/video_editor/";
+    system($cmd);
+    print "done.";
+  }
+  else {
+    // Process videos locally.
+    print "\nProcessing media...";
+    $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
+    shell_exec($cmd);
+    print "done.";
 
-  // 6. Refresh.
-  print "\nRefreshing metadata...";
-  chdir($htmlpath);
-  exec("php update.php diff video_editor");
-  exec("php update.php gen video_editor > video_editor.json");
-  exec("diff video_editor.json collections/video_editor.json");
-  exec("cp video_editor.json collections/");
-  print "done.";
+    // Verify import collection exist.
+    chdir($htmlpath);
+    if (!isset($collection[MACHINE_NAME])) {
+      $cmd = 'php update.php create "' . COLLECTION_NAME . '"';
+      exec($cmd);
+    }
+
+    // Copy to import directory.
+    chdir($video_editor_dir);
+    $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
+    $cmd = "cp mp4/* $import_dir/";
+    exec($cmd);
+  }
 }
+
+
+// 6. Refresh.
+print "\nRefreshing metadata...";
+chdir($htmlpath);
+$cmd = "php update.php diff " . MACHINE_NAME;
+exec($cmd);
+$cmd = "php update.php gen " . MACHINE_NAME;
+exec($cmd);
+$cmd = "php update.php gen " . MACHINE_NAME . " > " . MACHINE_NAME . ".json";
+exec($cmd);
+$cmd = "diff " . MACHINE_NAME . ".json collections/" . MACHINE_NAME . ".json";
+exec($cmd);
+$cmd = "cp " . MACHINE_NAME . ".json collections/";
+exec($cmd);
+print "done.";
+
 
 // 7. Generate.
 print "\nGenerating thumbnails...";
 chdir($htmlpath);
-exec("php generate.php video_editor");
+$cmd = "php generate.php " . MACHINE_NAME;
+exec($cmd);
 print "done.";
 dlog("Job completed.\n");
 
@@ -131,4 +151,3 @@ dlog("Job completed.\n");
 unlink("$p.inprogress");
 
 // @todo Email notifications
-
