@@ -41,6 +41,20 @@ function dlog($message, $override_newline = FALSE) {
   }
 }
 
+function create_dir($new_dir) {
+  if (!is_dir($new_dir)) {
+    if (mkdir($new_dir)) {
+      dlog("Directory $new_dir created.");
+    }
+    else {
+      dlog("Directory $new_dir failed to create.");
+    }
+  }
+  else {
+    dlog("Directory $new_dir already exists.");
+  }
+}
+
 function human_filesize($bytes, $dec = 2) {
     $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
     $factor = floor((strlen($bytes) - 1) / 3);

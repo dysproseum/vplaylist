@@ -57,6 +57,11 @@ else if ($action == "create") {
   ];
   $new_json = json_encode($new_collection, JSON_PRETTY_PRINT);
 
+  // Create collections directory.
+  $new_dir = $htmlpath . "/collections";
+  create_dir($new_dir);
+
+  // Create JSON file.
   $path = $htmlpath . "/collections/" . $new_file;
   $handle = fopen($path, "w");
   if ($handle) {
@@ -67,18 +72,9 @@ else if ($action == "create") {
     exit('Could not write to ' . $path . "\n");
   }
 
+  // Create new media directory.
   $new_dir = $conf['video_dir'] . '/' . $machine_name;
-  if (!is_dir($new_dir)) {
-    if (mkdir($new_dir)) {
-      dlog("Directory $new_dir created.");
-    }
-    else {
-      dlog("Directory $new_dir failed to create.");
-    }
-  }
-  else {
-    dlog("Directory $new_dir already exists.");
-  }
+  create_dir($new_dir);
   dlog("Done.\n");
   exit;
 }

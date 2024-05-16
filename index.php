@@ -83,7 +83,12 @@ require_once 'include/header.php';
 
 <?php endif; ?>
 
-<?php if ($machine_name == ''): ?>
+<?php if (empty($collections)): ?>
+	<div class="subnav">
+		<h2>No collections found.</h2>
+		<h4><a href="video-editor/index.php">Add more videos</a></h4>
+	</div>
+<?php elseif ($machine_name == ''): ?>
 	<div class="subnav">
 		<h2>Collections</h2>
 		<h4><a href="video-editor/index.php">Add more videos</a></h4>
@@ -111,14 +116,15 @@ require_once 'include/header.php';
 	</div>
 
 <?php elseif (!(isset($collections[$machine_name]))): ?>
-
 	<div class="subnav">
 		<h2>Collection not found</h2>
 		<?php header("HTTP/1.0 404 Not Found"); ?>
 	</div>
-
+<?php elseif (sizeof($collections[$machine_name]['items']) == 0): ?>
+	<div class="subnav">
+		<h2>Collection is empty.</h2>
+	</div>
 <?php else: ?>
-
 	<div class="subnav">
 	<h2><a href="index.php">Home</a> | <a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h2>
 	<?php if ($vid_player): ?>
