@@ -73,24 +73,24 @@ foreach ($urls as $index => $url) {
 
   if (EXTERNAL_MEDIA) {
     print "\nTransferring to media processor...";
-    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . MEDIA_HOSTNAME . ":/mnt/data/tmp/video-editor/";
-    system($cmd);
+    $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . MEDIA_HOSTNAME . ":" . $video_editor_dir;
+    exec($cmd);
     print "done.";
 
     // 4. Convert.
     print "\n[media_processor] Encoding media format...";
-    $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd /mnt/data/tmp/video-editor && ./collect_mp4"';
-    shell_exec($cmd);
+    $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd ' . $video_editor_dir . ' && ./collect_mp4"';
+    exec($cmd);
     print "done.";
 
     // 5. Transfer to storage.
     print "\n[media processor] Transferring to storage...";
-    $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* /mnt/data/tmp/video-editor/mp4 ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
-    system($cmd);
+    $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* ' . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
+    exec($cmd);
     print "done.";
 
     print "\nTransferring to storage...";
-    $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . STORE_HOSTNAME . ":/mnt/data/overflow/vplaylist_mp4/video_editor/";
+    $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET;
     system($cmd);
     print "done.";
   }

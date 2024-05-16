@@ -1,15 +1,6 @@
 <?php
 
-// Load paths from config.
-$config_path = dirname(__FILE__) . "/../config.php";
-if (file_exists($config_path)) {
-  require_once($config_path);
-}
-else {
-  print "Could not load host paths from config_path.\n";
-  print "Expected: $config_path\n";
-  exit;
-}
+require_once '../include/bootstrap.php';
 
 if (!isset($_REQUEST['video1'])) {
   exit;
@@ -51,7 +42,7 @@ else {
 
       <h4><a href="index.php">Add Another Video</a></h4>
 
-      <h4><a href="/vplaylist/index.php?collection=imported_videos">View Uploaded Videos</a></h4>
+      <h4><a href="/vplaylist/index.php?collection=<?php print machine_name($conf['import_collection']); ?>">View Uploaded Videos</a></h4>
     </form>
   </div>
 </div>
