@@ -38,9 +38,7 @@ if ($action == "list") {
 else if ($action == "create") {
   // Sanitize collection name.
   $collection_name = $argv[2];
-  $machine_name = strtolower($collection_name);
-  $machine_name = preg_replace('/[^\w\s]+/', '', $machine_name);
-  $machine_name = preg_replace('/[^a-zA-Z0-9]+/', '_', $machine_name);
+  $machine_name = machine_name($collection_name);
 
   if (!$machine_name) {
     exit("Invalid collection name, use a-z and 0-9 only.\n");

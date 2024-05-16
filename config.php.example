@@ -9,4 +9,13 @@ $conf['start_muted'] = true;
 $conf['use_ajax'] = true;
 
 // Path to directory containing video files.
-$conf['video_dir'] = '';
+$conf['video_dir'] = '/var/www/html/vplaylist';
+
+// Import collection name.
+$conf['import_collection'] = 'Imported Videos';
+
+// External media processor.
+$conf['external_media'] = false;
+$conf['media_hostname'] = 'user@example.com';
+$conf['store_hostname'] = 'user@example.com';
+$conf['store_target'] = '/var/www/vplaylist';
