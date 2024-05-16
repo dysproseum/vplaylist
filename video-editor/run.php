@@ -4,12 +4,12 @@ require_once '../include/bootstrap.php';
 global $collections;
 global $conf;
 
-define('COLLECTION_NAME', 'Imported Videos');
-define('MACHINE_NAME', 'imported_videos');
-define('EXTERNAL_MEDIA', false);
-define('MEDIA_HOSTNAME', 'david@192.168.1.237');
-define('STORE_HOSTNAME', 'pi@192.168.1.241');
-define('STORE_TARGET', '/mnt/data/overflow/vplaylist_mp4/video_editor/');
+define('COLLECTION_NAME', $conf['import_collection']);
+define('MACHINE_NAME', machine_name(COLLECTION_NAME));
+define('EXTERNAL_MEDIA', $conf['external_media']);
+define('MEDIA_HOSTNAME', $conf['media_hostname']);
+define('STORE_HOSTNAME', $conf['store_hostname']);
+define('STORE_TARGET', $conf['store_target']);
 
 // Define directories.
 $video_editor_dir = $conf['video_dir'] . "/video-editor";
@@ -67,15 +67,10 @@ foreach ($urls as $index => $url) {
 
   print "\nDownloading...";
   chdir($video_editor_dir . "/download");
-
-  // @todo if external media processor is used,
-  // no 'recode-video' parameter is needed.
-  // $cmd = "yt-dlp --recode-video mp4 -q --no-warnings $url";
   $cmd = "yt-dlp -q --no-warnings $url";
   exec($cmd);
   print "done.";
 
-  // @todo after each file to minimize overall delay
   if (EXTERNAL_MEDIA) {
     print "\nTransferring to media processor...";
     $cmd = "rsync -av --exclude=links.txt* /mnt/uploads/video-editor/ " . MEDIA_HOSTNAME . ":/mnt/data/tmp/video-editor/";

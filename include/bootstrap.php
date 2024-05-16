@@ -41,6 +41,13 @@ function dlog($message, $override_newline = FALSE) {
   }
 }
 
+function machine_name($collection_name) {
+  $machine_name = strtolower($collection_name);
+  $machine_name = preg_replace('/[^\w\s]+/', '', $machine_name);
+  $machine_name = preg_replace('/[^a-zA-Z0-9]+/', '_', $machine_name);
+  return $machine_name;
+}
+
 function create_dir($new_dir) {
   if (!is_dir($new_dir)) {
     if (mkdir($new_dir)) {
