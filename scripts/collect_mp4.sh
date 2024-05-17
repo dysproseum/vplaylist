@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd download
+
 for i in *.*
 do
 	echo "$i"
