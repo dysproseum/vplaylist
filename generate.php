@@ -4,6 +4,8 @@ require_once 'include/bootstrap.php';
 
 $machine_names = array();
 $ffmpeg = 'ffmpeg -loglevel quiet';
+$ffprobe_width = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=width -of csv=s=,:p=0 ';
+$ffprobe_height = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=height -of csv=s=,:p=0 ';
 
 if (isset($argv[1])) {
 	$machine_names[] = $argv[1];
@@ -30,6 +32,13 @@ foreach ($machine_names as $name) {
 		$input = $item['filename'];
 		$output = $out_dir . '/' .  basename($input, '.mp4') . '.jpg';
 
+		// Determine orientation.
+		$cmd = $ffprobe_width . '"' . $input . '"';
+		$width = exec($cmd);
+		$cmd = $ffprobe_height . '"' . $input . '"';
+		$height = exec($cmd);
+
+		// @todo if ($height > $width)
 		$cmd = $ffmpeg . ' -ss 00:00:06.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
 		exec($cmd);
 	}
