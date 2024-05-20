@@ -6,7 +6,6 @@ function addListenerMulti(el, s, fn) {
 }
 
 videoEndedListener = function () {
-
 	var url = window.location.href;
 	var urlParams = new URLSearchParams(window.location.search);
 	const imm_index = urlParams.get('index');
@@ -24,7 +23,9 @@ videoEndedListener = function () {
 	}
 	else {
 		urlParams.set('autoplay', 1);
-		mod_index++;
+		if (use_ajax == false) {
+			mod_index++;
+		}
 	}
 
 	var shuffle = document.querySelector('input[name=vid_shuffle]');
@@ -33,11 +34,13 @@ videoEndedListener = function () {
 	}
 	else {
 		urlParams.set('shuffle', 1);
-		mod_index = Math.floor(Math.random() * count.value);
+		if (use_ajax == false) {
+			mod_index = Math.floor(Math.random() * count.value);
+		}
 	}
 
 	var repeat = document.querySelector('input[name=vid_repeat]');
-	if (mod_index >= count.value) {
+	if (parseInt(mod_index) >= parseInt(count.value)) {
 		if (repeat.checked == true) {
 			urlParams.set('repeat', 1);
 			mod_index = 0;
@@ -68,6 +71,12 @@ videoEndedListener = function () {
 
 	const collection = urlParams.get('collection');
 	var ajaxUrl = '/vplaylist/getnextvideo.php?collection=' + collection + '&index=' + mod_index;
+	if (shuffle.checked == true) {
+		ajaxUrl += '&shuffle=1';
+	}
+	if (repeat.checked == true) {
+		ajaxUrl += '&repeat=1';
+	}
 	loadDoc(ajaxUrl);
 };
 
