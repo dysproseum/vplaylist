@@ -62,6 +62,14 @@ function create_dir($new_dir) {
   }
 }
 
+function fill_session_queue($machine_name) {
+  global $collections;
+  foreach ($collections[$machine_name]['items'] as $i => $item) {
+    $_SESSION[$machine_name]["p$i"] = $item;
+    $_SESSION[$machine_name]["p$i"]['index'] = $i;
+  }
+}
+
 function human_filesize($bytes, $dec = 2) {
     $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
     $factor = floor((strlen($bytes) - 1) / 3);

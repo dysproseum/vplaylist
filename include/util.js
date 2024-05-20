@@ -7,6 +7,13 @@ function loadDoc(url) {
         player.src = vidSrc;
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
+        var urlParams = new URLSearchParams(window.location.search);
+        if (data.index >= 0) {
+          urlParams.set('index', data.index);
+	  var newUrl = "/vplaylist/index.php?" + urlParams.toString();
+          var stateObj = '';
+          window.history.pushState(stateObj, "vplaylist", newUrl);
+        }
     }
   };
   xhttp.open("GET", url, true);
