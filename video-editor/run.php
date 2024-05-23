@@ -1,6 +1,6 @@
 <?php
 
-require_once '../include/bootstrap.php';
+require_once dirname(__FILE__) . '/../include/bootstrap.php';
 global $collections;
 global $conf;
 

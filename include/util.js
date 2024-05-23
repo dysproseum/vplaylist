@@ -3,7 +3,7 @@ function loadDoc(url) {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var data = JSON.parse(this.responseText);
-        var vidSrc = '/vplaylist/serve.php?filename=' + data.base64 + '&file=.mp4';
+        var vidSrc = '/vplaylist/serve.php?collection=' + data.collection + '&index=' + data.index + '&file=.mp4';
         player.src = vidSrc;
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;

@@ -183,7 +183,7 @@ if ($action == "gen") {
   // Output updated json file for this collection.
   $collections[$name]['items'] = array_reverse($collections[$name]['items']);
   $out = array($name => $collections[$name]);
-  $json = json_encode($out, JSON_PRETTY_PRINT);
+  $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
   print $json . "\n";
   exit;
 }

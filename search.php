@@ -35,7 +35,6 @@ foreach ($collections as $name => $values) {
   <div class="listing">
 	<?php
 	        $basename = basename($item['filename'], '.mp4');
-	        $vid_param = base64_encode($item['filename']);
 	        $thumbnail = THUMBS_PATH . $item['machine_name'] . '/' . $basename . '.jpg';
 	        $vid_link = 'index.php?collection=' . $item['machine_name'] . '&index=' . $item['index'];
 	?>

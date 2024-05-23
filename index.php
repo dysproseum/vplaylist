@@ -37,7 +37,6 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	}
 	else {
 		$item = $collections[$machine_name]['items'][$index];
-		$vid_file = base64_encode(addslashes($item['filename']));
 		$vid_title = basename($item['filename'], '.mp4');
 		$vid_player = TRUE;
 	}
@@ -71,9 +70,9 @@ require_once 'include/header.php';
 	<div class="player">
 	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
-			<source src="serve.php?filename=<?php print $vid_file; ?>" type="video/mp4" />
+			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
 		<?php else: ?>
-			<source src="serve.php?filename=<?php print $vid_file; ?>&file=.mp4" type="video/mp4" />
+			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
 		<?php endif; ?>
 	</video>
 	<span id="vid_title" class="label">
@@ -181,7 +180,6 @@ require_once 'include/header.php';
 	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
-			$vid_param = base64_encode($item['filename']);
 			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename . '.jpg';
 			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
 		?>
