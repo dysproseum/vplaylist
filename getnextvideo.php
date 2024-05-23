@@ -1,10 +1,12 @@
 <?php
 
 if (!isset($_REQUEST['index']) || !isset($_REQUEST['collection'])) {
-	exit('No index or collection specified');
+  header('HTTP/1.1 404 Not found');
+  exit('No index or collection specified');
 }
 
 require_once 'include/bootstrap.php';
+global $collections;
 
 $index = $_REQUEST['index'];
 $machine_name = $_REQUEST['collection'];
@@ -54,8 +56,8 @@ if (!isset($items[$index])) {
 
 $item = $items[$index];
 $item['index'] = $index;
-$item['base64'] = base64_encode(addslashes($item['filename']));
+$item['collection'] = $machine_name;
 $item['filename'] = basename($item['filename'], '.mp4');
 $item['queue_size'] = $queue_size;
 
-print json_encode($item, JSON_PRETTY_PRINT);
+print json_encode($item, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

@@ -1,21 +1,31 @@
 <?php
 
-if (isset($_REQUEST['filename'])) {
-  $filename = $_REQUEST['filename'];
-  $filepath = stripslashes(base64_decode($filename));
+require_once dirname(__FILE__) . '/include/bootstrap.php';
+global $collections;
+$dir = $conf['video_dir'];
+
+if (isset($_REQUEST['index'])) {
+  $index = $_REQUEST['index'];
+  $machine_name = $_REQUEST['collection'];
+  $item = $collections[$machine_name]['items'][$index];
+  $filepath = $item['filename'];
 }
 else {
+  header('HTTP/1.1 404 Not found');
   exit;
 }
 
-// @todo base64 doesn't play nice with quotes and emojis in the name.
-$dir = glob('/overflow/vplaylist_mp4/video_editor/mp4/*.mp4');
-
-$file = basename($filepath);
+$filename = basename($filepath);
 $filesize = filesize($filepath);
 $offset = 0;
 $length = $filesize;
 $buffer_size = 1024 * 1024;
+
+$fp = fopen($filepath, "rb");
+if (!$fp) {
+  header('HTTP/1.1 404 Not found');
+  exit;
+}
 
 // Allow seeking.
 header("Accept-Ranges: bytes");
@@ -52,18 +62,14 @@ if (!isset($_REQUEST['file'])) {
 	exit;
 }
 
-$fp = fopen($filepath, "rb");
-if ($fp) {
-	header('Content-Disposition: attachment');
-	header('Content-Type: video/mp4');
-	header('Content-Transfer-Encoding: binary');
-	header("Content-Length: $length");
+header('Content-Disposition: attachment');
+header('Content-Type: video/mp4');
+header('Content-Transfer-Encoding: binary');
+header("Content-Length: $length");
 
-	fseek($fp, $offset);
-	while (!feof($fp)) {
-		$buffer = fread($fp, 32 * 1024);
-		print $buffer;
-	}
-	fclose($fp);
-	exit;
+fseek($fp, $offset);
+while (!feof($fp)) {
+	$buffer = fread($fp, 32 * 1024);
+	print $buffer;
 }
+fclose($fp);
