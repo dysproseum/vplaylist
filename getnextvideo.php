@@ -51,6 +51,7 @@ else {
 
 $items = $collections[$machine_name]['items'];
 if (!isset($items[$index])) {
+  header('HTTP/1.1 404 Not found');
   exit('Invalid index ' . $index . '.');
 }
 

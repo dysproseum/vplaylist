@@ -43,7 +43,9 @@ videoEndedListener = function () {
 	if (parseInt(mod_index) >= parseInt(count.value)) {
 		if (repeat.checked == true) {
 			urlParams.set('repeat', 1);
-			mod_index = 0;
+			if (use_ajax == false) {
+				mod_index = 0;
+			}
 		}
 		else {
 			urlParams.set('repeat', 0);
@@ -61,7 +63,7 @@ videoEndedListener = function () {
 
 	urlParams.set('index', mod_index);
 	if (use_ajax == false) {
-	  window.location.search = urlParams.toString();
+		window.location.search = urlParams.toString();
         }
 
 	// Load next video via ajax.
