@@ -179,8 +179,9 @@ require_once 'include/header.php';
 	<div class="listing">
 	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
-			$basename = basename($item['filename'], '.mp4');
-			$thumbnail = THUMBS_PATH . $machine_name . '/' . $basename . '.jpg';
+			$basename = basename($item['filename'], '.mp4') . '.jpg';
+			$thumbnail = rawurlencode($basename);
+			$thumbnail = THUMBS_PATH . $machine_name . '/' . $thumbnail;
 			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
 		?>
 
