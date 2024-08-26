@@ -67,8 +67,14 @@ foreach ($urls as $index => $url) {
 
   print "\nDownloading...";
   chdir($video_editor_dir . "/download");
-  $cmd = "yt-dlp -q --no-warnings $url";
-  exec($cmd);
+  $cmd = "yt-dlp $url";
+
+  // Run command and log errors.
+  $output = [];
+  $result = exec("$cmd 2>&1", $output, $result_code);
+  if ($result_code != 0) {
+    print_r($output);
+  }
   print "done.";
 
   if (EXTERNAL_MEDIA) {
