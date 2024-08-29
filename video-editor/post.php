@@ -7,6 +7,8 @@ if (!isset($_REQUEST['video1'])) {
 }
 
 $url = $_REQUEST['video1'];
+$machine_name = $_REQUEST['select_collection_name'];
+error_log("New link queued for collection: " . $machine_name);
 
 // Sanitize url.
 $url = filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED);
@@ -25,6 +27,7 @@ $handle = fopen($p, 'a');
 if ($handle) {
   fputs($handle, $url . PHP_EOL);
   fclose($handle);
+  chmod($p, 0777);
 }
 else {
   exit('Error writing links');

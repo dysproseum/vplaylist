@@ -1,6 +1,11 @@
 <?php
-include("../include/bootstrap.php");
-include("../include/header.php");
+
+chdir(dirname(__FILE__) . "/../");
+include(dirname(__FILE__) . "/../include/bootstrap.php");
+global $collections;
+
+include(dirname(__FILE__) . "../include/header.php");
+
 ?>
 
 <link rel="stylesheet" href="../include/style.css">
@@ -18,8 +23,9 @@ include("../include/header.php");
         
         <label for="select_collection_name">Choose collection</label>
 	<select name="select_collection_name">
-          <option selected value="video_editor">Video Editor</option>
-          <option value="ambient">Ambient</option>
+          <?php foreach ($collections as $name => $values): ?>
+            <option value="<?php print $name; ?>"><?php print $values['name']; ?></option>
+          <?php endforeach; ?>
         </select>
 
         <input type="submit" />
@@ -35,4 +41,4 @@ include("../include/header.php");
   </div>
 </div>
 
-<?php include ("../include/footer.php"); ?>
+<?php include(dirname(__FILE__) . "../include/footer.php"); ?>
