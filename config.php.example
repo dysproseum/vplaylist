@@ -2,6 +2,8 @@
 
 global $conf;
 
+$config['debug'] = false;
+
 // Unmuting failed and the element was paused instead because the user didn't interact with the document before. https://goo.gl/xX8pDD
 $conf['start_muted'] = true;
 

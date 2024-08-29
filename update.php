@@ -1,8 +1,5 @@
 <?php
 
-// See also bootstrap.php:vlog().
-define('DEBUG', false);
-
 require_once 'include/bootstrap.php';
 global $collections;
 $htmlpath = dirname(__FILE__);
@@ -95,11 +92,11 @@ foreach ($machine_names as $name) {
 
   // Find new files by removing existing items from the array.
   foreach ($mod_files as $index => $file) {
-    if (DEBUG) vlog("\n $index. $file ");
+    if (DEBUG == 2) vlog("\n $index. $file ");
 
     foreach ($collections[$name]['items'] as $item) {
       if (basename($item['filename']) == basename($file)) {
-        if (DEBUG) vlog("\n MATCH");
+        if (DEBUG == 2) vlog("\n MATCH");
 
         unset($mod_files[$index]);
       }
@@ -131,10 +128,10 @@ foreach ($machine_names as $name) {
   // Show any deleted files by 
   // Loop again through collections and compare to file list.
   $mod_items = $collections[$name]['items'];
-  if (DEBUG) vlog("\n\nDeleted files:");
+  if (DEBUG == 2) vlog("\n\nDeleted files:");
 
   foreach ($mod_items as $index => $item) {
-    if (DEBUG) vlog("\n $index. " . basename($item['filename']));
+    if (DEBUG == 2) vlog("\n $index. " . basename($item['filename']));
 
     // If filename from directory matches one in the json, skip it.
     // We only want to show items whose files may have been deleted.

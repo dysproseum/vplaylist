@@ -8,7 +8,13 @@ if (file_exists($script)) {
 define('CONFIG_PATH', './collections/');
 define('THUMBS_PATH', './thumbnails/');
 
-global $collections;
+if (isset($conf['debug'])) {
+  define('DEBUG', $conf['debug']);
+}
+else {
+  define('DEBUG', false);
+}
+
 $collections = array();
 foreach(glob(CONFIG_PATH.'*.json') as $filename) {
 	$collection = json_decode(file_get_contents($filename), true);
@@ -39,6 +45,23 @@ function dlog($message, $override_newline = FALSE) {
   else {
     print PHP_EOL . "$timestamp  $message";
   }
+}
+
+// Run command and log errors.
+function vcmd($cmd, $message='') {
+  if ($message != '') {
+    print "\n$message";
+  }
+
+  $output = [];
+  $result = exec("$cmd 2>&1", $output, $result_code);
+  if (DEBUG || $result_code != 0) {
+    foreach ($output as $line) {
+      print "  $line\n";
+    }
+  }
+
+  return $result_code;
 }
 
 function machine_name($collection_name) {

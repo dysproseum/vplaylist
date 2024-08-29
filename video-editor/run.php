@@ -1,9 +1,12 @@
 <?php
 
-require_once dirname(__FILE__) . '/../include/bootstrap.php';
+// We know this should be the parent directory.
+$htmlpath = dirname(__FILE__) . "/../";
+chdir($htmlpath);
+require_once 'include/bootstrap.php';
 global $collections;
-global $conf;
 
+global $conf;
 define('COLLECTION_NAME', $conf['import_collection']);
 define('MACHINE_NAME', machine_name(COLLECTION_NAME));
 define('EXTERNAL_MEDIA', $conf['external_media']);
@@ -14,18 +17,17 @@ define('STORE_TARGET', $conf['store_target']);
 // Define directories.
 $video_editor_dir = $conf['video_dir'] . "/video-editor";
 $p = $video_editor_dir . "/links.txt";
-// We know this should be the parent directory.
-$htmlpath = dirname(__FILE__) . "/../";
 // Rsync optional, ex. files stored on a NAS.
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
-
 /***************************************************/
-
 
 // 1. Check for job in progress.
 if (file_exists("$p.inprogress")) {
-  error_log("\nJob still in progress, waiting to process new requests...");
+  print ".";
+  if (DEBUG == 2) {
+    dlog("[DEBUG] Job still in progress, waiting to process new requests...");
+  }
   exit;
 }
 
@@ -44,13 +46,13 @@ if ($handle) {
 
     fclose($handle);
 } else {
-    error_log("Error opening $p");
+    dlog("Error opening $p");
     exit;
 }
 $plural_maybe = "no requests";
 $cnt = sizeof($urls);
 if ($cnt == 0) {
-  print "\nQueue contained empty line";
+  dlog("Queue contained empty line");
 }
 else if ($cnt == 1) {
   $plural_maybe = "There is 1 request";
@@ -63,19 +65,32 @@ dlog("$plural_maybe in the queue.");
 // 3. Download.
 foreach ($urls as $index => $url) {
   $numeral = $index + 1;
-  echo "\n  [$numeral/$cnt] $url";
+  print "\n  [$numeral/$cnt] $url";
 
-  print "\nDownloading...";
-  chdir($video_editor_dir . "/download");
+  $download_dir = $video_editor_dir . "/download";
+  $before = glob($download_dir . "/*");
+  chdir($download_dir);
   $cmd = "yt-dlp $url";
-
-  // Run command and log errors.
-  $output = [];
-  $result = exec("$cmd 2>&1", $output, $result_code);
-  if ($result_code != 0) {
-    print_r($output);
-  }
+  vcmd($cmd, "Downloading...");
   print "done.";
+
+  // Get filename.
+  $after = glob($download_dir . "/*");
+  $diff = array_diff($after, $before);
+  if (!empty($diff)) {
+    $filename = $diff[0];
+    print "\n  Saved to: $filename\n";
+  }
+  else {
+    dlog("Downloaded file not found");
+    print_r($after);
+    exit;
+  }
+  // Clean up characters before conversion.
+  $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);
+  print "\niconv filename: " . basename($iconv);
+  $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
+  print "\npreg filename: " . basename($preg) . "\n";
 
   if (EXTERNAL_MEDIA) {
     print "\nTransferring to media processor...";
@@ -104,51 +119,60 @@ foreach ($urls as $index => $url) {
     // Process videos locally.
     print "\nProcessing media...";
     $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
-    shell_exec($cmd);
+    vcmd($cmd);
     print "done.";
 
     // Verify import collection exist.
-    chdir($htmlpath);
-    if (!isset($collection[MACHINE_NAME])) {
+    $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
+    if (!is_dir($import_dir)) {
+      chdir($htmlpath);
       $cmd = 'php update.php create "' . COLLECTION_NAME . '"';
-      exec($cmd);
+      vcmd($cmd);
     }
 
     // Copy to import directory.
     chdir($video_editor_dir);
     $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
     $cmd = "cp mp4/* $import_dir/";
-    exec($cmd);
+    vcmd($cmd);
+
+    // Remove files to prevent future copying.
+    $cmd = "rm mp4/*";
+    vcmd($cmd);
+    // Also remove from downloads or they get regenerated...
+    // Move into orig folder?
+    create_dir($video_editor_dir . "/originals");
+    $cmd = "mv download/* originals/";
+    vcmd($cmd);
+
   }
 }
 
 
 // 6. Refresh.
-print "\nRefreshing metadata...";
+print "\nCollection " . MACHINE_NAME . ": " . sizeof($collections[MACHINE_NAME]['items']);
 chdir($htmlpath);
 $cmd = "php update.php diff " . MACHINE_NAME;
-exec($cmd);
+vcmd($cmd, "Refreshing metadata...");
 $cmd = "php update.php gen " . MACHINE_NAME;
-exec($cmd);
+if (DEBUG == 2) vcmd($cmd, "Generating collection...");
 $cmd = "php update.php gen " . MACHINE_NAME . " > " . MACHINE_NAME . ".json";
-exec($cmd);
+vcmd($cmd, "Saving new collection...");
 $cmd = "diff " . MACHINE_NAME . ".json collections/" . MACHINE_NAME . ".json";
-exec($cmd);
+if (DEBUG == 2) vcmd($cmd, "Running diff...");
 $cmd = "cp " . MACHINE_NAME . ".json collections/";
-exec($cmd);
+vcmd($cmd, "Updating collection...");
 print "done.";
 
 
 // 7. Generate.
-print "\nGenerating thumbnails...";
 chdir($htmlpath);
 $cmd = "php generate.php " . MACHINE_NAME;
-exec($cmd);
+vcmd($cmd, "Generating thumbnails...");
 print "done.";
 dlog("Job completed.\n");
 
 // Delete links.txt
-// @todo only if successful
 unlink("$p.inprogress");
 
-// @todo Email notifications
+// @todo notifications
