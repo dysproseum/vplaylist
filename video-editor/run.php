@@ -84,7 +84,7 @@ foreach ($urls as $index => $url) {
   else {
     dlog("Downloaded file not found");
     print_r($after);
-    exit;
+    continue;
   }
   // Clean up characters before conversion.
   $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);

@@ -6,6 +6,10 @@ $machine_names = array();
 $ffmpeg = 'ffmpeg -loglevel quiet';
 $ffprobe_width = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=width -of csv=s=,:p=0 ';
 $ffprobe_height = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=height -of csv=s=,:p=0 ';
+$ffprobe_length = 'ffprobe -loglevel error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ';
+
+// Timestamp to capture thumbnail (default: 4 seconds).
+$thumb_timestamp = '00:00:04.00';
 
 if (isset($argv[1])) {
 	$machine_names[] = $argv[1];
@@ -38,8 +42,12 @@ foreach ($machine_names as $name) {
 		$cmd = $ffprobe_height . '"' . $input . '"';
 		$height = exec($cmd);
 
+		// Determine duration to ensure thumbnail capture.
+		$cmd = $ffprobe_length . '"' . $input . '"';
+		$length = exec($cmd);
+
 		// @todo if ($height > $width)
-		$cmd = $ffmpeg . ' -ss 00:00:06.00 -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
-		exec($cmd);
+		$cmd = $ffmpeg . ' -ss ' . $thumb_timestamp . ' -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
+		vcmd($cmd);
 	}
 }
