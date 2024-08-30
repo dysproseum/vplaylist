@@ -98,14 +98,12 @@ require_once 'include/header.php';
 		<?php
 			$total = sizeof($values['items']);
 			$index = rand(0, $total - 1);
-			$thumbnail = basename($collections[$collection]['items'][$index]['filename'], '.mp4') . '.jpg';
-			$thumbnail = rawurlencode($thumbnail);
-			$url = THUMBS_PATH . "$collection/$thumbnail";
+			$thumbnail = 'serve.php?collection=' . $collection . '&index=' . $index . '&file=.jpg';
 		?>
 
 		<div class="thumbnail">
 		<a href="index.php?collection=<?php print $collection; ?>">
-		<img src="<?php print $url; ?>" width="320" />
+		<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
 		<span class="label label-bottom"><?php print $total; ?> videos</span>
@@ -180,8 +178,7 @@ require_once 'include/header.php';
 	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
-			$thumbnail = rawurlencode($basename);
-			$thumbnail = THUMBS_PATH . $machine_name . '/' . $thumbnail . '.jpg';
+			$thumbnail = 'serve.php?collection=' . $machine_name . '&index=' . $index . '&file=.jpg';
 			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
 		?>
 
