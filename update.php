@@ -20,8 +20,10 @@ else if (isset($argv[2])) {
 }
 else if ($action != "list") {
   print "Usage: php update.php [diff|gen|create|list] [collection_id]\n\n";
-  print "  gen --all           Update all collections.\n";
   print "  create \"New Vids\"   Create new collection.\n";
+  print "  gen --all           Display JSON for collection(s).\n";
+  print "  diff new_vids       Show files to be added or removed.\n";
+  print "  gen --overwrite     Update the collection file on disk.\n";
   exit;
 }
 
@@ -183,10 +185,22 @@ foreach ($collections[$name]['items'] as &$item) {
 }
 
 if ($action == "gen") {
-  // Output updated json file for this collection.
-  $collections[$name]['items'] = array_reverse($collections[$name]['items']);
+  $collections[$name]['items'] = array_reverse($collections[$name]['items'], true);
   $out = array($name => $collections[$name]);
   $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-  print $json . "\n";
+
+  if ($argv[3] == "--overwrite") {
+    // Write out new json file.
+    $target = $htmlpath . '/collections/' . $name . '.json';
+    $fp = fopen($target, 'wb');
+    if ($fp) {
+      fputs($fp, $json);
+      fclose($fp);
+    }
+  }
+  else {
+    // Output updated json preview.
+    print $json . "\n";
+  }
   exit;
 }

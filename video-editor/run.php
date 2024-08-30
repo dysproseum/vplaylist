@@ -70,27 +70,28 @@ foreach ($urls as $index => $url) {
   $download_dir = $video_editor_dir . "/download";
   $before = glob($download_dir . "/*");
   chdir($download_dir);
+
+  $elapsed = time();
   $cmd = "yt-dlp $url";
   vcmd($cmd, "Downloading...");
-  print "done.";
+  print " (" . (time() - $elapsed) . "s)";
 
   // Get filename.
   $after = glob($download_dir . "/*");
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
     $filename = $diff[0];
-    print "\n  Saved to: $filename\n";
+    print "\n  " . basename($filename);
   }
   else {
     dlog("Downloaded file not found");
     print_r($after);
     continue;
   }
-  // Clean up characters before conversion.
+
+  // @todo clean up characters before conversion.
   $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);
-  print "\niconv filename: " . basename($iconv);
   $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
-  print "\npreg filename: " . basename($preg) . "\n";
 
   if (EXTERNAL_MEDIA) {
     print "\nTransferring to media processor...";
@@ -117,10 +118,10 @@ foreach ($urls as $index => $url) {
   }
   else {
     // Process videos locally.
-    print "\nProcessing media...";
+    $elapsed = time();
     $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
-    vcmd($cmd);
-    print "done.";
+    vcmd($cmd, "Processing media...");
+    print " (" . (time() - $elapsed) . "s)";
 
     // Verify import collection exist.
     $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
@@ -130,46 +131,42 @@ foreach ($urls as $index => $url) {
       vcmd($cmd);
     }
 
-    // Copy to import directory.
+    // Move converted files to data directory.
     chdir($video_editor_dir);
     $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
-    $cmd = "cp mp4/* $import_dir/";
+    $cmd = "mv mp4/* $import_dir/";
     vcmd($cmd);
 
-    // Remove files to prevent future copying.
-    $cmd = "rm mp4/*";
-    vcmd($cmd);
-    // Also remove from downloads or they get regenerated...
-    // Move into orig folder?
-    create_dir($video_editor_dir . "/originals");
+    // Move downloads into originals folder or they get regenerated.
     $cmd = "mv download/* originals/";
     vcmd($cmd);
-
   }
 }
 
 
 // 6. Refresh.
-print "\nCollection " . MACHINE_NAME . ": " . sizeof($collections[MACHINE_NAME]['items']);
 chdir($htmlpath);
+
+$elapsed = time();
 $cmd = "php update.php diff " . MACHINE_NAME;
-vcmd($cmd, "Refreshing metadata...");
-$cmd = "php update.php gen " . MACHINE_NAME;
-if (DEBUG == 2) vcmd($cmd, "Generating collection...");
-$cmd = "php update.php gen " . MACHINE_NAME . " > " . MACHINE_NAME . ".json";
-vcmd($cmd, "Saving new collection...");
-$cmd = "diff " . MACHINE_NAME . ".json collections/" . MACHINE_NAME . ".json";
-if (DEBUG == 2) vcmd($cmd, "Running diff...");
-$cmd = "cp " . MACHINE_NAME . ".json collections/";
-vcmd($cmd, "Updating collection...");
-print "done.";
+vcmd($cmd, "Comparing files...");
+print " (" . (time() - $elapsed) . "s)";
+
+print "\nCollection " . MACHINE_NAME . ": " . sizeof($collections[MACHINE_NAME]['items']);
+
+$elapsed = time();
+$cmd = "php update.php gen " . MACHINE_NAME . " --overwrite";
+vcmd($cmd, "Writing collection...");
+print " (" . (time() - $elapsed) . "s)";
 
 
 // 7. Generate.
 chdir($htmlpath);
+$elapsed = time();
 $cmd = "php generate.php " . MACHINE_NAME;
 vcmd($cmd, "Generating thumbnails...");
-print "done.";
+print " (" . (time() - $elapsed) . "s)";
+
 dlog("Job completed.\n");
 
 // Delete links.txt
