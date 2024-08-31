@@ -7,8 +7,6 @@ require_once 'include/bootstrap.php';
 global $collections;
 
 global $conf;
-define('COLLECTION_NAME', $conf['import_collection']);
-define('MACHINE_NAME', machine_name(COLLECTION_NAME));
 define('EXTERNAL_MEDIA', $conf['external_media']);
 define('MEDIA_HOSTNAME', $conf['media_hostname']);
 define('STORE_HOSTNAME', $conf['store_hostname']);
@@ -16,63 +14,53 @@ define('STORE_TARGET', $conf['store_target']);
 
 // Define directories.
 $video_editor_dir = $conf['video_dir'] . "/video-editor";
-$p = $video_editor_dir . "/links.txt";
+$p = $video_editor_dir . "/links.json";
 // Rsync optional, ex. files stored on a NAS.
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
 /***************************************************/
 
-// 1. Check for job in progress.
-if (file_exists("$p.inprogress")) {
-  print ".";
-  if (DEBUG == 2) {
-    dlog("[DEBUG] Job still in progress, waiting to process new requests...");
-  }
-  exit;
-}
-
-// 2. Check pending requests.
-$urls = [];
+// 1. Check pending requests.
 if (!file_exists($p)) {
   exit;
 }
-rename($p, "$p.inprogress");
-$handle = fopen("$p.inprogress", "r");
-if ($handle) {
 
-    while (($line = fgets($handle)) !== false) {
-        $urls[] = $line;
-    }
+// 2. Check for job in progress.
+$queue = [];
+$q = new Queue($p);
+$q->load();
+$links = $q->getLinks();
+$queue = $q->queueLinks();
+$cnt = sizeof($queue);
 
-    fclose($handle);
-} else {
-    dlog("Error opening $p");
-    exit;
+// Indicate progress in log file.
+if (empty($queue) && !(empty($links))) {
+  print ".";
 }
-$plural_maybe = "no requests";
-$cnt = sizeof($urls);
-if ($cnt == 0) {
-  dlog("Queue contained empty line");
-}
-else if ($cnt == 1) {
-  $plural_maybe = "There is 1 request";
-}
-else {
-  $plural_maybe = "There are $cnt requests";
-}
-dlog("$plural_maybe in the queue.");
 
-// 3. Download.
-foreach ($urls as $index => $url) {
+// Nothing to do.
+if (empty($queue)) {
+  // Return if no unset items to start.
+  if (DEBUG == 2) print "No unqueued links\n";
+  exit;
+}
+
+print "\nThere are $cnt requests in the queue";
+
+// 3. Download queued links.
+foreach ($queue as $index => $link) {
+
+  $q->setStatus('downloading', $index);
+
   $numeral = $index + 1;
-  print "\n  [$numeral/$cnt] $url";
+  print "\n  [$numeral/$cnt] " . $link['url'];
 
   $download_dir = $video_editor_dir . "/download";
   $before = glob($download_dir . "/*");
   chdir($download_dir);
 
   $elapsed = time();
-  $cmd = "yt-dlp $url";
+  $cmd = "yt-dlp " . $link['url'];
   vcmd($cmd, "Downloading...");
   print " (" . (time() - $elapsed) . "s)";
 
@@ -80,13 +68,14 @@ foreach ($urls as $index => $url) {
   $after = glob($download_dir . "/*");
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
-    $filename = $diff[0];
-    print "\n  " . basename($filename);
+    $filename = basename(array_shift($diff));
+    $q->setTitle($filename, $index);
+    print "\n  " . $filename;
   }
   else {
-    dlog("Downloaded file not found");
-    print_r($after);
-    continue;
+    $q->setTitle(array_shift($after), $index);
+    dlog("No new downloads found");
+    if (DEBUG == 2) print_r($after);
   }
 
   // @todo clean up characters before conversion.
@@ -117,6 +106,7 @@ foreach ($urls as $index => $url) {
     print "done.";
   }
   else {
+    $q->setStatus('processing', $index);
     // Process videos locally.
     $elapsed = time();
     $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
@@ -124,52 +114,53 @@ foreach ($urls as $index => $url) {
     print " (" . (time() - $elapsed) . "s)";
 
     // Verify import collection exist.
-    $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
+    $machine_name = $link['collection'];
+    $import_dir = $conf['video_dir'] . '/' . $machine_name;
     if (!is_dir($import_dir)) {
       chdir($htmlpath);
-      $cmd = 'php update.php create "' . COLLECTION_NAME . '"';
+      $cmd = 'php update.php create "' . $machine_name . '"';
       vcmd($cmd);
     }
 
     // Move converted files to data directory.
     chdir($video_editor_dir);
-    $import_dir = $conf['video_dir'] . '/' . MACHINE_NAME;
     $cmd = "mv mp4/* $import_dir/";
     vcmd($cmd);
 
     // Move downloads into originals folder or they get regenerated.
     $cmd = "mv download/* originals/";
     vcmd($cmd);
+
+
+    // 6. Refresh.
+    $q->setStatus('refreshing', $index);
+    chdir($htmlpath);
+
+    $elapsed = time();
+    $cmd = "php update.php diff " . $machine_name;
+    vcmd($cmd, "Comparing files...");
+    print " (" . (time() - $elapsed) . "s)";
+
+    print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+
+    $elapsed = time();
+    $cmd = "php update.php gen " . $machine_name . " --overwrite";
+    vcmd($cmd, "Writing collection...");
+    print " (" . (time() - $elapsed) . "s)";
+
+
+    // 7. Generate.
+    chdir($htmlpath);
+    $elapsed = time();
+    $cmd = "php generate.php " . $machine_name;
+    vcmd($cmd, "Generating thumbnails...");
+    print " (" . (time() - $elapsed) . "s)";
   }
+
+  // Set link to complete/remove it.
+  $q->setCompleted($index);
+
+  // @todo notifications
 }
 
-
-// 6. Refresh.
-chdir($htmlpath);
-
-$elapsed = time();
-$cmd = "php update.php diff " . MACHINE_NAME;
-vcmd($cmd, "Comparing files...");
-print " (" . (time() - $elapsed) . "s)";
-
-print "\nCollection " . MACHINE_NAME . ": " . sizeof($collections[MACHINE_NAME]['items']);
-
-$elapsed = time();
-$cmd = "php update.php gen " . MACHINE_NAME . " --overwrite";
-vcmd($cmd, "Writing collection...");
-print " (" . (time() - $elapsed) . "s)";
-
-
-// 7. Generate.
-chdir($htmlpath);
-$elapsed = time();
-$cmd = "php generate.php " . MACHINE_NAME;
-vcmd($cmd, "Generating thumbnails...");
-print " (" . (time() - $elapsed) . "s)";
-
 dlog("Job completed.\n");
-
-// Delete links.txt
-unlink("$p.inprogress");
-
-// @todo notifications

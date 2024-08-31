@@ -1,9 +1,7 @@
 <?php
 
-$script = dirname(__FILE__) . '/../config.php';
-if (file_exists($script)) {
-	require_once($script);
-}
+require_once(dirname(__FILE__) . '/../config.php');
+require_once('queue.php');
 
 define('CONFIG_PATH', './collections/');
 define('THUMBS_PATH', './thumbnails/');

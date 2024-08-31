@@ -4,7 +4,7 @@ chdir(dirname(__FILE__) . "/../");
 include(dirname(__FILE__) . "/../include/bootstrap.php");
 global $collections;
 
-include(dirname(__FILE__) . "../include/header.php");
+include(dirname(__FILE__) . "/../include/header.php");
 
 ?>
 
@@ -23,6 +23,7 @@ include(dirname(__FILE__) . "../include/header.php");
         
         <label for="select_collection_name">Choose collection</label>
 	<select name="select_collection_name">
+          <option>- Select -</option>
           <?php foreach ($collections as $name => $values): ?>
             <option value="<?php print $name; ?>"><?php print $values['name']; ?></option>
           <?php endforeach; ?>
@@ -30,15 +31,8 @@ include(dirname(__FILE__) . "../include/header.php");
 
         <input type="submit" />
 
-        <label for="video2">Video 2</label>
-        <input type="text" name="video2" disabled placeholder="Coming Soon" />
-      
-        <label for="email">Email (optional) for notification when complete</label>
-        <input type="text" name="email" disabled placeholder="Coming Soon" />
-        
-      
       </form>
   </div>
 </div>
 
-<?php include(dirname(__FILE__) . "../include/footer.php"); ?>
+<?php include(dirname(__FILE__) . "/../include/footer.php"); ?>
