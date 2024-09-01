@@ -42,8 +42,9 @@ else {
 $links[] = [
   'url' => $url,
   'collection' => $machine_name,
-//  'status' => '',
-//  'title' => '',
+  'status' => 'queued',
+  'title' => 'unknown',
+  'timestamp' => time(),
 ];
 
 $fp = fopen($p, 'wb');
@@ -57,22 +58,6 @@ else {
   exit('Error writing links');
 }
 
-// @todo redirect to download.php for status.
-
-?>
-
-<link rel="stylesheet" href="../include/style.css">
-
-<div class="subnav">
-</div>
-<div class="listing-box">
-  <div class="listing">
-    <form action="post.php" class="video-editor">
-      <h2>Check back soon!</h2>
-
-      <h4><a href="index.php">Add Another Video</a></h4>
-
-      <h4><a href="/vplaylist/index.php?collection=<?php print machine_name($conf['import_collection']); ?>">View Uploaded Videos</a></h4>
-    </form>
-  </div>
-</div>
+// Redirect to download.php for status.
+header('Location: download.php');
+exit;

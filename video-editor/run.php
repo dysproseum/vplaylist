@@ -28,8 +28,7 @@ if (!file_exists($p)) {
 // 2. Check for job in progress.
 $queue = [];
 $q = new Queue($p);
-$q->load();
-$links = $q->getLinks();
+$links = $q->load();
 $queue = $q->queueLinks();
 $cnt = sizeof($queue);
 
@@ -40,12 +39,17 @@ if (empty($queue) && !(empty($links))) {
 
 // Nothing to do.
 if (empty($queue)) {
-  // Return if no unset items to start.
   if (DEBUG == 2) print "No unqueued links\n";
   exit;
 }
 
-print "\nThere are $cnt requests in the queue";
+if ($cnt == 1) {
+  $plural_maybe = "There is 1 request";
+}
+else {
+  $plural_maybe = "There are $cnt requests";
+}
+dlog("$plural_maybe in the queue.");
 
 // 3. Download queued links.
 foreach ($queue as $index => $link) {
