@@ -11,12 +11,14 @@ include(dirname(__FILE__) . "/../include/header.php");
 <link rel="stylesheet" href="../include/style.css">
 
 <div class="subnav">
+  <h2>Video Editor</h2>
+  <h4><a href="download.php">Import Status</a></h4>
+  <h4><a href="/vplaylist/index.php?collection=<?php print machine_name($conf['import_collection']); ?>">View Uploaded Videos</a></h4>
 </div>
 <div class="listing-box">
    <div class="listing">
 
       <form action="post.php" method="post" class="video-editor">
-        <h2>Video Editor</h2>
       
         <label for="video1">Video URL</label>
         <input type="text" name="video1" autocomplete="off" />

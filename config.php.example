@@ -14,8 +14,8 @@ $conf['use_ajax'] = true;
 // Path to directory containing video files.
 $conf['video_dir'] = '/var/www/html/vplaylist';
 
-// Import collection name.
-$conf['import_collection'] = 'Imported Videos';
+// Path to JSON queue for importing videos.
+$conf['json_queue'] = $conf['video_dir'] . "/video-editor/links.json";
 
 // External media processor.
 $conf['external_media'] = false;

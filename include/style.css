@@ -251,8 +251,23 @@ form.video-editor input[type=submit] {
 form.video-editor input, form.video-editor select {
   padding: 20px;
   border: 2px solid black;
+  box-sizing: border-box;
 }
 
-form.video-editor {
-  padding: 20px;
+form.video-editor h2 {
+  padding: 0px;
+}
+
+form#imports .status {
+  width: 100%;
+  border: 1px solid white;
+  padding: 10px;
+}
+
+form#imports span {
+  width: 100%;
+}
+
+form#imports .title {
+  font-weight: bold;
 }

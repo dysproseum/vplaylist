@@ -44,6 +44,10 @@ class Queue {
     return true;
   }
 
+  function json() {
+    return json_encode($this->links, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+  }
+
   function getLinks() {
     return $this->links;
   }
@@ -53,11 +57,13 @@ class Queue {
     foreach ($this->links as $index => $link) {
       // Pull unset items into queue.
       if (!isset($link['status'])) {
-        $this->links[$index]['status'] = 'queued';
+        $this->setStatus('queued', $index);
+        $queue[] = $link;
+      }
+      if ($link['status'] == 'queued') {
         $queue[] = $link;
       }
     }
-    $this->save();
     return $queue;
   }
 
