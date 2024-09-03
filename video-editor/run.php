@@ -151,14 +151,6 @@ foreach ($queue as $index => $link) {
     $cmd = "php update.php gen " . $machine_name . " --overwrite";
     vcmd($cmd, "Writing collection...");
     print " (" . (time() - $elapsed) . "s)";
-
-
-    // 7. Generate.
-    chdir($htmlpath);
-    $elapsed = time();
-    $cmd = "php generate.php " . $machine_name;
-    vcmd($cmd, "Generating thumbnails...");
-    print " (" . (time() - $elapsed) . "s)";
   }
 
   // Set link to complete/remove it.
