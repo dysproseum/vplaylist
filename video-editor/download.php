@@ -29,12 +29,12 @@ include(dirname(__FILE__) . "/../include/header.php");
 ?>
 
 <link rel="stylesheet" href="../include/style.css">
+<script type="text/javascript" src="../include/util.js"></script>
 <script type="text/javascript" src="../include/ping.js"></script>
 
 <div class="subnav">
   <h2>Import Status</h2>
   <h4><a href="index.php">Add Another Video</a></h4>
-  <h4><a href="/vplaylist/index.php?collection=<?php print machine_name($conf['import_collection']); ?>">View Uploaded Videos</a></h4>
 </div>
 <div class="listing-box">
   <div class="listing">
