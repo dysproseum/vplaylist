@@ -108,21 +108,16 @@ foreach ($machine_names as $name) {
 
   // Leftover unmatched files are added to the collection array.
   foreach ($mod_files as $index => $filename) {
-    // reuse logic from install.php
-    $filename = $collection_path . '/' . basename($filename);
     $filename = $dir . '/' . basename($filename);
-    //$filesize = sprintf("%u", filesize($dir . '/' . basename($filename)));
     $filesize = exec('stat -c %s "' . $filename . '"');
-    //if ((int) $filesize < 0) {
-    //  $filesize = exec("stat -c %s " . $filename);
-      //$filesize = sprintf("%u", $filesize + PHP_INT_MAX + PHP_INT_MAX + 2);
-    //}
 
     $build = array(
       'filename' => $collection_path . '/' . basename($filename),
       'size' => $filesize,
       'length' => FALSE,
       'thumbnail' => FALSE,
+      'title' => basename($filename),
+      'timestamp' => filemtime($filename),
     );
     $collections[$name]['items'][] = $build;
   }
@@ -178,18 +173,17 @@ foreach ($machine_names as $name) {
   vlog("\n");
 }
 
-// Add thumbnails.
-foreach ($collections[$name]['items'] as &$item) {
-  $info = pathinfo($item['filename']);
-  $item['thumbnail'] = $htmlpath . '/thumbnails/' . $name . '/' . $info['filename'] . '.jpg';
-}
-
 if ($action == "gen") {
-  $collections[$name]['items'] = array_reverse($collections[$name]['items'], true);
+  // Sort by timestamp.
+  $items = $collections[$name]['items'];
+  usort($items, 'date_compare');
+  $items = array_reverse($items, true);
+  $collections[$name]['items'] = $items;
+
   $out = array($name => $collections[$name]);
   $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-  if ($argv[3] == "--overwrite") {
+  if (isset($argv[3]) && $argv[3] == "--overwrite") {
     // Write out new json file.
     $target = $htmlpath . '/collections/' . $name . '.json';
     $fp = fopen($target, 'wb');
