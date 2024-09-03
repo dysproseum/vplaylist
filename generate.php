@@ -11,30 +11,42 @@ $ffprobe_length = 'ffprobe -loglevel error -show_entries format=duration -of def
 // Timestamp to capture thumbnail (default: 4 seconds).
 $thumb_timestamp = '00:00:04.00';
 
-if (isset($argv[1])) {
-	$machine_names[] = $argv[1];
-	$ffmpeg .= ' -n';
-}
-else if (isset($argv[1]) && $argv[1] == '--all') {
+if (isset($argv[1]) && $argv[1] == '--all') {
 	$ffmpeg .= ' -y';
 	foreach ($collections as $name => $items) {
 		$machine_names[] = $name;
 	}
 }
+else if (isset($argv[1])) {
+	$ffmpeg .= ' -y';
+	$machine_names[] = $argv[1];
+}
 else {
-	print "Usage: php generate.php [collection_id]\n\n";
+	print "Usage: php generate.php {collection_id} [-y]\n\n";
 	print " --all	Regenerate thumbnails from all collections.\n";
 	exit;
+}
+
+$overwrite = false;
+if (isset($argv[2]) && $argv[2] == '-y') {
+  $overwrite = true;
 }
 
 foreach ($machine_names as $name) {
 
 	$out_dir = THUMBS_PATH . $name;
-	exec('mkdir -p ' . $out_dir);
+	vcmd('mkdir -p ' . $out_dir);
+        if ($overwrite) {
+          vcmd("rm $out_dir/*");
+        }
 
 	foreach ($collections[$name]['items'] as $item) {
 		$input = $item['filename'];
-		$output = $out_dir . '/' .  basename($input, '.mp4') . '.jpg';
+		$output = $item['thumbnail'];
+
+                if (file_exists($output) && $overwrite !== true) {
+                  continue;
+                }
 
 		// Determine orientation.
 		$cmd = $ffprobe_width . '"' . $input . '"';

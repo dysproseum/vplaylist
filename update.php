@@ -173,6 +173,12 @@ foreach ($machine_names as $name) {
   vlog("\n");
 }
 
+// Add thumbnails.
+foreach ($collections[$name]['items'] as &$item) {
+  $info = pathinfo($item['filename']);
+  $item['thumbnail'] = $htmlpath . '/thumbnails/' . $name . '/' . $info['filename'] . '.jpg';
+}
+
 if ($action == "gen") {
   // Sort by timestamp.
   $items = $collections[$name]['items'];
