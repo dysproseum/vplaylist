@@ -191,6 +191,11 @@ if ($action == "gen") {
       fputs($fp, $json);
       fclose($fp);
     }
+    // Regenerate thumbnails on update:
+    // If files were added or removed they can be outdated.
+    chdir($htmlpath);
+    $cmd = "php generate.php " . $name;
+    vcmd($cmd);
   }
   else {
     // Output updated json preview.
