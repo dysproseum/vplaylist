@@ -258,16 +258,36 @@ form.video-editor h2 {
   padding: 0px;
 }
 
-form#imports .status {
+form#imports .item {
   width: 100%;
   border: 1px solid white;
   padding: 10px;
 }
 
-form#imports span {
+form#imports .info {
   width: 100%;
 }
 
-form#imports .title {
+form#imports .info .title {
   font-weight: bold;
+}
+
+form#imports .info .status {
+  border: 1px solid white;
+}
+
+form#imports .info img {
+  display: block;
+}
+
+form#imports .downloading {
+  background: dodgerblue;
+}
+
+form#imports .processing {
+  background: gold;
+}
+
+form#imports .refreshing {
+  background: green;
 }

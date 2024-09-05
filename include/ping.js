@@ -19,6 +19,7 @@ function loadPing(url) {
           clone.id = index;
           clone.hidden = false;
           var status = link.status;
+          clone.classList.add(status);
           clone.querySelector('.status').innerHTML = status;
           var timestamp = millisecondsToStr(Date.now() - link.timestamp * 1000);
           clone.querySelector('.timestamp').innerHTML = timestamp;
@@ -35,22 +36,21 @@ function loadPing(url) {
     };
     xhttp.open("GET", url, true);
     xhttp.send();
-    return true;
 }
 
 var timeOut;
+var initialDelay = 2000;
 var delay = 5000;
 var url = "/vplaylist/ping.php";
 
 timeOut = function() {
-  if (loadPing(url)) {
-    setTimeout(timeOut,
-      delay);
-  }
+ loadPing(url);
+ setTimeout(timeOut,
+   delay);
 }
 
 window.addEventListener("load", function() {
   div = document.getElementById('index');
   setTimeout(timeOut,
-    delay);
+    initialDelay);
 });

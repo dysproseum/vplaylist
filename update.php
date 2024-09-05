@@ -200,7 +200,7 @@ if ($action == "gen") {
     // Regenerate thumbnails on update:
     // If files were added or removed they can be outdated.
     chdir($htmlpath);
-    $cmd = "php generate.php " . $name;
+    $cmd = "php generate.php $name -y";
     vcmd($cmd);
   }
   else {
