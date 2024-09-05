@@ -32,6 +32,10 @@ $links = $q->load();
 $queue = $q->queueLinks();
 $cnt = sizeof($queue);
 
+// @todo keep completed items in JSON file for 24 hours.
+// delete completed items with timestamp > 24 hours ago.
+// $q->pruneCompleted();
+
 // Indicate progress in log file.
 if (empty($queue) && !(empty($links))) {
   print ".";

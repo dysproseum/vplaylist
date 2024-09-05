@@ -16,8 +16,8 @@ $links = $q->load();
 // Example data.
 $links[] = [
   'url' => 'https://dysproseum.com/vplaylist',
-  'collection' => 'misc',
-  'status' => 'queued',
+  'collection' => '',
+  'status' => '',
   'title' => 'Loading...',
   'timestamp' => time(),
 ];
@@ -42,27 +42,30 @@ include(dirname(__FILE__) . "/../include/header.php");
     Loading...
     <?php if ($cnt == 0): ?>No active items<?php endif; ?>
     <?php foreach ($links as $index => $link): ?>
-      <div class="status" id="index" hidden>
-        <span class="info">
+      <div class="item" id="index" hidden>
+        <div class="info">
           <span class="title">
             <?php print $link['title'] ? $link['title'] : $link['url'];  ?>
+          </span>
+          <br>
+          <span class="status">
+            <?php print $link['status']; ?>
           </span>
           <span class="collection">
             <?php print $link['collection']; ?>
           </span>
-          <span class="status">
-            <?php print $link['status']; ?>
-          </span>
           <span class="timestamp">
             <?php print $link['timestamp']; ?>
           </span>
-        </span>
-        <!-- assign timestamps to each one -->
-        <!-- handle timer and metadata at the queue level? -->
+        </div>
+        <div class="icon">
+        </div>
+        <!--
         <div class="queued">Queued (<span class="value">0</span>s)</div>
         <div class="downloading">Downloading</div>
         <div class="processing">Processing</div>
         <div class="refreshing">Refreshing</div>
+        -->
       </div>
     <?php endforeach; ?>
     </form>
