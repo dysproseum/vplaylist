@@ -28,8 +28,9 @@ if (!file_exists($p)) {
 // 2. Check for job in progress.
 $queue = [];
 $q = new Queue($p);
-$links = $q->load();
+$q->load();
 $queue = $q->queueLinks();
+$links = $q->getNonCompletedLinks();
 $cnt = sizeof($queue);
 
 // @todo keep completed items in JSON file for 24 hours.
@@ -90,77 +91,91 @@ foreach ($queue as $index => $link) {
   $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);
   $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
 
-  if (EXTERNAL_MEDIA) {
-    print "\nTransferring to media processor...";
-    $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . MEDIA_HOSTNAME . ":" . $video_editor_dir;
-    exec($cmd);
-    print "done.";
+  // Process videos locally.
+  $q->setStatus('processing', $index);
+  $mp4_dir = $video_editor_dir . "/mp4";
+  $before = glob($mp4_dir . "/*");
+  $elapsed = time();
+  $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
+  vcmd($cmd, "Processing media...");
+  print " (" . (time() - $elapsed) . "s)";
 
-    // 4. Convert.
-    print "\n[media_processor] Encoding media format...";
-    $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd ' . $video_editor_dir . ' && ./collect_mp4"';
-    exec($cmd);
-    print "done.";
-
-    // 5. Transfer to storage.
-    print "\n[media processor] Transferring to storage...";
-    $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* ' . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
-    exec($cmd);
-    print "done.";
-
-    print "\nTransferring to storage...";
-    $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET;
-    system($cmd);
-    print "done.";
+  // Get filename.
+  $after = glob($mp4_dir . "/*");
+  $diff = array_diff($after, $before);
+  if (!empty($diff)) {
+    $filename = basename(array_shift($diff));
+    $q->setTitle($filename, $index);
+    print "\n  " . $filename;
   }
   else {
-    $q->setStatus('processing', $index);
-    // Process videos locally.
-    $elapsed = time();
-    $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
-    vcmd($cmd, "Processing media...");
-    print " (" . (time() - $elapsed) . "s)";
-
-    // Verify import collection exist.
-    $machine_name = $link['collection'];
-    $import_dir = $conf['video_dir'] . '/' . $machine_name;
-    if (!is_dir($import_dir)) {
-      chdir($htmlpath);
-      $cmd = 'php update.php create "' . $machine_name . '"';
-      vcmd($cmd);
-    }
-
-    // Move converted files to data directory.
-    chdir($video_editor_dir);
-    $cmd = "mv mp4/* $import_dir/";
-    vcmd($cmd);
-
-    // Move downloads into originals folder or they get regenerated.
-    $cmd = "mv download/* originals/";
-    vcmd($cmd);
-
-
-    // 6. Refresh.
-    $q->setStatus('refreshing', $index);
-    chdir($htmlpath);
-
-    $elapsed = time();
-    $cmd = "php update.php diff " . $machine_name;
-    vcmd($cmd, "Comparing files...");
-    print " (" . (time() - $elapsed) . "s)";
-
-    print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
-
-    $elapsed = time();
-    $cmd = "php update.php gen " . $machine_name . " --overwrite";
-    vcmd($cmd, "Writing collection...");
-    print " (" . (time() - $elapsed) . "s)";
+    $q->setTitle(array_shift($after), $index);
+    dlog("No new downloads found");
+    if (DEBUG == 2) print_r($after);
   }
 
-  // Set link to complete/remove it.
-  $q->setCompleted($index);
+  // Verify import collection exist.
+  $machine_name = $link['collection'];
+  $import_dir = $conf['video_dir'] . '/' . $machine_name;
+  if (!is_dir($import_dir)) {
+    chdir($htmlpath);
+    $cmd = 'php update.php create "' . $machine_name . '"';
+    vcmd($cmd);
+  }
+
+  // Move converted files to data directory.
+  chdir($video_editor_dir);
+  $cmd = "mv mp4/* $import_dir/";
+  vcmd($cmd);
+
+  // Move downloads into originals folder or they get regenerated.
+  $cmd = "mv download/* originals/";
+  vcmd($cmd);
+
+
+  // 6. Refresh.
+  $q->setStatus('refreshing', $index);
+  chdir($htmlpath);
+
+  $elapsed = time();
+  $cmd = "php update.php diff " . $machine_name;
+  vcmd($cmd, "Comparing files...");
+  print " (" . (time() - $elapsed) . "s)";
+
+  print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+
+  $elapsed = time();
+  $cmd = "php update.php gen " . $machine_name . " --overwrite";
+  vcmd($cmd, "Writing collection...");
+  print " (" . (time() - $elapsed) . "s)";
+
+  $q->setStatus('completed', $index);
 
   // @todo notifications
 }
 
 dlog("Job completed.\n");
+
+if (EXTERNAL_MEDIA) {
+  print "\nTransferring to media processor...";
+  $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . MEDIA_HOSTNAME . ":" . $video_editor_dir;
+  exec($cmd);
+  print "done.";
+
+  // 4. Convert.
+  print "\n[media_processor] Encoding media format...";
+  $cmd = 'ssh ' . MEDIA_HOSTNAME . ' "cd ' . $video_editor_dir . ' && ./collect_mp4"';
+  exec($cmd);
+  print "done.";
+
+  // 5. Transfer to storage.
+  print "\n[media processor] Transferring to storage...";
+  $cmd = 'ssh ' . MEDIA_HOSTNAME  . ' "rsync -av --exclude=links.txt* ' . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET . '"';
+  exec($cmd);
+  print "done.";
+
+  print "\nTransferring to storage...";
+  $cmd = "rsync -av --exclude=links.txt* " . $video_editor_dir . ' ' . STORE_HOSTNAME . ':' . STORE_TARGET;
+  system($cmd);
+  print "done.";
+}

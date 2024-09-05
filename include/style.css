@@ -262,6 +262,7 @@ form#imports .item {
   width: 100%;
   border: 1px solid white;
   padding: 10px;
+  margin-bottom: 10px;
 }
 
 form#imports .info {
@@ -284,6 +285,7 @@ form#imports .status {
   padding-left: 72px;
   text-transform: capitalize;
 }
+
 form#imports .queued .icon {
   display: block;
   float: right;
@@ -296,13 +298,12 @@ form#imports .queued {
   color: black;
 }
 
-
 form#imports .downloading {
   background: dodgerblue;
 }
 
 form#imports .downloading .info {
-  background: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif) no-repeat;
+  background: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif) no-repeat top right;
 }
 
 form#imports .processing {
@@ -310,7 +311,7 @@ form#imports .processing {
 }
 
 form#imports .processing .info {
-  background: url(https://cur.cursors-4u.net/food/images1/foo35.gif) no-repeat;
+  background: url(https://cur.cursors-4u.net/food/images1/foo35.gif) no-repeat top right;
 }
 
 form#imports .refreshing {
@@ -318,5 +319,5 @@ form#imports .refreshing {
 }
 
 form#imports .refreshing .info {
-  background: url(https://cur.cursors-4u.net/games/images/gam71.gif) no-repeat;
+  background: url(https://cur.cursors-4u.net/games/images/gam71.gif) no-repeat top right;
 }
