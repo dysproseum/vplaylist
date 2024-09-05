@@ -35,7 +35,6 @@ class Queue {
       fputs($fp, json_encode($this->links, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
       fputs($fp, PHP_EOL);
       fclose($fp);
-      //chmod($p, 0777);
     }
     else {
       dlog("Error saving queue file.");
@@ -50,6 +49,16 @@ class Queue {
 
   function getLinks() {
     return $this->links;
+  }
+
+  function getNonCompletedLinks() {
+    $queue = [];
+    foreach ($this->links as $index => $link) {
+      if ($link['status'] != 'completed') {
+        $queue[] = $link;
+      }
+    }
+    return $queue;
   }
 
   function queueLinks() {
@@ -68,11 +77,13 @@ class Queue {
   }
 
   function setStatus($status, $index) {
+    $this->load();
     $this->links[$index]['status'] = $status;
     $this->save();
   }
 
   function setTitle($title, $index) {
+    $this->load();
     $this->links[$index]['title'] = $title;
     $this->save();
   }
