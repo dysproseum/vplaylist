@@ -11,6 +11,7 @@ function loadPing(url) {
         var data = JSON.parse(this.responseText);
 
         var msg = document.getElementById('imports');
+        // @todo keep completed links somehow.
         msg.innerHTML = '';
 
         data.forEach(function(link, index) {

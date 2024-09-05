@@ -272,22 +272,51 @@ form#imports .info .title {
   font-weight: bold;
 }
 
-form#imports .info .status {
-  border: 1px solid white;
-}
-
 form#imports .info img {
   display: block;
+  float: left;
 }
+
+form#imports .status {
+  display: block;
+  height: 72px;
+  line-height: 72px;
+  padding-left: 72px;
+  text-transform: capitalize;
+}
+form#imports .queued .icon {
+  display: block;
+  float: right;
+  width: 100px;
+  height: 100px;
+}
+
+form#imports .queued {
+  background: gray;
+  color: black;
+}
+
 
 form#imports .downloading {
   background: dodgerblue;
 }
 
+form#imports .downloading .info {
+  background: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif) no-repeat;
+}
+
 form#imports .processing {
-  background: gold;
+  background: goldenrod;
+}
+
+form#imports .processing .info {
+  background: url(https://cur.cursors-4u.net/food/images1/foo35.gif) no-repeat;
 }
 
 form#imports .refreshing {
   background: green;
+}
+
+form#imports .refreshing .info {
+  background: url(https://cur.cursors-4u.net/games/images/gam71.gif) no-repeat;
 }
