@@ -11,14 +11,14 @@ class Queue {
 
   function __construct($path) {
     $this->path = $path;
+    $this->links = [];
   }
 
   function load() {
-    $this->links = [];
     $data = file_get_contents($this->path);
 
     if ($data === false) {
-      dlog("Error opening queue file: " . $this->path);
+      error_log("Error opening queue file: " . $this->path);
       return false;
     }
     $this->links = json_decode($data, true);
@@ -26,6 +26,11 @@ class Queue {
       print json_last_error_msg();
       return false;
     }
+    // Set id value.
+    foreach ($this->links as $index => $link) {
+      $this->links[$index]['id'] = $index;
+    }
+    $this->save();
     return $this->links;
   }
 
@@ -37,7 +42,7 @@ class Queue {
       fclose($fp);
     }
     else {
-      dlog("Error saving queue file.");
+      error_log("Error saving queue file: " . $this->path);
       return false;
     }
     return true;
@@ -51,17 +56,18 @@ class Queue {
     return $this->links;
   }
 
-  function getNonCompletedLinks() {
-    $queue = [];
+  function getActiveLinks() {
+    $active = [];
     foreach ($this->links as $index => $link) {
-      if ($link['status'] != 'completed') {
-        $queue[] = $link;
+      if ($link['status'] != 'completed' && $link['status'] != 'queued') {
+        $active[] = $link;
       }
     }
-    return $queue;
+    return $active;
   }
 
-  function queueLinks() {
+  function queueLink() {
+    $this->load();
     $queue = [];
     foreach ($this->links as $index => $link) {
       // Pull unset items into queue.
@@ -69,11 +75,12 @@ class Queue {
         $this->setStatus('queued', $index);
         $queue[] = $link;
       }
-      if ($link['status'] == 'queued') {
+      else if ($link['status'] == 'queued') {
         $queue[] = $link;
       }
     }
-    return $queue;
+    $this->save();
+    return array_slice($queue, 0, 1);
   }
 
   function setStatus($status, $index) {
@@ -88,8 +95,26 @@ class Queue {
     $this->save();
   }
 
-  function setCompleted($index) {
-    unset($this->links[$index]);
+  function setTarget($target, $index) {
+    $this->load();
+    $this->links[$index]['target'] = $target;
+    $this->save();
+  }
+
+  function pruneCompleted() {
+    $this->load();
+    $expire = time() - 24 * 3600;
+    foreach ($this->links as $index => $link) {
+      if ($link['status'] == 'completed' && $link['timestamp'] < $expire) {
+        unset($this->links[$index]);
+      }
+    }
+    $this->save();
+  }
+
+  function setElapsed($status, $elapsed, $index) {
+    $this->load();
+    $this->links[$index]['metadata'][$status]['elapsed'] = $elapsed;
     $this->save();
   }
 

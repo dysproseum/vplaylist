@@ -2,6 +2,7 @@ body {
 	background: url(bg.jpg) no-repeat fixed;
 	background-position: center;
 	background-size: cover;
+	margin: 0;
 }
 
 body.behind-video {
@@ -135,6 +136,7 @@ body.nocontrols {
 	width: 100%;
 	background: #555555;
 	text-align: left;
+	box-sizing: border-box;
 }
 
 .header h1 {
@@ -157,7 +159,7 @@ form.search {
 	position: absolute;
 	top: 0;
 	right: 0;
-	margin: 10px 10px 0px 0px;
+	margin: 6px 6px 0px 0px;
 	width:30%;
 	text-align: right;
 }

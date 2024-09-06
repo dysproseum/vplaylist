@@ -20,6 +20,7 @@ $links[] = [
   'status' => '',
   'title' => 'Loading...',
   'timestamp' => time(),
+  'target' => 'https://dysproseum.com/vplaylist',
 ];
 
 $cnt = sizeof($links);
@@ -56,6 +57,9 @@ include(dirname(__FILE__) . "/../include/header.php");
           </span>
           <span class="timestamp">
             <?php print $link['timestamp']; ?>
+          </span>
+          <span class="target">
+            <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
           </span>
         </div>
         <div class="icon">

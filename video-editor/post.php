@@ -43,11 +43,10 @@ $item = [
   'url' => $url,
   'collection' => $machine_name,
   'status' => 'queued',
-  'title' => 'unknown',
   'timestamp' => time(),
 ];
 
-array_unshift($links, $item);
+$links[] = $item;
 
 $fp = fopen($p, 'wb');
 if ($fp) {
