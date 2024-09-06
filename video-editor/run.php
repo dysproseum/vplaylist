@@ -28,18 +28,14 @@ if (!file_exists($p)) {
 // 2. Check for job in progress.
 $queue = [];
 $q = new Queue($p);
-$q->load();
-$queue = $q->queueLinks();
-$links = $q->getNonCompletedLinks();
-$cnt = sizeof($queue);
+$q->pruneCompleted();
+$queue = $q->queueLink();
+$links = $q->getActiveLinks();
 
-// @todo keep completed items in JSON file for 24 hours.
-// delete completed items with timestamp > 24 hours ago.
-// $q->pruneCompleted();
-
-// Indicate progress in log file.
-if (empty($queue) && !(empty($links))) {
+// If active, indicate progress in log file.
+if (!empty($links)) {
   print ".";
+  exit;
 }
 
 // Nothing to do.
@@ -48,21 +44,17 @@ if (empty($queue)) {
   exit;
 }
 
-if ($cnt == 1) {
-  $plural_maybe = "There is 1 request";
-}
-else {
-  $plural_maybe = "There are $cnt requests";
-}
-dlog("$plural_maybe in the queue.");
+print "\nCollections loaded: " . sizeof($collections);
 
 // 3. Download queued links.
-foreach ($queue as $index => $link) {
+foreach ($queue as $link) {
+  if (!isset($link['id'])) {
+    continue;
+  }
+  $id = $link['id'];
+  $q->setStatus('downloading', $id);
 
-  $q->setStatus('downloading', $index);
-
-  $numeral = $index + 1;
-  print "\n  [$numeral/$cnt] " . $link['url'];
+  print "\n  [Slot $id] " . $link['url'];
 
   $download_dir = $video_editor_dir . "/download";
   $before = glob($download_dir . "/*");
@@ -78,11 +70,11 @@ foreach ($queue as $index => $link) {
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
     $filename = basename(array_shift($diff));
-    $q->setTitle($filename, $index);
+    $q->setTitle($filename, $id);
     print "\n  " . $filename;
   }
   else {
-    $q->setTitle(array_shift($after), $index);
+    $q->setTitle(array_shift($after), $id);
     dlog("No new downloads found");
     if (DEBUG == 2) print_r($after);
   }
@@ -92,7 +84,7 @@ foreach ($queue as $index => $link) {
   $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
 
   // Process videos locally.
-  $q->setStatus('processing', $index);
+  $q->setStatus('processing', $id);
   $mp4_dir = $video_editor_dir . "/mp4";
   $before = glob($mp4_dir . "/*");
   $elapsed = time();
@@ -105,11 +97,11 @@ foreach ($queue as $index => $link) {
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
     $filename = basename(array_shift($diff));
-    $q->setTitle($filename, $index);
+    $q->setTitle($filename, $id);
     print "\n  " . $filename;
   }
   else {
-    $q->setTitle(array_shift($after), $index);
+    $q->setTitle(array_shift($after), $id);
     dlog("No new downloads found");
     if (DEBUG == 2) print_r($after);
   }
@@ -134,7 +126,7 @@ foreach ($queue as $index => $link) {
 
 
   // 6. Refresh.
-  $q->setStatus('refreshing', $index);
+  $q->setStatus('refreshing', $id);
   chdir($htmlpath);
 
   $elapsed = time();
@@ -149,7 +141,18 @@ foreach ($queue as $index => $link) {
   vcmd($cmd, "Writing collection...");
   print " (" . (time() - $elapsed) . "s)";
 
-  $q->setStatus('completed', $index);
+  $collections = load_collections();
+  print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+
+  $q->setStatus('completed', $id);
+
+  // Using filename, get the id to build the link to video.
+  foreach ($collections[$machine_name]['items'] as $index => $item) {
+    if ($item['title'] == $filename) {
+      $url = "/vplaylist/index.php?collection=$machine_name&index=$index";
+      $q->setTarget($url, $id);
+    }
+  }
 
   // @todo notifications
 }

@@ -11,7 +11,7 @@
 <title>vplaylist</title>
 </head>
 
-<?php if ($controls == ''): ?>
+<?php if ($controls == '0'): ?>
   <body class="nocontrols">
 <?php elseif ($vid_player): ?>
   <body class="behind-video">

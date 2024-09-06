@@ -8,12 +8,18 @@ function loadPing(url) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        var data = JSON.parse(this.responseText);
-
         var msg = document.getElementById('imports');
-        // @todo keep completed links somehow.
-        msg.innerHTML = '';
 
+        try {
+          var data = JSON.parse(this.responseText);
+        }
+        catch (e) {
+          msg.innerHTML = this.responseText;
+          console.log(e);
+          return;
+        }
+
+        msg.innerHTML = '';
         data.forEach(function(link, index) {
           // true means clone all childNodes and all event handlers
           var clone = div.cloneNode(true);
@@ -26,6 +32,8 @@ function loadPing(url) {
           clone.querySelector('.timestamp').innerHTML = timestamp;
           var title = link.title ? link.title : link.url;
           clone.querySelector('.title').innerHTML = title;
+          var target = link.target ? link.target : '';
+          clone.querySelector('.target a').href = target;
 
           msg.appendChild(clone);
         });

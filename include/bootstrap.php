@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__) . '/../config.php');
 require_once('queue.php');
 
-define('CONFIG_PATH', './collections/');
+define('CONFIG_PATH', dirname(__FILE__) . '/../collections/');
 define('THUMBS_PATH', './thumbnails/');
 
 if (isset($conf['debug'])) {
@@ -13,16 +13,20 @@ else {
   define('DEBUG', false);
 }
 
-$collections = array();
-foreach(glob(CONFIG_PATH.'*.json') as $filename) {
-	$collection = json_decode(file_get_contents($filename), true);
-	if ($collection) {
-		foreach ($collection as $name => $values) {
-			$collections[$name] = $values;
-			$machine_name = $name;
-		}
-	}
+function load_collections() {
+  $collections = array();
+  foreach(glob(CONFIG_PATH.'*.json') as $filename) {
+    $collection = json_decode(file_get_contents($filename), true);
+    if ($collection) {
+      foreach ($collection as $name => $values) {
+        $collections[$name] = $values;
+        $machine_name = $name;
+      }
+    }
+  }
+  return $collections;
 }
+$collections = load_collections();
 
 function vlog($message, $override_action = '') {
 
