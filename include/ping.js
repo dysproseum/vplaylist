@@ -27,13 +27,17 @@ function loadPing(url) {
           clone.hidden = false;
           var status = link.status;
           clone.classList.add(status);
-          clone.querySelector('.status').innerHTML = status;
+          clone.querySelector('.status-text').innerHTML = status;
           var timestamp = millisecondsToStr(Date.now() - link.timestamp * 1000);
           clone.querySelector('.timestamp').innerHTML = timestamp;
           var title = link.title ? link.title : link.url;
           clone.querySelector('.title').innerHTML = title;
           var target = link.target ? link.target : '';
-          clone.querySelector('.target a').href = target;
+          if (target) {
+            var targetLink = clone.querySelector('.target a');
+            targetLink.hidden = false;
+            targetLink.href = target;
+          }
 
           msg.appendChild(clone);
         });
