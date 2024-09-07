@@ -334,6 +334,31 @@ form#imports .info img {
   float: left;
 }
 
+.progress-container {
+  display: block;
+  margin:0 auto;
+  background:#CDCDCD;
+  height:5px;
+  border-radius:4px;
+  border: 1px solid gray;
+  width: 75%;
+  margin: 4px 0px 4px 0px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 5px;
+  width:100%;
+  max-width:100%;
+  border-radius:4px;
+}
+
+.progress-bar span {
+  height: 5px;
+  border-radius:4px;
+  display: block;
+}
+
 form#imports .status-bar {
   text-transform: capitalize;
   background: white;
@@ -382,16 +407,27 @@ form#imports .queued {
   background-image: url(http://alt.dysproseum.com/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
 }
 
-form#imports .queued .status-bar {
+form#imports .queued .progress-bar span {
   background-color: goldenrod;
+  width: 100% !important;
 }
 
-form#imports .downloading .status-bar,
-form#imports .processing .status-bar,
-form#imports .refreshing .status-bar {
+form#imports .downloading .progress-bar span {
   background-color: dodgerblue;
+  width: 5%;
 }
 
-form#imports .completed .status-bar {
+form#imports .processing .progress-bar span {
+  background-color: dodgerblue;
+  width: 33%;
+}
+
+form#imports .refreshing .progress-bar span {
+  background-color: dodgerblue;
+  width: 75%;
+}
+
+form#imports .completed .progress-bar span {
   background-color: mediumaquamarine;
+  width: 100% !important;
 }
