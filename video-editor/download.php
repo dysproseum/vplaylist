@@ -34,13 +34,16 @@ include(dirname(__FILE__) . "/../include/header.php");
 <script type="text/javascript" src="../include/ping.js"></script>
 
 <div class="subnav">
-  <h2>Import Status</h2>
+  <h2>Video Editor</h2>
   <h4><a href="index.php">Add Another Video</a></h4>
 </div>
 <div class="listing-box">
   <div class="listing">
+    <h2>Import status</h2>
     <form action="post.php" class="video-editor" id="imports">
-    Loading...
+    <div class="item">
+      <span class="title">Loading...</span>
+    </div>
     <?php if ($cnt == 0): ?>No active items<?php endif; ?>
     <?php foreach ($links as $index => $link): ?>
       <div class="item" id="index" hidden>
@@ -49,7 +52,11 @@ include(dirname(__FILE__) . "/../include/header.php");
             <?php print $link['title'] ? $link['title'] : $link['url'];  ?>
           </span>
           <br>
-          <span class="status">
+          <span class="status-bar"></span>
+          <span class="target">
+            <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
+          </span>
+          <span class="status-text">
             <?php print $link['status']; ?>
           </span>
           <span class="collection">
@@ -57,9 +64,6 @@ include(dirname(__FILE__) . "/../include/header.php");
           </span>
           <span class="timestamp">
             <?php print $link['timestamp']; ?>
-          </span>
-          <span class="target">
-            <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
           </span>
         </div>
         <div class="icon">

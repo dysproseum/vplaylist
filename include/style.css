@@ -3,6 +3,11 @@ body {
 	background-position: center;
 	background-size: cover;
 	margin: 0;
+font-family: monospace;
+}
+
+input, select {
+	font-family: monospace;
 }
 
 body.behind-video {
@@ -64,11 +69,14 @@ body.nocontrols {
 .thumbnail .label-top {
 	top: 0px;
 	right: 0px;
-	background: #0000088;
+	background: #00000088;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 .thumbnail:hover .label-top {
-	background: none;
+	background: #555555;
+	background: mediumpurple;
 }
 
 .thumbnail .label-bottom {
@@ -76,10 +84,13 @@ body.nocontrols {
 	right: 0px;
 	background: #00000088;
 	pointer-events: none;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 .thumbnail:hover .label-bottom {
 	background: #555555;
+	background: mediumpurple;
 }
 
 .player {
@@ -117,7 +128,7 @@ body.nocontrols {
 	padding: 20px 0 20px 0;
 	background: #00000088;
 	text-shadow: -2px 0px black;
-	font-size: 14pt;
+	font-size: 14px;
 }
 
 .listing-box {
@@ -139,13 +150,29 @@ body.nocontrols {
 	box-sizing: border-box;
 }
 
+.header {
+	height: 48px;
+	background: mediumpurple;
+}
+
+body.behind-video .header {
+	background: #555555;
+}
+
 .header h1 {
-	margin: 0px 0px 10px 10px;
+	margin: 0;
 }
 
 .header h1 a {
 	color: white;
 	text-shadow: 3px 0px 2px black;
+	font-size: 20px;
+	padding: 12px;
+        line-height: 48px;
+}
+
+.header h1 a:hover {
+	background: mediumpurple;
 }
 
 .footer {
@@ -165,8 +192,7 @@ form.search {
 }
 
 form.search input[type=text] {
-	font-size: 1.25em;
-	font-family: "Times New Roman", Serif;
+	font-size: 14px;
 	height: 36px;
 	border: 0 none;
 	padding: 0px 0px 0px 10px;
@@ -176,23 +202,36 @@ h2 {
 	float: left;
 	color: white;
 	text-shadow: -2px 0px 2px black;
-	padding-left: 20px;
+	padding-left: 12px;
+	font-size: 14px;
+	line-height: 32px;
+	height: 32px;
+	margin: 0;
 }
 
 h4 {
 	float: right;
 	color: white;
 	text-shadow: 2px 0px 2px black;
-	padding-right: 20px;
+	line-height: 32px;
+	height: 32px;
+	margin: 0;
 }
 
 h4 a {
 	color: white;
+	padding: 8px;
+}
+
+h4 a:hover {
+	background: mediumpurple;
 }
 
 .subnav {
 	float: left;
 	width: 100%;
+	background: #555555;
+	margin-bottom: 32px;
 }
 
 .subnav a {
@@ -207,7 +246,7 @@ h6, h6 a {
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
-	font-size: 14pt;
+	font-size: 14px;
 }
 
 form.install {
@@ -246,7 +285,7 @@ form.video-editor input[type=submit] {
   cursor: pointer;
   background: mediumpurple;
   color: white;
-  font-size: 18px;
+  font-size: 14px;
   text-shadow: -2px 0 2px #000;
 }
 
@@ -260,19 +299,34 @@ form.video-editor h2 {
   padding: 0px;
 }
 
+form#imports {
+  border-radius: 4px;
+  border: 1px solid white;
+  margin-bottom: 20px;
+}
+
 form#imports .item {
   width: 100%;
-  border: 1px solid white;
   padding: 10px;
-  margin-bottom: 10px;
+  background-size: contain;
+  background-position: top right;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  color: black;
+  background-color: #eeeeee;
+}
+
+form#imports div:nth-child(even) {
+  background-color: #cccccc;
 }
 
 form#imports .info {
   width: 100%;
 }
 
-form#imports .info .title {
+form#imports .title, form#imports .collection {
   font-weight: bold;
+  text-shadow: -2px 0px 2px white;
 }
 
 form#imports .info img {
@@ -280,46 +334,64 @@ form#imports .info img {
   float: left;
 }
 
-form#imports .status {
-  display: block;
-  height: 72px;
-  line-height: 72px;
-  padding-left: 72px;
+form#imports .status-bar {
   text-transform: capitalize;
-}
-
-form#imports .queued .icon {
+  background: white;
+  color: white;
+  padding: 4px;
+  margin: 10px 0px 10px 0px;
   display: block;
-  float: right;
-  width: 100px;
-  height: 100px;
+  border-radius: 4px;
+  border: 1px solid gray;
+  font-family: monospace;
+  width: 75%;
 }
 
-form#imports .queued {
-  background: gray;
-  color: black;
+form#imports .target {
+  float: right;
+}
+
+form#imports .target a {
+  font-weight: bold;
+  text-shadow: 1px 0px 1px black;
+  color: white;
+  background: mediumpurple;
+  border: 1px solid gray;
+  text-decoration: none;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+form#imports .target a:hover {
+  text-decoration: underline;
 }
 
 form#imports .downloading {
-  background: dodgerblue;
-}
-
-form#imports .downloading .info {
-  background: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif) no-repeat top right;
+  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);
 }
 
 form#imports .processing {
-  background: goldenrod;
-}
-
-form#imports .processing .info {
-  background: url(https://cur.cursors-4u.net/food/images1/foo35.gif) no-repeat top right;
+  background-image: url(https://cur.cursors-4u.net/food/images1/foo35.gif);
 }
 
 form#imports .refreshing {
-  background: green;
+  background-image: url(https://cur.cursors-4u.net/games/images/gam71.gif);
 }
 
-form#imports .refreshing .info {
-  background: url(https://cur.cursors-4u.net/games/images/gam71.gif) no-repeat top right;
+form#imports .queued {
+  background-image: url(http://alt.dysproseum.com/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
+}
+
+form#imports .queued .status-bar {
+  background-color: goldenrod;
+}
+
+form#imports .downloading .status-bar,
+form#imports .processing .status-bar,
+form#imports .refreshing .status-bar {
+  background-color: dodgerblue;
+}
+
+form#imports .completed .status-bar {
+  background-color: mediumaquamarine;
 }
