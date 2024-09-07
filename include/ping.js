@@ -28,7 +28,8 @@ function loadPing(url) {
           var status = link.status;
           clone.classList.add(status);
           clone.querySelector('.status-text').innerHTML = status;
-          var timestamp = millisecondsToStr(Date.now() - link.timestamp * 1000);
+          var timeDiff = Date.now() - link.timestamp * 1000;
+          var timestamp = millisecondsToStr(timeDiff);
           clone.querySelector('.timestamp').innerHTML = timestamp;
           var title = link.title ? link.title : link.url;
           clone.querySelector('.title').innerHTML = title;
@@ -38,6 +39,23 @@ function loadPing(url) {
             targetLink.hidden = false;
             targetLink.href = target;
           }
+
+          // Update progress bar based on timestamp.
+          var progress = clone.querySelector('.progress');
+          var width = 0;
+          switch (link.status) {
+            case 'downloading':
+              width = 3;
+              break;
+            case 'processing':
+              width = 33;
+              break;
+            case 'refreshing':
+              width = 75;
+              break;
+          }
+          width += (timeDiff / 1000) / 60;
+          progress.style.width = width + '%';
 
           msg.appendChild(clone);
         });

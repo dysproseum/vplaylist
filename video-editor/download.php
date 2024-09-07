@@ -52,7 +52,11 @@ include(dirname(__FILE__) . "/../include/header.php");
             <?php print $link['title'] ? $link['title'] : $link['url'];  ?>
           </span>
           <br>
-          <span class="status-bar"></span>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <span class="progress"></span>
+            </div>
+          </div>
           <span class="target">
             <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
           </span>
