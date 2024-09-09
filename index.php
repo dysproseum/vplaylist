@@ -170,6 +170,7 @@ require_once 'include/header.php';
 	<?php else: ?>
 		<h4><a href="video-editor/index.php">Add more videos</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a></h4>
+		<h4><a href="getnextvideo.php?collection=<?php print $machine_name; ?>">Shuffle All</a></h4>
 	<?php endif; ?>
 	</div>
 

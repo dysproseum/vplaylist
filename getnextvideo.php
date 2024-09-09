@@ -1,16 +1,23 @@
 <?php
 
-if (!isset($_REQUEST['index']) || !isset($_REQUEST['collection'])) {
+if (!isset($_REQUEST['collection'])) {
   header('HTTP/1.1 404 Not found');
-  exit('No index or collection specified');
+  exit('No collection specified');
 }
+$machine_name = $_REQUEST['collection'];
 
 require_once 'include/bootstrap.php';
 global $collections;
-
-$index = $_REQUEST['index'];
-$machine_name = $_REQUEST['collection'];
 $queue_size = sizeof($collections[$machine_name]['items']);
+
+if (!isset($_REQUEST['index'])) {
+  // Randomize from collection to start shuffle.
+  $index = rand(0, $queue_size);
+  $url = "index.php?collection=$machine_name&index=$index&autoplay=1&shuffle=1";
+  header("Location: $url");
+  exit;
+}
+$index = $_REQUEST['index'];
 
 // Randomize from session queue.
 if (isset($_REQUEST['shuffle'])) {
