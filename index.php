@@ -105,8 +105,8 @@ require_once 'include/header.php';
 		<a href="index.php?collection=<?php print $collection; ?>">
 		<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
-		<a class="label label-top" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
-		<span class="label label-bottom"><?php print $total; ?> videos</span>
+		<span class="label label-top"><?php print $total; ?> videos</span>
+		<a class="label label-bottom" href="index.php?collection=<?php print $collection; ?>"><?php print $values['name']; ?></a>
 		</div>
 	<?php endforeach; ?>
 	</div>
