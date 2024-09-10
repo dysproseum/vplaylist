@@ -90,7 +90,9 @@ require_once 'include/header.php';
 <?php elseif ($machine_name == ''): ?>
 	<div class="subnav">
 		<h2>Collections</h2>
-		<h4><a href="video-editor/index.php">Add more videos</a></h4>
+                <div class="subnav-right-side">
+			<h4><a href="video-editor/index.php">Add more videos</a></h4>
+                </div>
 	</div>
 	<div class="listing-box">
 	<div class="listing">
