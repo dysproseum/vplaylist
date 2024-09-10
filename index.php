@@ -123,8 +123,9 @@ require_once 'include/header.php';
 	</div>
 <?php else: ?>
 	<div class="subnav">
-	<h2><a href="index.php">Home</a> | <a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h2>
+	<h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
 	<?php if ($vid_player): ?>
+          <div class="subnav-right-side">
 		<input type="hidden" name="vid_count" value="<?php print sizeof($collections[$machine_name]['items']); ?>" />
 
 		<h4>
@@ -167,10 +168,13 @@ require_once 'include/header.php';
 			<?php endif; ?>
 			/>
 		</h4>
+          </div>
 	<?php else: ?>
+          <div class="subnav-right-side">
 		<h4><a href="video-editor/index.php">Add more videos</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a></h4>
 		<h4><a href="getnextvideo.php?collection=<?php print $machine_name; ?>">Shuffle All</a></h4>
+          </div>
 	<?php endif; ?>
 	</div>
 
