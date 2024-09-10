@@ -21,6 +21,7 @@ $links[] = [
   'title' => 'Loading...',
   'timestamp' => time(),
   'target' => 'https://dysproseum.com/vplaylist',
+  'duration' => '',
 ];
 
 $cnt = sizeof($links);
@@ -35,28 +36,36 @@ include(dirname(__FILE__) . "/../include/header.php");
 
 <div class="subnav">
   <h2>Video Editor</h2>
-  <h4><a href="index.php">Add Another Video</a></h4>
+  <div class="subnav-right-side">
+    <h4><a href="index.php">Add Another Video</a></h4>
+  </div>
 </div>
 <div class="listing-box">
   <div class="listing">
     <h2>Import status</h2>
     <form action="post.php" class="video-editor" id="imports">
-    <div class="item">
-      <span class="title">Loading...</span>
-    </div>
+      <div class="item">
+        <span class="title">Loading...</span>
+      </div>
+
     <?php if ($cnt == 0): ?>No active items<?php endif; ?>
+
     <?php foreach ($links as $index => $link): ?>
       <div class="item" id="index" hidden>
         <div class="info">
           <span class="title">
-            <?php print $link['title'] ? $link['title'] : $link['url'];  ?>
+            <?php print $link['title'] ? $link['title'] : $link['url']; ?>
           </span>
-          <br>
+          <span class="duration">
+            <?php print $link['duration']; ?>
+          </span>
+
           <div class="progress-container">
             <div class="progress-bar">
               <span class="progress"></span>
             </div>
           </div>
+
           <span class="target">
             <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
           </span>
@@ -70,6 +79,7 @@ include(dirname(__FILE__) . "/../include/header.php");
             <?php print $link['timestamp']; ?>
           </span>
         </div>
+
         <div class="icon">
         </div>
         <!--

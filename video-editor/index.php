@@ -12,7 +12,9 @@ include(dirname(__FILE__) . "/../include/header.php");
 
 <div class="subnav">
   <h2>Video Editor</h2>
-  <h4><a href="download.php">Import Status</a></h4>
+  <div class="subnav-right-side">
+    <h4><a href="download.php">Import Status</a></h4>
+  </div>
 </div>
 <div class="listing-box">
    <div class="listing">

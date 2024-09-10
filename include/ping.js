@@ -28,11 +28,12 @@ function loadPing(url) {
           var status = link.status;
           clone.classList.add(status);
           clone.querySelector('.status-text').innerHTML = status;
-          var timeDiff = Date.now() - link.timestamp * 1000;
-          var timestamp = millisecondsToStr(timeDiff);
-          clone.querySelector('.timestamp').innerHTML = timestamp;
           var title = link.title ? link.title : link.url;
           clone.querySelector('.title').innerHTML = title;
+          var duration = link.duration ? millisecondsToStr(link.duration * 1000) : '';
+          clone.querySelector('.duration').innerHTML = duration;
+          var collection = link.collection ? link.collection : '';
+          clone.querySelector('.collection').innerHTML = collection;
           var target = link.target ? link.target : '';
           if (target) {
             var targetLink = clone.querySelector('.target a');
@@ -40,28 +41,46 @@ function loadPing(url) {
             targetLink.href = target;
           }
 
-          // Update progress bar based on timestamp.
+          // Update progress bar based on timestamp and duration.
+          var timeDiff = Date.now() - link.timestamp * 1000;
+          var td = timeDiff / 1000;
           var progress = clone.querySelector('.progress');
           var width = 0;
+          var output = '';
+
           switch (link.status) {
+            case 'queued':
             case 'downloading':
-              width = 3;
+              // Count up from timestamp.
+              output = millisecondsToStr(timeDiff) + " elapsed";
+              width = td ;
               break;
             case 'processing':
-              width = 33;
-              break;
             case 'refreshing':
-              width = 75;
+              // Count down remaining time.
+              width = td / link.duration * 100;
+              var left = link.duration * 1000 - timeDiff;
+              if (left < 0) {
+                output = "almost... taking " + millisecondsToStr(Math.abs(left)) + " longer than estimated";
+              }
+              else {
+                output = millisecondsToStr(left) + " remaining";
+              }
               break;
+            case 'completed':
+              width = 100;
+              var total = link.time_complete * 1000 - link.timestamp * 1000;
+              output = millisecondsToStr(total) + " total";
           }
-          width += (timeDiff / 1000) / 60;
+
           progress.style.width = width + '%';
+          clone.querySelector('.timestamp').innerHTML = output;
 
           msg.appendChild(clone);
         });
 
         if (data.length == 0) {
-          msg.innerHTML = 'No active links';
+          msg.innerHTML = '<div class="item">No active links</div>';
         }
       }
     };

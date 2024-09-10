@@ -101,11 +101,24 @@ class Queue {
     $this->save();
   }
 
+  function setDuration($duration, $index) {
+    $this->load();
+    $this->links[$index]['duration'] = $duration;
+    $this->save();
+  }
+
+  function setCompleted($timestamp, $index) {
+    $this->load();
+    $this->links[$index]['time_complete'] = $timestamp;
+    $this->save();
+  }
+
   function pruneCompleted() {
     $this->load();
     $expire = time() - 24 * 3600;
     foreach ($this->links as $index => $link) {
       if ($link['status'] == 'completed' && $link['timestamp'] < $expire) {
+        dlog("Expiring from queue: " . $link['id'] . ", " . $link['title']);
         unset($this->links[$index]);
       }
     }

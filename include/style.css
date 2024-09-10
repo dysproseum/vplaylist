@@ -81,7 +81,7 @@ body.nocontrols {
 
 .thumbnail .label-bottom {
 	bottom: 0px;
-	right: 0px;
+	left: 0px;
 	background: #00000088;
 	pointer-events: none;
 	font-size: 14px;
@@ -210,7 +210,7 @@ h2 {
 }
 
 h4 {
-	float: right;
+	float: left;
 	color: white;
 	text-shadow: 2px 0px 2px black;
 	line-height: 32px;
@@ -240,6 +240,24 @@ h4 a:hover {
 
 .subnav label, .subnav input {
 	cursor: pointer;
+}
+
+.subnav input {
+	margin-top: 9px;
+	float: left;
+}
+
+.subnav-right-side {
+	float: right;
+}
+
+.subnav-right-side h4 {
+	padding: 0px 5px 0px 5px;
+	margin-right: 10px;
+}
+
+.subnav-right-side h4:hover, .subnav a:hover {
+	background: mediumpurple;
 }
 
 h6, h6 a {
@@ -321,7 +339,18 @@ form#imports div:nth-child(even) {
 }
 
 form#imports .info {
+  box-sizing: border-box;
+  background: url(/vplaylist/include/videotape.jpg);
   width: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding-left: 86px;
+}
+
+form#imports .icon {
+  display: block;
+  float: left;
+  height: 100%;
 }
 
 form#imports .title, form#imports .collection {
@@ -372,6 +401,10 @@ form#imports .status-bar {
   width: 75%;
 }
 
+form#imports .status-text {
+  font-style: italic;
+}
+
 form#imports .target {
   float: right;
 }
@@ -391,8 +424,12 @@ form#imports .target a:hover {
   text-decoration: underline;
 }
 
+form#imports .queued {
+  background-image: url(http://alt.dysproseum.com/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
+}
+
 form#imports .downloading {
-  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);
+  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);*/
 }
 
 form#imports .processing {
@@ -401,10 +438,6 @@ form#imports .processing {
 
 form#imports .refreshing {
   background-image: url(https://cur.cursors-4u.net/games/images/gam71.gif);
-}
-
-form#imports .queued {
-  background-image: url(http://alt.dysproseum.com/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
 }
 
 form#imports .queued .progress-bar span {
