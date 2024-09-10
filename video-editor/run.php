@@ -79,6 +79,12 @@ foreach ($queue as $link) {
     if (DEBUG == 2) print_r($after);
   }
 
+  // Get video duration.
+  $cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"$filename\"";
+  $duration = exec($cmd);
+  print "\nDuration: $duration seconds";
+  $q->setDuration($duration, $id);
+
   // @todo clean up characters before conversion.
   $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);
   $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
@@ -145,10 +151,12 @@ foreach ($queue as $link) {
   print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
 
   $q->setStatus('completed', $id);
+  $q->setCompleted(time(), $id);
 
   // Using filename, get the id to build the link to video.
   foreach ($collections[$machine_name]['items'] as $index => $item) {
     if ($item['title'] == $filename) {
+      $q->setIndex($index, $id);
       $url = "/vplaylist/index.php?collection=$machine_name&index=$index";
       $q->setTarget($url, $id);
     }

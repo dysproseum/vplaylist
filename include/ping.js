@@ -20,6 +20,8 @@ function loadPing(url) {
         }
 
         msg.innerHTML = '';
+
+        // @todo only replace if different?
         data.forEach(function(link, index) {
           // true means clone all childNodes and all event handlers
           var clone = div.cloneNode(true);
@@ -34,11 +36,24 @@ function loadPing(url) {
           clone.querySelector('.duration').innerHTML = duration;
           var collection = link.collection ? link.collection : '';
           clone.querySelector('.collection').innerHTML = collection;
+
+          // Target links.
           var target = link.target ? link.target : '';
           if (target) {
-            var targetLink = clone.querySelector('.target a');
-            targetLink.hidden = false;
-            targetLink.href = target;
+            var targetLinks = clone.querySelectorAll('.target');
+            targetLinks.forEach(function(targetLink, index) {
+              targetLink.hidden = false;
+              targetLink.href = target;
+            });
+            var icon = clone.querySelector(".icon");
+            icon.classList.add("icon-border");
+          }
+
+          // Thumbnail.
+          if (link.index && link.status == "completed") {
+            var uri = "/vplaylist/serve.php?collection=" + link.collection + "&index=" + link.index + "&file=.jpg";
+            var thumbnail = clone.querySelector(".icon .thumb");
+            thumbnail.src = uri;
           }
 
           // Update progress bar based on timestamp and duration.
@@ -90,7 +105,7 @@ function loadPing(url) {
 
 var timeOut;
 var initialDelay = 2000;
-var delay = 5000;
+var delay = 45000;
 var url = "/vplaylist/ping.php";
 
 timeOut = function() {
