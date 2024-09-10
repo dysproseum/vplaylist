@@ -16,12 +16,16 @@ $item = $collections[$machine_name]['items'][$index];
 // Serve thumbnails and exit.
 if (isset($_REQUEST['file']) && $_REQUEST['file'] == '.jpg') {
   $filepath = $item['thumbnail'];
+  if (!file_exists($filepath)) {
+    $filepath = dirname(__FILE__) . "/include/videotape.png";
+  }
   $filesize = filesize($filepath);
   header('X-Vplaylist: ' . $filepath);
+
   $fp = fopen($filepath, 'rb');
   if ($fp) {
     $mtime = filemtime($filepath);
-    header('Content-Type: image/jpeg');
+    header('Content-Type: ' . mime_content_type($filepath));
     header('Content-Length: ' . $filesize);
 
     // Caching.
