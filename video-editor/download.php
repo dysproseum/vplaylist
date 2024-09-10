@@ -52,6 +52,14 @@ include(dirname(__FILE__) . "/../include/header.php");
 
     <?php foreach ($links as $index => $link): ?>
       <div class="item" id="index" hidden>
+        <div class="icon">
+          <a class="target" href="#" title="Watch now" hidden>
+            <img class="thumb" src="/vplaylist/include/videotape.png" alt="Video thumbnail" />
+          </a>
+        </div>
+        <span class="target-text">
+          <a class="target" href="<?php print $link['target']; ?>" hidden>Watch now</a>
+        </span>
         <div class="info">
           <span class="title">
             <?php print $link['title'] ? $link['title'] : $link['url']; ?>
@@ -66,9 +74,6 @@ include(dirname(__FILE__) . "/../include/header.php");
             </div>
           </div>
 
-          <span class="target">
-            <a href="<?php print $link['target']; ?>" hidden>Watch now</a>
-          </span>
           <span class="status-text">
             <?php print $link['status']; ?>
           </span>
@@ -78,9 +83,6 @@ include(dirname(__FILE__) . "/../include/header.php");
           <span class="timestamp">
             <?php print $link['timestamp']; ?>
           </span>
-        </div>
-
-        <div class="icon">
         </div>
         <!--
         <div class="queued">Queued (<span class="value">0</span>s)</div>

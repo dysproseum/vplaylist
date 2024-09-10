@@ -101,6 +101,12 @@ class Queue {
     $this->save();
   }
 
+  function setIndex($collection_index, $queue_index) {
+    $this->load();
+    $this->links[$queue_index]['index'] = $collection_index;
+    $this->save();
+  }
+
   function setDuration($duration, $index) {
     $this->load();
     $this->links[$index]['duration'] = $duration;

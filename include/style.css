@@ -32,7 +32,7 @@ body.nocontrols {
 	margin: 16px;
 	border-radius: 10px;
 	border: 4px outset gray;
-	background: url(videotape.jpg) no-repeat;
+	background: url(videotape.png) no-repeat;
 	background-size: contain;
 }
 
@@ -52,7 +52,7 @@ body.nocontrols {
 }
 
 .thumbnail img {
-	zoom: 1.1;
+	background: black;
 }
 
 .thumbnail .label {
@@ -251,9 +251,11 @@ h4 a:hover {
 	float: right;
 }
 
-.subnav-right-side h4 {
-	padding: 0px 5px 0px 5px;
-	margin-right: 10px;
+.behind-video .subnav-right-side h4 label {
+	display: block;
+	float: right;
+	height: 100%;
+	padding: 0px 10px 0px 5px;
 }
 
 .subnav-right-side h4:hover, .subnav a:hover {
@@ -265,6 +267,10 @@ h6, h6 a {
 	text-shadow: 2px 0px 2px black;
 	padding: 10px;
 	font-size: 14px;
+}
+
+h6 a:hover {
+	background: mediumpurple;
 }
 
 form.install {
@@ -334,23 +340,17 @@ form#imports .item {
   background-color: #eeeeee;
 }
 
-form#imports div:nth-child(even) {
+form#imports div.item:nth-child(even) {
   background-color: #cccccc;
 }
 
 form#imports .info {
   box-sizing: border-box;
-  background: url(/vplaylist/include/videotape.jpg);
   width: 100%;
   background-size: contain;
   background-repeat: no-repeat;
   padding-left: 86px;
-}
-
-form#imports .icon {
-  display: block;
-  float: left;
-  height: 100%;
+  padding-right: 86px;
 }
 
 form#imports .title, form#imports .collection {
@@ -358,9 +358,29 @@ form#imports .title, form#imports .collection {
   text-shadow: -2px 0px 2px white;
 }
 
-form#imports .info img {
+form#imports .icon {
   display: block;
   float: left;
+  margin-right: 10px;
+  width: 80px;
+  height: 45px;
+  overflow: hidden;
+  background: url(videotape.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+form#imports .icon-border:hover {
+  box-shadow: 1px 1px 4px black, -1px -1px 4px black, -1px 1px 4px black, 1px -1px 4px black;
+}
+
+form#imports .icon .thumb {
+  opacity: 0;
+  width: 80px;
+  border-radius: 4px;
+}
+form#imports .icon .thumb:hover {
+  opacity: 1;
 }
 
 .progress-container {
@@ -370,7 +390,7 @@ form#imports .info img {
   height:5px;
   border-radius:4px;
   border: 1px solid gray;
-  width: 75%;
+  width: 99%;
   margin: 4px 0px 4px 0px;
   overflow: hidden;
 }
@@ -409,7 +429,16 @@ form#imports .target {
   float: right;
 }
 
-form#imports .target a {
+form#imports .incomplete {
+
+}
+
+form#imports .target-text {
+  float: right;
+  display: block;
+}
+
+form#imports .target-text a {
   font-weight: bold;
   text-shadow: 1px 0px 1px black;
   color: white;
@@ -420,7 +449,7 @@ form#imports .target a {
   border-radius: 4px;
 }
 
-form#imports .target a:hover {
+form#imports .target-text a:hover {
   text-decoration: underline;
 }
 
