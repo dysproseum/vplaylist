@@ -28,9 +28,11 @@ class Queue {
     }
     // Set id value.
     foreach ($this->links as $index => $link) {
-      $this->links[$index]['id'] = $index;
+      if (!isset($link['id'])) {
+        $this->links[$index]['id'] = $index;
+        $this->save();
+      }
     }
-    $this->save();
     return $this->links;
   }
 
@@ -86,6 +88,7 @@ class Queue {
   function setStatus($status, $index) {
     $this->load();
     $this->links[$index]['status'] = $status;
+    $this->links[$index]["time_$status"] = time();
     $this->save();
   }
 
@@ -123,11 +126,17 @@ class Queue {
     $this->load();
     $expire = time() - 24 * 3600;
     foreach ($this->links as $index => $link) {
+      if (!isset($link['timestamp'])) {
+        continue;
+      }
       if ($link['status'] == 'completed' && $link['timestamp'] < $expire) {
+        dlog("Pruning for " . date('Y-m-d h:i a', $expire));
+        dlog("Pruning timestamp " . date('Y-m-d h:i a', $link['timestamp']));
         dlog("Expiring from queue: " . $link['id'] . ", " . $link['title']);
         unset($this->links[$index]);
       }
     }
+    $this->links = array_values($this->links);
     $this->save();
   }
 
