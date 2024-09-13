@@ -20,6 +20,15 @@ $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
 /***************************************************/
 
+// tape slots.
+$statuses = [
+  'queued' =>      'queued',
+  'downloading' => 'recording',
+  'processing' =>  'mixing',
+  'refreshing' =>  'rewinding',
+  'completed' =>   'ejected',
+];
+
 // 1. Check pending requests.
 if (!file_exists($p)) {
   exit;
@@ -53,8 +62,17 @@ foreach ($queue as $link) {
   }
   $id = $link['id'];
   $q->setStatus('downloading', $id);
-
   print "\n  [Slot $id] " . $link['url'];
+
+  // Get duration.
+  $cmd = "yt-dlp --get-duration " . $link['url'];
+  $duration = exec($cmd);
+  print "\nDuration: $duration";
+  $yt_duration = explode(":", $duration);
+  $duration = 0;
+  $duration += $yt_duration[0] * 60 + $yt_duration[1];
+  print "\n  Duration: $duration";
+  // $q->setDuration($duration, $id);
 
   $download_dir = $video_editor_dir . "/download";
   $before = glob($download_dir . "/*");
@@ -151,7 +169,6 @@ foreach ($queue as $link) {
   print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
 
   $q->setStatus('completed', $id);
-  $q->setCompleted(time(), $id);
 
   // Using filename, get the id to build the link to video.
   foreach ($collections[$machine_name]['items'] as $index => $item) {

@@ -82,6 +82,7 @@ include(dirname(__FILE__) . "/../include/header.php");
           </span>
           <span class="timestamp">
             <?php print $link['timestamp']; ?>
+            3 minutes elapsed 5 minutes remaining
           </span>
         </div>
         <!--
