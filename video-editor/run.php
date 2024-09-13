@@ -18,17 +18,6 @@ $p = $video_editor_dir . "/links.json";
 // Rsync optional, ex. files stored on a NAS.
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
-/***************************************************/
-
-// tape slots.
-$statuses = [
-  'queued' =>      'queued',
-  'downloading' => 'recording',
-  'processing' =>  'mixing',
-  'refreshing' =>  'rewinding',
-  'completed' =>   'ejected',
-];
-
 // 1. Check pending requests.
 if (!file_exists($p)) {
   exit;
@@ -53,7 +42,7 @@ if (empty($queue)) {
   exit;
 }
 
-print "\nCollections loaded: " . sizeof($collections);
+dlog("Collections loaded: " . sizeof($collections));
 
 // 3. Download queued links.
 foreach ($queue as $link) {
@@ -61,25 +50,45 @@ foreach ($queue as $link) {
     continue;
   }
   $id = $link['id'];
-  $q->setStatus('downloading', $id);
   print "\n  [Slot $id] " . $link['url'];
 
   // Get duration.
   $cmd = "yt-dlp --get-duration " . $link['url'];
-  $duration = exec($cmd);
-  print "\nDuration: $duration";
-  $yt_duration = explode(":", $duration);
+  $min_sec = exec($cmd);
+  $q->setDisplayDuration($min_sec, $id);
+
+  $segs = explode(":", $min_sec);
   $duration = 0;
-  $duration += $yt_duration[0] * 60 + $yt_duration[1];
-  print "\n  Duration: $duration";
-  // $q->setDuration($duration, $id);
+  switch(sizeof($segs)) {
+    case 2:
+      $duration += $segs[0] * 60 + $segs[1];
+      break;
+    case 3:
+      $duration += $segs[0] * 60 * 60 + $segs[1] * 60 + $segs[2];
+      break;
+  }
+  print "\n  Duration: $duration seconds";
+  // Get title.
+  $cmd = "yt-dlp --get-title " . $link['url'];
+  $title = exec($cmd);
+  print "\n  $title";
+
+  // Clean up characters before conversion.
+  $title = str_replace('/', '_', $title);
+  $title = str_replace('"', '', $title);
+  $title = iconv('UTF-8', 'ASCII//TRANSLIT',  $title);
+  if (strlen($title) > 255) {
+    $title = substr($title, 0, 255);
+  }
+  $q->setTitle($title, $id);
 
   $download_dir = $video_editor_dir . "/download";
   $before = glob($download_dir . "/*");
   chdir($download_dir);
 
+  $q->setStatus('downloading', $id);
   $elapsed = time();
-  $cmd = "yt-dlp " . $link['url'];
+  $cmd = "yt-dlp -o \"$title.%(ext)s\" " . $link['url'];
   vcmd($cmd, "Downloading...");
   print " (" . (time() - $elapsed) . "s)";
 
@@ -95,19 +104,19 @@ foreach ($queue as $link) {
     $q->setTitle(array_shift($after), $id);
     dlog("No new downloads found");
     if (DEBUG == 2) print_r($after);
+
+    // Can't continue to match with final id without filename.
+    $q->setError("Downloaded file not found", $id);
+    continue;
   }
 
   // Get video duration.
   $cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"$filename\"";
   $duration = exec($cmd);
-  print "\nDuration: $duration seconds";
+  print "\n  Duration: $duration seconds";
   $q->setDuration($duration, $id);
 
-  // @todo clean up characters before conversion.
-  $iconv = iconv('UTF-8', 'ASCII//TRANSLIT',  $filename);
-  $preg = preg_replace('/[^\00-\255]+/u', '', $filename);
-
-  // Process videos locally.
+  // 4. Process videos locally.
   $q->setStatus('processing', $id);
   $mp4_dir = $video_editor_dir . "/mp4";
   $before = glob($mp4_dir . "/*");
@@ -149,7 +158,7 @@ foreach ($queue as $link) {
   vcmd($cmd);
 
 
-  // 6. Refresh.
+  // 5. Refresh.
   $q->setStatus('refreshing', $id);
   chdir($htmlpath);
 
@@ -158,7 +167,7 @@ foreach ($queue as $link) {
   vcmd($cmd, "Comparing files...");
   print " (" . (time() - $elapsed) . "s)";
 
-  print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+  print "\n  Collection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
 
   $elapsed = time();
   $cmd = "php update.php gen " . $machine_name . " --overwrite";
@@ -166,13 +175,13 @@ foreach ($queue as $link) {
   print " (" . (time() - $elapsed) . "s)";
 
   $collections = load_collections();
-  print "\nCollection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+  print "\n  Collection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
 
   $q->setStatus('completed', $id);
 
   // Using filename, get the id to build the link to video.
   foreach ($collections[$machine_name]['items'] as $index => $item) {
-    if ($item['title'] == $filename) {
+    if (isset($item['title']) && $item['title'] == $filename) {
       $q->setIndex($index, $id);
       $url = "/vplaylist/index.php?collection=$machine_name&index=$index";
       $q->setTarget($url, $id);

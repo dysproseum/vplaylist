@@ -16,13 +16,19 @@ function loadPing(url) {
         catch (e) {
           msg.innerHTML = this.responseText;
           console.log(e);
-          return;
         }
 
         msg.innerHTML = '';
 
         // @todo only replace if different?
+        var active = false;
         data.forEach(function(link, index) {
+
+          // Throttle requests based on activity.
+          if (link.status != 'completed' && link.status != 'error') {
+            active = true;
+          }
+
           // true means clone all childNodes and all event handlers
           var clone = div.cloneNode(true);
           clone.id = index;
@@ -32,7 +38,7 @@ function loadPing(url) {
           clone.querySelector('.status-text').innerHTML = status;
           var title = link.title ? link.title : link.url;
           clone.querySelector('.title').innerHTML = title;
-          var duration = link.duration ? millisecondsToStr(link.duration * 1000) : '';
+          var duration = link.display_duration ? "(" + link.display_duration + ")" : '';
           clone.querySelector('.duration').innerHTML = duration;
           var collection = link.collection ? link.collection : '';
           clone.querySelector('.collection').innerHTML = collection;
@@ -61,7 +67,7 @@ function loadPing(url) {
           var td = timeDiff / 1000;
           var progress = clone.querySelector('.progress');
           var width = 0;
-          var output = millisecondsToStr(timeDiff) + " elapsed";
+          var output = millisecondsToStr(timeDiff) + " elapsed ";
 
           switch (link.status) {
             case 'queued':
@@ -77,14 +83,15 @@ function loadPing(url) {
               // Count down remaining time.
               td = (Date.now() - link.time_processing * 1000) / 1000;
               var collection_count = 200;
-              var total_estimate = parseInt(link.duration) / 2 + collection_count;
+              var processing_factor = 4;
+              var total_estimate = parseInt(link.duration) / processing_factor + collection_count;
               width = 50 + (td / total_estimate) * 50;
               var left = (total_estimate - td) * 1000;
               if (left < 0) {
-                output += " " + millisecondsToStr(Math.abs(left)) + " past estimate";
+                output += millisecondsToStr(Math.abs(left)) + " past estimate";
               }
               else {
-                output += " " + millisecondsToStr(left) + " remaining";
+                output += millisecondsToStr(left) + " remaining";
               }
               break;
             case 'completed':
@@ -94,13 +101,28 @@ function loadPing(url) {
           }
 
           progress.style.width = width + '%';
+          progress.title = width + '%';
           clone.querySelector('.timestamp').innerHTML = output;
+
+          if (link.status == 'error' && link.error) {
+            var errorMsg = link.error;
+            var td = Date.now() - link.time_error * 1000;
+            var timeAgo = millisecondsToStr(td) + " ago";
+            clone.querySelector('.timestamp').innerHTML = timeAgo + " " + errorMsg;
+          }
 
           msg.appendChild(clone);
         });
 
         if (data.length == 0) {
           msg.innerHTML = '<div class="item">No active links</div>';
+        }
+
+        if (active) {
+          setTimeout(timeOut, activeDelay);
+        }
+        else {
+          setTimeout(timeOut, normalDelay);
         }
       }
     };
@@ -110,13 +132,12 @@ function loadPing(url) {
 
 var timeOut;
 var initialDelay = 2000;
-var delay = 5000;
+var normalDelay = 15000;
+var activeDelay = 1000;
 var url = "/vplaylist/ping.php";
 
 timeOut = function() {
  loadPing(url);
- setTimeout(timeOut,
-   delay);
 }
 
 window.addEventListener("load", function() {
