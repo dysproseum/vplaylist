@@ -61,30 +61,35 @@ function loadPing(url) {
           var td = timeDiff / 1000;
           var progress = clone.querySelector('.progress');
           var width = 0;
-          var output = '';
+          var output = millisecondsToStr(timeDiff) + " elapsed";
 
           switch (link.status) {
             case 'queued':
+              break;
             case 'downloading':
               // Count up from timestamp.
-              output = millisecondsToStr(timeDiff) + " elapsed";
-              width = td ;
+              td = (Date.now() - link.time_downloading * 1000) / 1000;
+              // Function that approaches 100; y(x)=100(1−e^(−bx)).
+              width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * td / 2));
               break;
             case 'processing':
             case 'refreshing':
               // Count down remaining time.
-              width = td / link.duration * 100;
-              var left = link.duration * 1000 - timeDiff;
+              td = (Date.now() - link.time_processing * 1000) / 1000;
+              var collection_count = 200;
+              var total_estimate = parseInt(link.duration) / 2 + collection_count;
+              width = 50 + (td / total_estimate) * 50;
+              var left = (total_estimate - td) * 1000;
               if (left < 0) {
-                output = "almost... taking " + millisecondsToStr(Math.abs(left)) + " longer than estimated";
+                output += " " + millisecondsToStr(Math.abs(left)) + " past estimate";
               }
               else {
-                output = millisecondsToStr(left) + " remaining";
+                output += " " + millisecondsToStr(left) + " remaining";
               }
               break;
             case 'completed':
               width = 100;
-              var total = link.time_complete * 1000 - link.timestamp * 1000;
+              var total = (link.time_completed - link.timestamp) * 1000;
               output = millisecondsToStr(total) + " total";
           }
 
@@ -105,7 +110,7 @@ function loadPing(url) {
 
 var timeOut;
 var initialDelay = 2000;
-var delay = 45000;
+var delay = 5000;
 var url = "/vplaylist/ping.php";
 
 timeOut = function() {

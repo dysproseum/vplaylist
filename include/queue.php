@@ -26,13 +26,18 @@ class Queue {
       print json_last_error_msg();
       return false;
     }
-    // Set id value.
+    // Set new id values.
     foreach ($this->links as $index => $link) {
       if (!isset($link['id'])) {
-        $this->links[$index]['id'] = $index;
-        $this->save();
+        if (isset($this->links[$index - 1]['id'])) {
+          $this->links[$index]['id'] = $this->links[$index - 1]['id'] + 1;
+        }
+        else {
+          $this->links[$index]['id'] = $index;
+        }
       }
     }
+    $this->save();
     return $this->links;
   }
 
@@ -52,6 +57,25 @@ class Queue {
 
   function json() {
     return json_encode($this->links, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+  }
+
+  // Array indices may be incorrect after pruning.
+  function get($id) {
+    foreach ($this->links as $index => $link) {
+      if ($link['id'] == $id) {
+        // return pointer? no
+        // return new index?
+        // use guid generated in run.php?
+        //
+        // Either way, we need to set the array by its current index.
+        // $this->get(3);
+        // may return $this->links[0];
+        // $this->set(3 ,$link);
+        // so use:
+        // $this->links[$this->get(3)]['status'] = 'downloading';
+        return $index;
+      }
+    }
   }
 
   function getLinks() {
@@ -87,38 +111,40 @@ class Queue {
 
   function setStatus($status, $index) {
     $this->load();
-    $this->links[$index]['status'] = $status;
-    $this->links[$index]["time_$status"] = time();
+print_r($this->json());
+    $this->links[$this->get($index)]['status'] = $status;
+    $this->links[$this->get($index)]["time_$status"] = time();
+print_r($this->json());
     $this->save();
   }
 
   function setTitle($title, $index) {
     $this->load();
-    $this->links[$index]['title'] = $title;
+    $this->links[$this->get($index)]['title'] = $title;
     $this->save();
   }
 
   function setTarget($target, $index) {
     $this->load();
-    $this->links[$index]['target'] = $target;
+    $this->links[$this->get($index)]['target'] = $target;
     $this->save();
   }
 
   function setIndex($collection_index, $queue_index) {
     $this->load();
-    $this->links[$queue_index]['index'] = $collection_index;
+    $this->links[$this->get($queue_index)]['index'] = $collection_index;
     $this->save();
   }
 
   function setDuration($duration, $index) {
     $this->load();
-    $this->links[$index]['duration'] = $duration;
+    $this->links[$this->get($index)]['duration'] = $duration;
     $this->save();
   }
 
   function setCompleted($timestamp, $index) {
     $this->load();
-    $this->links[$index]['time_complete'] = $timestamp;
+    $this->links[$this->get($index)]['time_complete'] = $timestamp;
     $this->save();
   }
 
@@ -137,12 +163,6 @@ class Queue {
       }
     }
     $this->links = array_values($this->links);
-    $this->save();
-  }
-
-  function setElapsed($status, $elapsed, $index) {
-    $this->load();
-    $this->links[$index]['metadata'][$status]['elapsed'] = $elapsed;
     $this->save();
   }
 
