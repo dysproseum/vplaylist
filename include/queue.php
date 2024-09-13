@@ -84,8 +84,9 @@ class Queue {
 
   function getActiveLinks() {
     $active = [];
+    $ignore = ['completed', 'queued', 'error'];
     foreach ($this->links as $index => $link) {
-      if ($link['status'] != 'completed' && $link['status'] != 'queued') {
+      if (!in_array($link['status'], $ignore)) {
         $active[] = $link;
       }
     }
@@ -111,10 +112,8 @@ class Queue {
 
   function setStatus($status, $index) {
     $this->load();
-print_r($this->json());
     $this->links[$this->get($index)]['status'] = $status;
     $this->links[$this->get($index)]["time_$status"] = time();
-print_r($this->json());
     $this->save();
   }
 
@@ -142,6 +141,12 @@ print_r($this->json());
     $this->save();
   }
 
+  function setDisplayDuration($duration, $index) {
+    $this->load();
+    $this->links[$this->get($index)]['display_duration'] = $duration;
+    $this->save();
+  }
+
   function setCompleted($timestamp, $index) {
     $this->load();
     $this->links[$this->get($index)]['time_complete'] = $timestamp;
@@ -156,13 +161,18 @@ print_r($this->json());
         continue;
       }
       if ($link['status'] == 'completed' && $link['timestamp'] < $expire) {
-        dlog("Pruning for " . date('Y-m-d h:i a', $expire));
         dlog("Pruning timestamp " . date('Y-m-d h:i a', $link['timestamp']));
         dlog("Expiring from queue: " . $link['id'] . ", " . $link['title']);
         unset($this->links[$index]);
       }
     }
     $this->links = array_values($this->links);
+    $this->save();
+  }
+
+  function setError($msg, $index) {
+    $this->setStatus('error', $index);
+    $this->links[$this->get($index)]['error'] = $msg;
     $this->save();
   }
 

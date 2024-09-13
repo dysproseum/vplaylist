@@ -469,6 +469,11 @@ form#imports .refreshing {
   background-image: url(https://cur.cursors-4u.net/games/images/gam71.gif);
 }
 
+form#imports .error .progress-bar span {
+  background-color: indianred;
+  width: 100% !important;
+}
+
 form#imports .queued .progress-bar span {
   background-color: goldenrod;
   width: 100% !important;
