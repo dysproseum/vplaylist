@@ -5,8 +5,9 @@ function loadDoc(url) {
       var data = JSON.parse(this.responseText);
         var vidSrc = '/vplaylist/serve.php?collection=' + data.collection + '&index=' + data.index + '&file=.mp4';
         setTimeout(function() {
-          player.src = vidSrc;
+          player.controls = controls;
         }, 1500);
+        player.src = vidSrc;
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
         document.title = data.filename + " | vplaylist";
