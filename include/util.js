@@ -4,8 +4,8 @@ function loadDoc(url) {
     if (this.readyState == 4 && this.status == 200) {
       var data = JSON.parse(this.responseText);
         var vidSrc = '/vplaylist/serve.php?collection=' + data.collection + '&index=' + data.index + '&file=.mp4';
-        player.src = vidSrc;
         setTimeout(function() {
+          player.src = vidSrc;
         }, 1500);
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
