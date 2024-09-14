@@ -96,6 +96,7 @@ body.nocontrols {
 .player {
 	float: left;
 	width: 100%;
+	min-height: 360px;
 }
 
 .player video {

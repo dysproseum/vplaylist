@@ -5,6 +5,8 @@ function loadDoc(url) {
       var data = JSON.parse(this.responseText);
         var vidSrc = '/vplaylist/serve.php?collection=' + data.collection + '&index=' + data.index + '&file=.mp4';
         player.src = vidSrc;
+        setTimeout(function() {
+        }, 1500);
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
         document.title = data.filename + " | vplaylist";
@@ -17,6 +19,8 @@ function loadDoc(url) {
         }
     }
   };
+  var controls = player.controls;
+  player.controls = false;
   xhttp.open("GET", url, true);
   xhttp.send();
   return true;
