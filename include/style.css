@@ -1,9 +1,8 @@
 body {
-	background: url(bg.jpg) no-repeat fixed;
+	background: url(stars.jpg) repeat;
 	background-position: center;
-	background-size: cover;
 	margin: 0;
-font-family: monospace;
+	font-family: monospace;
 }
 
 input, select {
