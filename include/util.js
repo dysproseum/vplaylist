@@ -7,6 +7,7 @@ function loadDoc(url) {
         player.src = vidSrc;
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
+        document.title = data.filename + " | vplaylist";
         var urlParams = new URLSearchParams(window.location.search);
         if (data.index >= 0) {
           urlParams.set('index', data.index);
