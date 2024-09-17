@@ -8,7 +8,16 @@
   const start_muted = <?php print $conf['start_muted']; ?>;
   const use_ajax = <?php print $conf['use_ajax']; ?>;
 </script>
-<title>vplaylist</title>
+<?php
+  $title = "vplaylist";
+  if (isset($vid_title) && $vid_title != '') {
+    $title = "$vid_title | vplaylist";
+  }
+?>
+<title><?php print $title; ?></title>
+<meta property="og:title" content="<?php print $title; ?>" />
+<meta property="og:description" content="vplaylist is an HTML5 video player for desktop and mobile for personal use" />
+<meta property="og:image" content="/vplaylist/serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>" />
 </head>
 
 <?php if ($controls == '0'): ?>
