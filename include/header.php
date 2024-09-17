@@ -15,9 +15,9 @@
   }
 ?>
 <title><?php print $title; ?></title>
-<meta property="og:title" content="<?php print $title; ?>" />
+<meta property="og:title" content="<?php print $vid_title; ?>" />
 <meta property="og:description" content="vplaylist is an HTML5 video player for desktop and mobile for personal use" />
-<meta property="og:image" content="/vplaylist/serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>" />
+<meta property="og:image" content="/vplaylist/serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.jpg" />
 </head>
 
 <?php if ($controls == '0'): ?>
