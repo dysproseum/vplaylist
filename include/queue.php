@@ -156,13 +156,14 @@ class Queue {
   function pruneCompleted() {
     $this->load();
     $expire = time() - 24 * 3600;
+    $statuses = ['completed', 'error'];
     foreach ($this->links as $index => $link) {
       if (!isset($link['timestamp'])) {
         continue;
       }
-      if ($link['status'] == 'completed' && $link['timestamp'] < $expire) {
+      if (in_array($link['status'], $statuses) && $link['timestamp'] < $expire) {
         dlog("Pruning timestamp " . date('Y-m-d h:i a', $link['timestamp']));
-        dlog("Expiring from queue: " . $link['id'] . ", " . $link['title']);
+        dlog("Expiring [" . $link['id'] . "], status " . $link['status']);
         unset($this->links[$index]);
       }
     }
