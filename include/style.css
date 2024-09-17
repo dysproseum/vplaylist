@@ -126,7 +126,8 @@ body.nocontrols {
 	text-align: center;
 	width: 100%;
 	padding: 20px 0 20px 0;
-	background: #00000088;
+	background: -webkit-linear-gradient(top, rgba(0, 0, -1, 0), rgba(0, 0, 0, 1));
+	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 	text-shadow: -2px 0px black;
 	font-size: 14px;
 }
