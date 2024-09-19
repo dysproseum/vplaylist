@@ -61,7 +61,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$repeat = ($_REQUEST['repeat'] == 1) ? 'repeat' : '';
 }
 
-// Sort by name.
+// Sort filters.
 if (isset($_REQUEST['collection']) && $_REQUEST['collection'] != '') {
   if (isset($_REQUEST['sort']) && $_REQUEST['sort'] == 'name') {
     $items = $collections[$machine_name]['items'];
@@ -72,6 +72,13 @@ if (isset($_REQUEST['collection']) && $_REQUEST['collection'] != '') {
       uasort($items, 'name_compare');
     }
     $collections[$machine_name]['items'] = $items;
+  }
+  else if (isset($_REQUEST['sort']) && $_REQUEST['sort'] == 'date') {
+    $items = $collections[$machine_name]['items'];
+    if (isset($_REQUEST['order']) && $_REQUEST['order'] == 'desc') {
+      $items = array_reverse($items, true);
+      $collections[$machine_name]['items'] = $items;
+    }
   }
 }
 
@@ -192,6 +199,7 @@ require_once 'include/header.php';
 		<h4><a href="getnextvideo.php?collection=<?php print $machine_name; ?>">Shuffle All</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name">Sort a-z</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name&order=desc">Sort z-a</a></h4>
+		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=date&order=desc">Oldest first</a></h4>
           </div>
 	<?php endif; ?>
 	</div>
