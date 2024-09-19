@@ -33,9 +33,9 @@ $ cd vplaylist
 $ cp config.php.example config.php
 ````
 
-#### Create a media storage directory
+#### Set media storage directory
 
-Set `video_dir` config value to point to a writable storage location:
+Update `config.php` to point to a writable storage location:
 
 ````
 $conf['video_dir'] = '/var/www/vplaylist';
