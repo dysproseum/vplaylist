@@ -61,6 +61,20 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$repeat = ($_REQUEST['repeat'] == 1) ? 'repeat' : '';
 }
 
+// Sort by name.
+if (isset($_REQUEST['collection']) && $_REQUEST['collection'] != '') {
+  if (isset($_REQUEST['sort']) && $_REQUEST['sort'] == 'name') {
+    $items = $collections[$machine_name]['items'];
+    if (isset($_REQUEST['order']) && $_REQUEST['order'] == 'desc') {
+      uasort($items, 'name_compare_desc');
+    }
+    else {
+      uasort($items, 'name_compare');
+    }
+    $collections[$machine_name]['items'] = $items;
+  }
+}
+
 // Add'l body classes are set depending on vid_player.
 require_once 'include/header.php';
 
@@ -176,6 +190,8 @@ require_once 'include/header.php';
 		<h4><a href="video-editor/index.php">Add more videos</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a></h4>
 		<h4><a href="getnextvideo.php?collection=<?php print $machine_name; ?>">Shuffle All</a></h4>
+		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name">Sort a-z</a></h4>
+		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name&order=desc">Sort z-a</a></h4>
           </div>
 	<?php endif; ?>
 	</div>
