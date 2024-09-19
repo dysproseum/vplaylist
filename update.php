@@ -177,6 +177,7 @@ foreach ($machine_names as $name) {
 foreach ($collections[$name]['items'] as &$item) {
   $info = pathinfo($item['filename']);
   $item['thumbnail'] = $htmlpath . '/thumbnails/' . $name . '/' . $info['filename'] . '.jpg';
+  $item['title'] = $info['filename'];
 }
 
 if ($action == "gen") {
