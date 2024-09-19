@@ -106,6 +106,18 @@ function date_compare($a1, $a2) {
   return $a1['timestamp'] - $a2['timestamp'];
 }
 
+function date_compare_desc($a1, $a2) {
+  return date_compare($a2, $a1);
+}
+
+function name_compare($a1, $a2) {
+  return strcasecmp($a1['title'], $a2['title']);
+}
+
+function name_compare_desc($a1, $a2) {
+  return name_compare($a2, $a1);
+}
+
 function is_mobile() {
 	return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|boost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
 }
