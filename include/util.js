@@ -58,6 +58,12 @@ function prepareVidLinks() {
   }
 }
 
+function epochTime() {
+  var d = new Date();
+  var seconds = Math.round(d.getTime() / 1000);
+  return seconds;
+}
+
 function millisecondsToStr(milliseconds) {
     // TIP: to find current time in milliseconds, use:
     // var  current_time_milliseconds = new Date().getTime();
@@ -89,4 +95,8 @@ function millisecondsToStr(milliseconds) {
         return seconds + ' second' + numberEnding(seconds);
     }
     return 'less than a second'; //'just now' //or other string you like;
+}
+
+function humanReadableTime(seconds) {
+  return millisecondsToStr(seconds * 1000);
 }
