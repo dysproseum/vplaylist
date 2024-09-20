@@ -188,10 +188,9 @@ foreach ($queue as $link) {
       $q->setTarget($url, $id);
     }
   }
-  // @todo error log if not found.
-  // if (!$q->getIndex($id)) {
-  //  print "\n  Index not matched";
-  //}
+  if ($q->getIndex($id) === false) {
+    print "\n  Warning: Index not matched.";
+  }
 
   // @todo notifications
 }

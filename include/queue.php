@@ -135,6 +135,15 @@ class Queue {
     $this->save();
   }
 
+  function getIndex($queue_index) {
+    $this->load();
+    $item = $this->links[$this->get($queue_index)];
+    if (isset($item['index'])) {
+      return $item['index'];
+    }
+    return false;
+  }
+
   function setDuration($duration, $index) {
     $this->load();
     $this->links[$this->get($index)]['duration'] = $duration;
@@ -163,7 +172,7 @@ class Queue {
       }
       if (in_array($link['status'], $statuses) && $link['timestamp'] < $expire) {
         dlog("Pruning timestamp " . date('Y-m-d h:i a', $link['timestamp']));
-        dlog("Expiring [" . $link['id'] . "], status " . $link['status']);
+        dlog("Expiring [Slot " . $link['id'] . "], status " . $link['status']);
         unset($this->links[$index]);
       }
     }
