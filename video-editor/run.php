@@ -77,6 +77,7 @@ foreach ($queue as $link) {
   $title = str_replace('/', '_', $title);
   $title = str_replace('"', '', $title);
   $title = iconv('UTF-8', 'ASCII//TRANSLIT',  $title);
+  $title = str_replace('?', '', $title);
   if (strlen($title) > 255) {
     $title = substr($title, 0, 255);
   }
@@ -181,12 +182,16 @@ foreach ($queue as $link) {
 
   // Using filename, get the id to build the link to video.
   foreach ($collections[$machine_name]['items'] as $index => $item) {
-    if (isset($item['title']) && $item['title'] == $filename) {
+    if (isset($item['filename']) && basename($item['filename']) == $filename) {
       $q->setIndex($index, $id);
       $url = "/vplaylist/index.php?collection=$machine_name&index=$index";
       $q->setTarget($url, $id);
     }
   }
+  // @todo error log if not found.
+  // if (!$q->getIndex($id)) {
+  //  print "\n  Index not matched";
+  //}
 
   // @todo notifications
 }
