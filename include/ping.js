@@ -9,13 +9,13 @@ function loadPing(url) {
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         var msg = document.getElementById('imports');
-
+        var data = [];
         try {
-          var data = JSON.parse(this.responseText);
+          data = JSON.parse(this.responseText);
         }
         catch (e) {
-          msg.innerHTML = this.responseText;
-          console.log(e);
+          console.log(new Date() + " " + e);
+          data = [];
         }
 
         msg.innerHTML = '';
@@ -133,7 +133,7 @@ function loadPing(url) {
 var timeOut;
 var initialDelay = 2000;
 var normalDelay = 15000;
-var activeDelay = 1000;
+var activeDelay = 500;
 var url = "/vplaylist/ping.php";
 
 timeOut = function() {
