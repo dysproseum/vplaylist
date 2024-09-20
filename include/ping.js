@@ -63,41 +63,40 @@ function loadPing(url) {
           }
 
           // Update progress bar based on timestamp and duration.
-          var timeDiff = Date.now() - link.timestamp * 1000;
-          var td = timeDiff / 1000;
+          var timeDiff = epochTime() - link.timestamp;
           var progress = clone.querySelector('.progress');
           var width = 0;
-          var output = millisecondsToStr(timeDiff) + " elapsed ";
+          var output = humanReadableTime(timeDiff) + " elapsed ";
 
           switch (link.status) {
             case 'queued':
               break;
             case 'downloading':
               // Count up from timestamp.
-              td = (Date.now() - link.time_downloading * 1000) / 1000;
+              timeDiff = epochTime() - link.time_downloading;
               // Function that approaches 100; y(x)=100(1−e^(−bx)).
-              width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * td / 2));
+              width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * timeDiff / 2));
               break;
             case 'processing':
             case 'refreshing':
               // Count down remaining time.
-              td = (Date.now() - link.time_processing * 1000) / 1000;
+              timeDiff = epochTime() - link.time_processing;
               var collection_count = 200;
               var processing_factor = 4;
               var total_estimate = parseInt(link.duration) / processing_factor + collection_count;
-              width = 50 + (td / total_estimate) * 50;
-              var left = (total_estimate - td) * 1000;
+              width = 50 + (timeDiff / total_estimate) * 50;
+              var left = total_estimate - timeDiff;
               if (left < 0) {
-                output += millisecondsToStr(Math.abs(left)) + " past estimate";
+                output += humanReadableTime(Math.abs(left)) + " past estimate";
               }
               else {
-                output += millisecondsToStr(left) + " remaining";
+                output += humanReadableTime(left) + " remaining";
               }
               break;
             case 'completed':
               width = 100;
-              var total = (link.time_completed - link.timestamp) * 1000;
-              output = millisecondsToStr(total) + " total";
+              var total = link.time_completed - link.timestamp;
+              output = humanReadableTime(total) + " total";
           }
 
           progress.style.width = width + '%';
@@ -106,8 +105,8 @@ function loadPing(url) {
 
           if (link.status == 'error' && link.error) {
             var errorMsg = link.error;
-            var td = Date.now() - link.time_error * 1000;
-            var timeAgo = millisecondsToStr(td) + " ago";
+            timeDiff = epochTime() - link.time_error;
+            var timeAgo = humanReadableTime(timeDiff) + " ago";
             clone.querySelector('.timestamp').innerHTML = timeAgo + " " + errorMsg;
           }
 
