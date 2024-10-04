@@ -177,7 +177,16 @@ foreach ($machine_names as $name) {
 foreach ($collections[$name]['items'] as &$item) {
   $info = pathinfo($item['filename']);
   $item['thumbnail'] = $htmlpath . '/thumbnails/' . $name . '/' . $info['filename'] . '.jpg';
+
+  // Update title.
   $item['title'] = $info['filename'];
+
+  // Add duration.
+  unset($item['length']);
+  $item['duration'] = get_video_duration($item['filename']);
+
+  // Add framerate.
+  $item['framerate'] = get_video_framerate($item['filename']);
 }
 
 if ($action == "gen") {
