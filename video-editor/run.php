@@ -112,8 +112,7 @@ foreach ($queue as $link) {
   }
 
   // Get video duration.
-  $cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"$filename\"";
-  $duration = exec($cmd);
+  $duration = get_video_duration($filename);
   print "\n  Duration: $duration seconds";
   $q->setDuration($duration, $id);
 

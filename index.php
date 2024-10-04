@@ -38,6 +38,8 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 	else {
 		$item = $collections[$machine_name]['items'][$index];
 		$vid_title = basename($item['filename'], '.mp4');
+		$duration = seconds_to_clock_time($item['duration']);
+		$framerate = isset($item['framerate']) ? $item['framerate'] : 0;
 		$vid_player = TRUE;
 	}
 
