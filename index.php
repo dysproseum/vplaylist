@@ -91,7 +91,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>">
+	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> height="360" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
 		<?php else: ?>
@@ -147,14 +147,66 @@ require_once 'include/header.php';
 		<h2>Collection is empty.</h2>
 	</div>
 <?php else: ?>
-	<div class="subnav">
-	<h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
 	<?php if ($vid_player): ?>
-          <div class="subnav-right-side">
+        <div class="supernav">
+          <div class="supernav-left-side">
+            <?php include "include/javascript-equalizer.html"; ?>
+            <div class="player-controls">
+		<h4>
+			<label for="vid_muted">
+				<i class="fa-sharp fa-solid fa-volume-xmark"></i>
+			</label>
+			<input type="checkbox" name="vid_muted" id="vid_muted"
+			<?php if ($muted !== ''): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
+		<div id="volvalue">0</div>
+		<input type="range" class="vertical" id="volslider" />
+		<input type="range" class="horizontal" min="-1" max="1" step="0.1" id="panner" />
+            </div>
+          </div>
+          <div class="supernav-middle">
+            <div class="player-controls">
+		  <div class="button">
+			<a id="player-rec"><i class="fa-sharp fa-solid fa-circle"></i></a>
+		  </div>
+		  <div class="button">
+			<a id="player-play"><i class="fa-sharp fa-solid fa-play"></i></a>
+		  </div>
+		  <div class="button">
+			<a id="player-stop"><i class="fa-sharp fa-solid fa-stop"></i></a>
+		  </div>
+		  <div class="button">
+			<a id="player-prev"><i class="fa-sharp fa-solid fa-backward-fast"></i></a>
+		  </div>
+		  <div class="button">
+			<a id="player-next"><i class="fa-sharp fa-solid fa-forward-fast"></i></a>
+		  </div>
+		  <div class="button">
+			<a id="player-pause"><i class="fa-sharp fa-solid fa-pause"></i></a>
+		  </div>
+	    </div>
+          </div>
+          <div class="supernav-right-side">
+		<input type="range" class="vertical" min="0.1" max="2" step="0.05" id="vidspeed" />
+	    <div class="time-box">
+              <div id="player-time">00:00:00</div>
+              <div id="player-duration">&nbsp;/ <?php print $duration; ?></div>
+              <div id="player-status" hidden>&nbsp;</div>
+              <script type="text/javascript">framerate = <?php print $framerate; ?>;</script>
+            </div>
+            <a onclick="body.classList.toggle('backlight')">Backlight</a>
+            <a onclick="body.classList.toggle('fixed-supernav')">Mode</a>
+            <a id="maximize" onclick="toggleFullscreen()">Fullscreen</a>
+              <div class="player-controls">
 		<input type="hidden" name="vid_count" value="<?php print sizeof($collections[$machine_name]['items']); ?>" />
 
 		<h4>
-			<label for="vid_autoplay">Autoplay</label>
+			<label for="vid_autoplay">
+				<i class="fa-sharp fa-solid fa-rotate"></i>
+			</label>
 			<input type="checkbox" name="vid_autoplay" id="vid_autoplay"
 			<?php if ($autoplay): ?>
 				checked="checked"
@@ -162,7 +214,9 @@ require_once 'include/header.php';
 			/>
 		</h4>
 		<h4>
-			<label for="vid_shuffle">Shuffle</label>
+			<label for="vid_shuffle">
+				<i class="fa-sharp fa-solid fa-shuffle"></i>
+			</label>
 			<input type="checkbox" name="vid_shuffle" id="vid_shuffle"
 			<?php if ($shuffle): ?>
 				checked="checked"
@@ -170,7 +224,9 @@ require_once 'include/header.php';
 			/>
 		</h4>
 		<h4>
-			<label for="vid_repeat">Repeat All</label>
+			<label for="vid_repeat">
+				<i class="fa-sharp fa-solid fa-repeat"></i>
+			</label>
 			<input type="checkbox" name="vid_repeat" id="vid_repeat"
 			<?php if ($repeat): ?>
 				checked="checked"
@@ -178,23 +234,27 @@ require_once 'include/header.php';
 			/>
 		</h4>
 		<h4>
-			<label for="vid_loop">Loop</label>
+			<label for="vid_loop">
+				<i class="fa-sharp fa-solid fa-1"></i>
+			</label>
 			<input type="checkbox" name="vid_loop" id="vid_loop"
 			<?php if ($loop): ?>
 				checked="checked"
 			<?php endif; ?>
 			/>
 		</h4>
-		<h4>
-			<label for="vid_muted">Muted</label>
-			<input type="checkbox" name="vid_muted" id="vid_muted"
-			<?php if ($muted !== ''): ?>
-				checked="checked"
-			<?php endif; ?>
-			/>
-		</h4>
+		</div>
+            </div>
           </div>
+        </div>
+	<div class="subnav">
+	  <h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
+          <div class="subnav-right-side">
+          </div>
+	</div>
 	<?php else: ?>
+	<div class="subnav">
+	  <h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
           <div class="subnav-right-side">
 		<h4><a href="video-editor/index.php">Add more videos</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&index=0&autoplay=1">Play All</a></h4>
@@ -203,8 +263,8 @@ require_once 'include/header.php';
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name&order=desc">Sort z-a</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=date&order=desc">Oldest first</a></h4>
           </div>
-	<?php endif; ?>
 	</div>
+	<?php endif; ?>
 
 	<div class="listing-box">
 	<div class="listing">

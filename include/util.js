@@ -7,9 +7,21 @@ function loadDoc(url) {
         setTimeout(function() {
           player.controls = controls;
         }, 1500);
+
         player.src = vidSrc;
+	var pause = document.querySelector("#player-pause");
+	if (pause.classList.contains("pressed")) {
+		player.pause();
+	}
+
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
+
+	var duration = document.querySelector("#player-duration");
+	duration.innerText = " / " + secondsToClockTime(data.duration);
+
+	framerate = eval(data.framerate);
+
         document.title = data.filename + " | vplaylist";
         var urlParams = new URLSearchParams(window.location.search);
         if (data.index >= 0) {
