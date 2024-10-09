@@ -1,8 +1,14 @@
+@font-face {
+    font-family: 'vcr';
+    src: url('vcr_osd_mono.woff') format('woff'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+         url('vcr_osd_mono.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+}
+
 body {
 	background: url(stars.jpg) repeat;
 	background-position: center;
 	margin: 0;
-	font-family: monospace;
+	font-family: vcr;
 }
 
 input, select {
@@ -18,6 +24,7 @@ body.behind-video video .label {
 	position: absolute;
 	top: 0;
 }
+
 body.nocontrols {
 	overflow: hidden;
 }
@@ -101,35 +108,43 @@ body.nocontrols {
 .player video {
 	display: inherit;
 	margin: 0 auto;
-	padding: 10px;
-	margin-top: -10px;
+	margin-top: 20px;
 	background: black;
 	border-radius: 8px;
+	box-shadow: 0 0 20px 10px black;
+	opacity: 1 !important;
+}
+
+.backlight .player video {
+	margin-top: -10px;
 	box-shadow: 0 0 10px white;
+	padding: 16px;
+  transition: .2s ease-in-out;
 }
 
 #background-video {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
+	width: 100vw;
+	height: 100vh;
+	object-fit: cover;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1;
 }
 
 .player .label {
-	color: white;
+	color: #cccccc;
 	float: left;
 	text-align: center;
 	width: 100%;
-	padding: 20px 0 20px 0;
+	padding: 10px 0 20px 0;
 	background: -webkit-linear-gradient(top, rgba(0, 0, -1, 0), rgba(0, 0, 0, 1));
 	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 	text-shadow: -2px 0px black;
-	font-size: 14px;
+	font-size: 16px;
+	font-weight: bold;
 }
 
 .listing-box {
@@ -228,11 +243,222 @@ h4 a:hover {
 	background: mediumpurple;
 }
 
+.supernav {
+	display: block;
+	float: left;
+	width: 100%;
+	height: 96px;
+	background: #555555;
+/*	background: -webkit-linear-gradient(bottom, rgba(0, 0, -1, 0), rgba(0, 0, 0, 1));
+	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)); */
+	border-top: 1px solid #cccccc;
+	position: relative;
+	z-index: 1;
+}
+
+.fixed-supernav .supernav {
+  position: fixed;
+  bottom: 0;
+}
+
+.fixed-supernav video {
+  height: 540px;
+}
+
+.supernav h4 {
+	color: #cccccc;
+	background: black;
+	border: 1px solid white;
+	margin-right: 5px;
+	height: 32px;
+	overflow: hidden;
+}
+
+.supernav h4:last-child {
+	margin-right: 0;
+}
+
+.supernav h4:hover {
+}
+
+.supernav-left-side {
+	float: left;
+	width: 33%;
+	text-align: left;
+}
+
+.supernav-left-side canvas {
+	width: 220px;
+	height: 70px;
+	float: left;
+	margin-left: 18px;
+	margin-top: 12px;
+	background: url(stars.jpg);
+	border: 1px solid #cccccc;
+	box-shadow: 0 0 4px white;
+	border-radius: 7px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.supernav-left-side .player-controls {
+	width: unset;
+	float: left;
+}
+
+.supernav-left-side .player-controls label {
+	padding: unset;
+}
+
+.supernav-left-side h4 {
+	border: 0;
+	border-radius: 42px;
+	padding: 10px;
+	margin: 20px;
+	border-top: 1px solid #cccccc;
+	border-bottom: 4px solid #2B1800;
+}
+
+.supernav-left-side h4 input[type=checkbox] {
+	display: none;
+}
+
+.supernav .time-box {
+	padding: 10px;
+	background: url(stars.jpg);
+	color: #cccccc;
+	float: right;
+	margin: 8px;
+	border-radius: 8px;
+	border: 1px solid #cccccc;
+	box-shadow: 0 0 4px white;
+	font-weight: bold;
+}
+
+.supernav-right-side #player-time {
+	float: left;
+}
+
+.supernav-right-side #player-duration {
+	float: right;
+	white-space: break-spaces;
+}
+
+.supernav-right-side #player-status {
+	min-width: 20px;
+	min-height: 20px;
+	padding-left: 10px;
+	margin-left: 10px;
+	margin-top: 10px;
+
+	color: #cccccc;
+	text-shadow: -1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+}
+
+.supernav-left-side #player-status {
+	background: url(https://imgs.search.brave.com/fXe4nGGtFgaOkJMCxc5Scw98XIidjBf0RwJumLHuVjo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YW5pbWF0ZWRpbWFn/ZXMub3JnL2RhdGEv/bWVkaWEvMzQyL2Fu/aW1hdGVkLWxlZC1p/bWFnZS0wMDgzLmdp/Zg.gif) no-repeat;
+}
+
+.supernav-middle {
+	float: left;
+	width: 34%;
+	text-align: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.supernav-middle .player-controls {
+	text-align: center;
+	float: right;
+	width: 100%;
+}
+
+.supernav-right-side .player-controls {
+	position: absolute;
+	right: 10px;
+	top: 55px;
+}
+
+.player-controls input[type=checkbox] {
+	margin-top: 9px;
+	float: left;
+	display: none;
+}
+
+.player-controls label {
+	padding: 10px;
+	cursor: pointer;
+	line-height: 32px;
+}
+
+.player-controls h4 {
+	border-radius: 20px;
+}
+
+.player-controls h4:has(input:checked) {
+	background: mediumpurple;
+}
+
+.player-controls a {
+	display: block;
+	float: left;
+	margin-right: 10px;
+	width: 48px;
+	height: 48px;
+	line-height: 48px;
+	text-align: center;
+	color: #cccccc;
+	box-shadow: 2px 2px black;
+	background: #333333;
+	font-weight: bold;
+	cursor: pointer;
+	text-decoration: none;
+	user-select: none;
+	text-shadow: 0 0 4px black;
+}
+
+.player-controls a:last-child {
+	margin-right: 0;
+}
+
+.player-controls a:hover {
+
+}
+
+.player-controls a:active,
+.player-controls .pressed {
+	background: silver;
+	box-shadow: none;
+	margin-top: 1px;
+	margin-left: 1px;
+	box-shadow: 2px 2px black inset;
+	width: 47px;
+	height: 47px;
+}
+
+.player-controls .pressed {
+
+}
+
+.supernav-right-side {
+	float: right;
+	width: 33%;
+	height: 100%;
+}
+
 .subnav {
 	float: left;
 	width: 100%;
 	background: #555555;
 	margin-bottom: 32px;
+}
+
+.behind-video .subnav {
+	background: unset;
 }
 
 .subnav a {
@@ -241,11 +467,6 @@ h4 a:hover {
 
 .subnav label, .subnav input {
 	cursor: pointer;
-}
-
-.subnav input {
-	margin-top: 9px;
-	float: left;
 }
 
 .subnav-right-side {
@@ -259,7 +480,7 @@ h4 a:hover {
 	padding: 0px 10px 0px 5px;
 }
 
-.subnav-right-side h4:hover, .subnav a:hover {
+.subnav a:hover {
 	background: mediumpurple;
 }
 
@@ -498,4 +719,188 @@ form#imports .refreshing .progress-bar span {
 form#imports .completed .progress-bar span {
   background-color: mediumaquamarine;
   width: 100% !important;
+}
+
+/*
+ * Pressable, iOS Compatible CSS Button
+ * https://codepen.io/jemware/pen/kPoYbe
+ */
+.button {
+  position:relative;
+  display:inline-block;
+  margin:4px;
+}
+
+.button a {
+	color: #cccccc;
+	font-weight:bold;
+	font-size:16px;
+	text-align: center;
+	text-decoration:none;
+	background-color:#666666;
+	display:block;
+	position:relative;
+	padding:5px;
+
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	text-shadow: 0px 2px 0px #000;
+	filter: dropshadow(color=#000, offx=0px, offy=1px);
+
+	-webkit-box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+	-moz-box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+	box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.button a.pressed,
+.button a:active{
+	top:10px;
+	background-color:#666666;
+	-webkit-box-shadow:inset 0 1px 0 #cccccc, inset 0 -3px 0 #444444;
+	-moz-box-shadow:inset 0 1px 0 #cccccc, inset 0 -3pxpx 0 #444444;
+}
+
+.button:after{
+	content:"";
+	height:100%;
+	width:100%;
+	padding:4px;
+	position: absolute;
+	bottom:-15px;
+	left:-4px;
+	z-index:-1;
+	background-color:#2B1800;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+/*
+ * Custom slider
+ * https://codepen.io/ibaslogic/pen/GRYRgay
+ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 78px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 6px;
+  display: block;
+  float: left;
+  margin-top: 28px;
+}
+
+/* Thumb: webkit */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 30px;
+  width: 9px;
+ background-color: #aaaaaa;
+/*   background-image: url("https://ibaslogic.github.io/hosted-assets/smile.png");*/
+  background-size: cover;
+/*   border-radius: 50%;*/
+  border: none;
+  transition: .2s ease-in-out;
+  /*  rotate thumb  */
+  transform: rotateZ(var(--thumb-rotate, 0deg));
+  border-left: 4px solid black;
+  border-right: 4px solid black;
+}
+
+/* Thumb: Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 30px;
+  width: 30px;
+/*   background-color: #f50; */
+  background-image: url("https://ibaslogic.github.io/hosted-assets/smile.png");
+  background-size: cover;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+  /*  rotate thumb  */
+  transform: rotateZ(var(--thumb-rotate, 0deg));
+}
+
+/* Hover, active & focus Thumb: Webkit */
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+input[type="range"]:focus::-webkit-slider-thumb {
+  /*box-shadow: 0 0 0 13px rgba(255,85,0, .2)*/
+}
+
+/* Hover, active & focus Thumb: Firfox */
+
+input[type="range"]::-moz-range-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+input[type="range"]:active::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+input[type="range"]:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+
+/*=============
+Aesthetics
+=========================*/
+
+body {
+/*  font-family: system-ui;*/
+}
+
+h1 {
+ /* color: #4b4949; */
+ /*  text-align: center;*/
+}
+
+.wrapper {
+  color: #4b4949;
+  background: #f50;
+  max-width: 400px;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 4rem;
+  width: 80%;
+  background: #fff;
+  padding: 0px 10px;
+}
+
+.value {
+  font-size: 26px;
+  width: 50px;
+  text-align: center;
+}
+
+.horizontal {
+/*  background: linear-gradient(to right, rgb(255, 85, 0) 32%, rgb(204, 204, 204) 32%); */
+  background: #2B1800;
+  border: 1px solid #999999;
+}
+
+.vertical {
+  transform: rotate(-90deg);
+  background: #2B1800;
+  border: 1px solid #999999;
 }
