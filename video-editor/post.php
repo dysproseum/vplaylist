@@ -29,7 +29,39 @@ if (!isset($collections[$machine_name])) {
   exit('Invalid collection ' . $machine_name);
 }
 
-error_log("New link queued for collection: " . $machine_name);
+error_log("New link queueing for collection: " . $machine_name);
+
+// Check for playlist.
+if (strstr($url, 'playlist')) {
+
+  $cmd = 'yt-dlp --get-id --flat-playlist "' . $url . '"';
+error_log($cmd);
+  $playlist = shell_exec($cmd);
+error_log($playlist);
+  foreach (explode("\n", $playlist) as $video_id) {
+    if (!$video_id) {
+      continue;
+    }
+    error_log("Found $video_id");
+    // Make a request to this page?
+    $self = $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
+
+    $ch = curl_init();
+    curl_setopt($ch, URLOPT_URL, $self);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+      'video1' => "https://youtu.be/$video_id",
+      'select_collection_name' => $machine_name,
+    ]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $server_output = curl_exec($ch);
+    curl_close($ch);
+  }
+
+  // Redirect to download.php for status.
+  header('Location: download.php');
+  exit;
+}
 
 // Check for existing links.
 if (file_exists($p)) {
