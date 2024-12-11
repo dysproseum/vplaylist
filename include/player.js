@@ -296,11 +296,30 @@ window.onload = function(){
 	});
 
 	prev.addEventListener("mousedown", function() {
-
+		if (play.classList.contains("pressed")) {
+			this.classList.toggle("pressed");
+			if (this.classList.contains("pressed")) {
+				// setInterval
+			}
+			else {
+				// clearInterval
+			}
+		}
 	});
 
 	next.addEventListener("mousedown", function() {
-		getNextVideo();
+		if (play.classList.contains("pressed")) {
+			this.classList.toggle("pressed");
+			if (this.classList.contains("pressed")) {
+				// setInterval
+			}
+			else {
+				// clearInterval
+			}
+		}
+		else {
+			getNextVideo();
+		}
 	});
 
 	pause.addEventListener("mousedown", function(e) {

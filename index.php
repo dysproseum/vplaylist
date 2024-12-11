@@ -154,7 +154,7 @@ require_once 'include/header.php';
             <div class="player-controls">
 		<h4>
 			<label for="vid_muted">
-				<i class="fa-sharp fa-solid fa-volume-xmark"></i>
+				<i class="fa-sharp fa-solid fa-volume-xmark" title="Mute"></i>
 			</label>
 			<input type="checkbox" name="vid_muted" id="vid_muted"
 			<?php if ($muted !== ''): ?>
@@ -205,7 +205,7 @@ require_once 'include/header.php';
 
 		<h4>
 			<label for="vid_autoplay">
-				<i class="fa-sharp fa-solid fa-rotate"></i>
+				<i class="fa-sharp fa-solid fa-rotate" title="Autoplay"></i>
 			</label>
 			<input type="checkbox" name="vid_autoplay" id="vid_autoplay"
 			<?php if ($autoplay): ?>
@@ -215,7 +215,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_shuffle">
-				<i class="fa-sharp fa-solid fa-shuffle"></i>
+				<i class="fa-sharp fa-solid fa-shuffle" title="Shuffle"></i>
 			</label>
 			<input type="checkbox" name="vid_shuffle" id="vid_shuffle"
 			<?php if ($shuffle): ?>
@@ -225,7 +225,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_repeat">
-				<i class="fa-sharp fa-solid fa-repeat"></i>
+				<i class="fa-sharp fa-solid fa-repeat" title="Repeat All"></i>
 			</label>
 			<input type="checkbox" name="vid_repeat" id="vid_repeat"
 			<?php if ($repeat): ?>
@@ -235,7 +235,7 @@ require_once 'include/header.php';
 		</h4>
 		<h4>
 			<label for="vid_loop">
-				<i class="fa-sharp fa-solid fa-1"></i>
+				<i class="fa-sharp fa-solid fa-1" title="Repeat 1"></i>
 			</label>
 			<input type="checkbox" name="vid_loop" id="vid_loop"
 			<?php if ($loop): ?>

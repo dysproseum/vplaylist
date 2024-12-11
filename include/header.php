@@ -5,7 +5,6 @@
 <script src="include/util.js"></script>
 <script src="include/player.js"></script>
 <script src="include/fullscreen.js"></script>
-<script src="https://kit.fontawesome.com/619da17a85.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
   const start_muted = <?php print $conf['start_muted']; ?>;
   const use_ajax = <?php print $conf['use_ajax']; ?>;
