@@ -47,7 +47,7 @@ error_log($playlist);
     $self = $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
 
     $ch = curl_init();
-    curl_setopt($ch, URLOPT_URL, $self);
+    curl_setopt($ch, CURLOPT_URL, $self);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
       'video1' => "https://youtu.be/$video_id",
