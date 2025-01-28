@@ -165,4 +165,8 @@ window.onload = function(){
 			autoplay.checked = true;
 		}
 	};
+
+//        var x = document.createElement("google-cast-launcher");
+//        var y = document.querySelector(".castbar");
+//        y.append(x);
 };

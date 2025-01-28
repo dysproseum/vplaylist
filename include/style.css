@@ -499,3 +499,19 @@ form#imports .completed .progress-bar span {
   background-color: mediumaquamarine;
   width: 100% !important;
 }
+
+.castbar {
+  display: block;
+  float: left;
+  background: green;
+  width: 100%;
+}
+
+google-cast-launcher {
+  display: block;
+  float: left;
+}
+
+#media_control {
+  opacity: 1 !important;
+}
