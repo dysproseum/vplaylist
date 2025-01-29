@@ -14,9 +14,33 @@
 
 'use strict';
 
-import {
-  mediaJSON
-} from './media.js';
+// import {
+//   mediaJSON
+// } from './media.js';
+
+const MEDIA_SOURCE_ROOT = 'https://dysproseum.com/vplaylist/';
+let videoSrc = document.getElementById("video_element").src;
+videoSrc = videoSrc.replace(MEDIA_SOURCE_ROOT, '');
+let vidTitle = document.getElementById("vid_title").innerHTML;
+vidTitle = vidTitle.replace(MEDIA_SOURCE_ROOT, '');
+let vidThumb = document.getElementById("vid_thumb").src;
+vidThumb = vidThumb.replace(MEDIA_SOURCE_ROOT, '');
+
+let mediaJSON = {
+  'media': [{
+      'subtitle': 'Grumpy Bunny is grumpy',
+//      'contentUrl': 'serve.php?collection=ambient&index=1&file=.mp4',
+      'contentUrl': videoSrc,
+      'contentType': 'video/mp4',
+//      'thumb': 'serve.php?collection=ambient&index=1&file=.jpg',
+      'thumb': vidThumb,
+      'title': vidTitle,
+      'duration': 596
+    },
+  ]
+};
+console.log(mediaJSON);
+
 import {
   breakClipsJSON,
   breaksJSON
@@ -26,7 +50,7 @@ import {
 const DEMO_MODE = false;
 
 /** @const {string} Media source root URL */
-const MEDIA_SOURCE_ROOT = 'https://storage.googleapis.com/cpe-sample-media/content/';
+// const MEDIA_SOURCE_ROOT = 'https://storage.googleapis.com/cpe-sample-media/content/';
 
 /**
  * Controls if Ads are enabled. Controlled by radio button.
@@ -168,7 +192,8 @@ CastPlayer.prototype.initializeCastPlayer = function () {
   // Set the receiver application ID to your own (created in the
   // Google Cast Developer Console), or optionally
   // use the chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-  options.receiverApplicationId = 'C0868879';
+  // options.receiverApplicationId = 'C0868879';
+  options.receiverApplicationId = chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
 
   // Auto join policy can be one of the following three:
   // ORIGIN_SCOPED - Auto connect from same appId and page origin
