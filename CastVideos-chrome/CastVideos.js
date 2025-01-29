@@ -21,7 +21,7 @@
 const MEDIA_SOURCE_ROOT = 'https://dysproseum.com/vplaylist/';
 let videoSrc = document.getElementById("video_element").src;
 videoSrc = videoSrc.replace(MEDIA_SOURCE_ROOT, '');
-let vidTitle = document.getElementById("vid_title").innerHTML;
+let vidTitle = document.getElementById("vid_title").innerHTML.trim();
 vidTitle = vidTitle.replace(MEDIA_SOURCE_ROOT, '');
 let vidThumb = document.getElementById("vid_thumb").src;
 vidThumb = vidThumb.replace(MEDIA_SOURCE_ROOT, '');
@@ -29,17 +29,15 @@ vidThumb = vidThumb.replace(MEDIA_SOURCE_ROOT, '');
 let mediaJSON = {
   'media': [{
       'subtitle': 'Grumpy Bunny is grumpy',
-//      'contentUrl': 'serve.php?collection=ambient&index=1&file=.mp4',
       'contentUrl': videoSrc,
       'contentType': 'video/mp4',
-//      'thumb': 'serve.php?collection=ambient&index=1&file=.jpg',
       'thumb': vidThumb,
       'title': vidTitle,
       'duration': 596
     },
   ]
 };
-console.log(mediaJSON);
+console.log(mediaJSON.media);
 
 import {
   breakClipsJSON,
@@ -1670,6 +1668,8 @@ CastPlayer.getErrorMessage = function (error) {
 let castPlayer = new CastPlayer();
 window['__onGCastApiAvailable'] = function (isAvailable) {
   if (isAvailable) {
-    castPlayer.initializeCastPlayer();
+    setTimeout(() => {
+      castPlayer.initializeCastPlayer();
+    }, 1000)
   }
 };
