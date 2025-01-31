@@ -14,9 +14,14 @@
 
 'use strict';
 
-import {
-  mediaJSON
-} from './media.js';
+// import {
+//   mediaJSON
+// } from './media.js';
+
+let mediaSwitching = false;
+console.log(mediaJSON.media);
+console.log({currentMediaIndex});
+
 import {
   breakClipsJSON,
   breaksJSON
@@ -26,7 +31,8 @@ import {
 const DEMO_MODE = false;
 
 /** @const {string} Media source root URL */
-const MEDIA_SOURCE_ROOT = 'https://storage.googleapis.com/cpe-sample-media/content/';
+// const MEDIA_SOURCE_ROOT = 'https://storage.googleapis.com/cpe-sample-media/content/';
+const MEDIA_SOURCE_ROOT = 'https://dysproseum.com/vplaylist/';
 
 /**
  * Controls if Ads are enabled. Controlled by radio button.
@@ -134,7 +140,8 @@ var CastPlayer = function () {
 
   /* Local player variables */
   /** @type {number} A number for current media index */
-  this.currentMediaIndex = 0;
+  // this.currentMediaIndex = 0;
+  this.currentMediaIndex = currentMediaIndex;
   /** @type {?Object} media contents from JSON */
   this.mediaContents = null;
   /** @type {boolean} Fullscreen mode on/off */
@@ -168,7 +175,8 @@ CastPlayer.prototype.initializeCastPlayer = function () {
   // Set the receiver application ID to your own (created in the
   // Google Cast Developer Console), or optionally
   // use the chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-  options.receiverApplicationId = 'C0868879';
+  // options.receiverApplicationId = 'C0868879';
+  options.receiverApplicationId = chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
 
   // Auto join policy can be one of the following three:
   // ORIGIN_SCOPED - Auto connect from same appId and page origin
@@ -207,6 +215,16 @@ CastPlayer.prototype.switchPlayer = function () {
     this.setupRemotePlayer();
   } else {
     this.setupLocalPlayer();
+  }
+
+  let imageSub = document.querySelector(".imageSub");
+  imageSub.style.display = imageSub.style.display == "none" ? "block" : "none";
+  // switch back when done
+  let vidPlayer = document.getElementById("video_element");
+  if (imageSub.style.display == "none") {
+    vidPlayer.pause();
+    vidPlayer.currentTime = 0;
+    vidPlayer.style.display = "block";
   }
 };
 
@@ -754,9 +772,15 @@ CastPlayer.prototype.setupRemotePlayer = function () {
 
   playerTarget.updateDisplay = function () {
     let castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+
     if (castSession && castSession.getMediaSession() && castSession.getMediaSession().media) {
       let media = castSession.getMediaSession();
       let mediaInfo = media.media;
+
+      console.log(media.playerState);
+      if (media.playerState === 'PLAYING') {
+        mediaSwitching = false;
+      }
 
       // image placeholder for video view
       var vi = document.getElementById('video_image');
@@ -821,7 +845,24 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       } else {
         document.getElementById('live_indicator').style.display = 'none';
       }
+    } else if (castSession) {
+      console.log("NO MEDIA");
+      console.log(currentMediaIndex + " of " + mediaJSON.media.length);
+
+      // load next media
+      if (!mediaSwitching && mediaJSON.media[currentMediaIndex + 1]) {
+        mediaSwitching = true;
+        currentMediaIndex++;
+        this.currentMediaIndex = currentMediaIndex;
+        // reset timestamp to zero
+        this.stopProgressTimer();
+        this.currentMediaTime = 0;
+
+        this.setupRemotePlayer();
+      }
     } else {
+      console.log("NO MEDIA, NO CAST SESSION");
+
       // playerstate view
       document.getElementById('playerstate').style.display = 'none';
       document.getElementById('playerstatebg').style.display = 'none';
@@ -956,6 +997,7 @@ CastPlayer.prototype.selectMedia = function (mediaIndex) {
   console.log('Media index selected: ' + mediaIndex);
 
   this.currentMediaIndex = mediaIndex;
+  currentMediaIndex = mediaIndex;
   // Clear currentMediaInfo when playing content from the sender.
   this.playerHandler.currentMediaInfo = undefined;
 
@@ -1645,6 +1687,8 @@ CastPlayer.getErrorMessage = function (error) {
 let castPlayer = new CastPlayer();
 window['__onGCastApiAvailable'] = function (isAvailable) {
   if (isAvailable) {
-    castPlayer.initializeCastPlayer();
+    setTimeout(() => {
+      castPlayer.initializeCastPlayer();
+    }, 1000)
   }
 };
