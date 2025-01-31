@@ -505,7 +505,8 @@ form#imports .completed .progress-bar span {
 .castbar {
   display: block;
   float: left;
-  background: green;
+  background: gray;
+  border-bottom: 1px solid lightgray;
   width: 100%;
 }
 

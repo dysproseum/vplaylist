@@ -3,8 +3,8 @@ html {
 }
 
 body {
-  background-color: #F2F2F2;
-  font-family: 'Roboto', "OpenSans", "Verdana", Georgia, Serif;
+  /* background-color: #F2F2F2; */
+  /* font-family: 'Roboto', "OpenSans", "Verdana", Georgia, Serif; */
 }
 
 #msg {
@@ -127,7 +127,7 @@ body {
   display: none;
 }
 
-#video_element {
+/* #video_element {
   display: none;
   margin-left: 40px;
   margin-right: auto;
@@ -136,10 +136,11 @@ body {
   width: 960px;
   height: 540px;
   background-color: #000;
-}
+} */
 
 #media_info {
-  display: block;
+  /* display: block; */
+  display: none;
   clear: both;
   float: left;
   width: 940px;
@@ -189,11 +190,11 @@ radio {
   width: 960px;
   height: 60px;
   z-index: 1000;
-  margin: -60px 0px 0px 40px;
+  /* margin: -60px 0px 0px 40px; */
   padding: 0px;
   opacity: 0.7;
-  background-color: #000;
-  font-family: 'Roboto', "Open Sans", "Verdana", Georgia, Serif;
+  /* background-color: #000; */
+  /* font-family: 'Roboto', "Open Sans", "Verdana", Georgia, Serif; */
   transition: opacity 1s;
   -webkit-transition:opacity 1s; /* Safari */
 }
@@ -539,10 +540,10 @@ div.imageSub div.label {
   text-align: center;
 }
 
-#carousel {
+/* #carousel {
   width: 990px;
   margin: 20px 10px 10px 40px;
-}
+} */
 
 .thumb {
   float: left;

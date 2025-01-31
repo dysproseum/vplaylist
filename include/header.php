@@ -2,6 +2,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="include/cast.css">
 <script src="include/util.js"></script>
 <script src="include/player.js"></script>
 <script type="text/javascript">
