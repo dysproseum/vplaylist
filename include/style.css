@@ -500,6 +500,8 @@ form#imports .completed .progress-bar span {
   width: 100% !important;
 }
 
+/* Chromecast styles */
+
 .castbar {
   display: block;
   float: left;
@@ -514,4 +516,9 @@ google-cast-launcher {
 
 #media_control {
   opacity: 1 !important;
+}
+
+.imageSub img {
+  display: block;
+  margin: 0 auto;
 }

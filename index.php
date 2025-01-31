@@ -85,16 +85,51 @@ if (isset($_REQUEST['collection']) && $_REQUEST['collection'] != '') {
 // Add'l body classes are set depending on vid_player.
 require_once 'include/header.php';
 
-// Prepare video source
+// Prepare mediaInfo sources.
 $vid_src = "serve.php?collection=$machine_name&index=$index&file=.mp4";
 $vid_img = "serve.php?collection=$machine_name&index=$index&file=.jpg";
 
+$mediaInfo = [];
+foreach ($collections[$machine_name]['items'] as $i => $item) {
+  $basename = basename($item['filename'], '.mp4');
+  $thumbnail = "serve.php?collection=$machine_name&index=$i&file=.jpg";
+  $vid_link = "serve.php?collection=$machine_name&index=$i&file=.mp4";
+  $duration = 596;
+  $size = human_filesize($item['size']);
+  $mediaInfo[] = [
+    'title' => $basename,
+    'contentUrl' => $vid_link,
+    'contentType' => 'video/mp4',
+    'thumb' => $thumbnail,
+    'duration' => $duration,
+    'subtitle' => 'vplaylist',
+  ];
+}
+
+$mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
+
 ?>
 
-<img id="vid_thumb" src="<?php print $vid_img; ?>" style="display: none" />
-
 <?php if ($vid_player): ?>
+
+  <script type="text/javascript">
+    let mediaJSON = {
+      'media': <?php print $mediaInfoJSON; ?>
+    };
+    let currentMediaIndex = <?php print $index; ?>;
+  </script>
+
 	<div class="player">
+
+          <div class="imageSub" style="display: none">
+            <!-- Put Your Image Width -->
+            <div class="blackbg" id="playerstatebg">IDLE</div>
+            <div class=label id="playerstate">IDLE</div>
+            <img src="imagefiles/bunny.jpg" id="video_image">
+            <div id="video_image_overlay"></div>
+          </div>
+          <div id="skip">Skip Ad</div>
+
 	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>" src="<?php print $vid_src; ?>">
 	</video>
 	<span id="vid_title" class="label">
@@ -211,17 +246,6 @@ $vid_img = "serve.php?collection=$machine_name&index=$index&file=.jpg";
     <div id="logo"></div>
   </div>
   <div id="main_video">
-    <div class="imageSub">
-      <!-- Put Your Image Width -->
-      <div class="blackbg" id="playerstatebg">IDLE</div>
-      <div class=label id="playerstate">IDLE</div>
-      <img src="imagefiles/bunny.jpg" id="video_image">
-      <div id="video_image_overlay"></div>
-      <video id="video_element">
-      </video>
-    </div>
-
-    <div id="skip">Skip Ad</div>
 
     <div id="media_control">
       <div id="play"></div>
