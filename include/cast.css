@@ -296,7 +296,8 @@ radio {
   z-index: 3;
   background-repeat: repeat-x;
   position: absolute;
-  background-color: rgba(208, 2, 27, 1.0);
+  /* background-color: rgba(208, 2, 27, 1.0); */
+  background-color: mediumpurple;
   padding-left: -2px;
 }
 
@@ -327,7 +328,8 @@ radio {
   z-index: 5;
   margin-top: -2px;
   position: absolute;
-  background-color: rgba(208, 2, 27, 1.0);
+  /* background-color: rgba(208, 2, 27, 1.0); */
+  background-color: mediumpurple;
 }
 
 #progress_indicator:hover {
@@ -551,11 +553,11 @@ div.imageSub div.label {
   cursor: pointer;
 }
 
-.thumbnail {
+/* .thumbnail {
   margin-right: 10px;
   width: 225px;
   height: 127px;
-}
+} */
 
 .vertical {
   -webkit-transform: rotate(90deg);

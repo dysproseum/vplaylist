@@ -22,10 +22,13 @@ let mediaSwitching = false;
 console.log(mediaJSON.media);
 console.log({currentMediaIndex});
 
-import {
-  breakClipsJSON,
-  breaksJSON
-} from './ads.js';
+// import {
+//   breakClipsJSON,
+//   breaksJSON
+// } from './ads.js';
+
+let breakClipsJSON = [];
+let breaksJSON = [];
 
 /** Cleaner UI for demo purposes. */
 const DEMO_MODE = false;
@@ -1394,7 +1397,8 @@ CastPlayer.prototype.enableProgressBar = function (enable) {
 
   if (enable) {
     // Enable UI
-    progress.style.backgroundImage = "url('./imagefiles/timeline_bg_progress.png')";
+    // progress.style.backgroundImage = "url('./imagefiles/timeline_bg_progress.png')";
+    progress.style.backgroundColor = "mediumpurple";
     progress.style.cursor = "pointer";
     seekable_window.style.cursor = "pointer";
     progress_indicator.style.cursor = "pointer";
@@ -1406,7 +1410,8 @@ CastPlayer.prototype.enableProgressBar = function (enable) {
     progress_indicator.addEventListener('dragend', this.seekMediaListener);
   } else {
     // Disable UI
-    progress.style.backgroundImage = "url('./imagefiles/timeline_bg_buffer.png')";
+    // progress.style.backgroundImage = "url('./imagefiles/timeline_bg_buffer.png')";
+    progress.style.backgroundColor = "mediumpurple";
     progress.style.cursor = "default";
     seekable_window.style.cursor = "default";
     progress_indicator.style.cursor = "default";

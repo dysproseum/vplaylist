@@ -172,54 +172,58 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
 	</div>
 
 <?php elseif (!(isset($collections[$machine_name]))): ?>
+
 	<div class="subnav">
 		<h2>Collection not found</h2>
 		<?php header("HTTP/1.0 404 Not Found"); ?>
 	</div>
+
 <?php elseif (sizeof($collections[$machine_name]['items']) == 0): ?>
+
 	<div class="subnav">
 		<h2>Collection is empty.</h2>
 	</div>
+
 <?php else: ?>
 
-	<div class="castbar">
-  <div id="main_video">
-
-    <div id="media_control">
-      <div id="play"></div>
-      <div id="pause"></div>
-      <div id="audio_bg"></div>
-      <div id="audio_bg_track"></div>
-      <div id="audio_indicator"></div>
-      <div id="audio_bg_level"></div>
-      <div id="audio_on"></div>
-      <div id="audio_off"></div>
-      <div id="progress_bar_container">
-        <div id="progress_bg"></div>
-        <div id="seekable_window"></div>
-        <div id="progress"></div>
-        <div id="unseekable_overlay"></div>
-        <div id="progress_indicator"></div>
-      </div>
-      <div id="fullscreen_expand"></div>
-      <div id="fullscreen_collapse"></div>
-      <google-cast-launcher id="castbutton"></google-cast-launcher>
-      <div id="currentTime">00:00:00</div>
-      <div id="duration">00:00:00</div>
-      <img id="live_indicator">
-    </div>
-  </div>
-  <div id="media_info">
-    <div id="media_title"></div>
-    <div id="feature_toggle_container">
-      <input type="radio" id="none" name="feature" value="none" checked>None<br>
-      <input type="radio" id="ads" name="feature" value="ads">Ads<br>
-      <input type="radio" id="live" name="feature" value="live">Live
-    </div>
-    <div id="media_subtitle"></div>
-  </div>
-
-	</div>
+	<?php if ($vid_player): ?>
+          <div class="castbar">
+            <div id="main_video">
+              <div id="media_control">
+                <div id="play"></div>
+                <div id="pause"></div>
+                <div id="audio_bg"></div>
+                <div id="audio_bg_track"></div>
+                <div id="audio_indicator"></div>
+                <div id="audio_bg_level"></div>
+                <div id="audio_on"></div>
+                <div id="audio_off"></div>
+                <div id="progress_bar_container">
+                  <div id="progress_bg"></div>
+                  <div id="seekable_window"></div>
+                  <div id="progress"></div>
+                  <div id="unseekable_overlay"></div>
+                  <div id="progress_indicator"></div>
+                </div>
+                <div id="fullscreen_expand"></div>
+                <div id="fullscreen_collapse"></div>
+                <google-cast-launcher id="castbutton"></google-cast-launcher>
+                <div id="currentTime">00:00:00</div>
+                <div id="duration">00:00:00</div>
+                <img id="live_indicator">
+              </div>
+            </div>
+            <div id="media_info">
+              <div id="media_title"></div>
+              <div id="feature_toggle_container">
+                <input type="radio" id="none" name="feature" value="none" checked>None<br>
+                <input type="radio" id="ads" name="feature" value="ads">Ads<br>
+                <input type="radio" id="live" name="feature" value="live">Live
+              </div>
+              <div id="media_subtitle"></div>
+            </div>
+          </div>
+	<?php endif; ?>
 
 	<div class="subnav">
 	<h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>

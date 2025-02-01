@@ -9,7 +9,7 @@
   const start_muted = <?php print $conf['start_muted']; ?>;
   const use_ajax = <?php print $conf['use_ajax']; ?>;
 </script>
-<script src="CastVideos-chrome/CastVideos.js" type="module"></script>
+<script src="include/cast.js" type="module"></script>
 <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 <?php
   $title = "vplaylist";
