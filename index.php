@@ -205,6 +205,7 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
                   <div id="unseekable_overlay"></div>
                   <div id="progress_indicator"></div>
                 </div>
+                <input type="range" value="0" min="0" step="1" id="seek_range" />
                 <div id="fullscreen_expand"></div>
                 <div id="fullscreen_collapse"></div>
                 <google-cast-launcher id="castbutton"></google-cast-launcher>

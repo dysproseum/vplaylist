@@ -1048,6 +1048,13 @@ CastPlayer.prototype.seekMedia = function (event) {
     return;
   }
 
+  // Support input[type=range]
+  var range = document.getElementById("seek_range");
+  if (event.target == range) {
+    this.playerHandler.seekTo(range.value);
+    return;
+  }
+
   var position = parseInt(event.offsetX, 10);
   var pi = document.getElementById('progress_indicator');
   var progress = document.getElementById('progress');
@@ -1138,6 +1145,9 @@ CastPlayer.prototype.incrementMediaTime = function () {
 CastPlayer.prototype.updateProgressBarByTimer = function () {
   var progressBar = document.getElementById('progress');
   var pi = document.getElementById('progress_indicator');
+  var range = document.getElementById("seek_range");
+  range.max = this.mediaDuration;
+  range.value = this.currentMediaTime;
 
   // Live situation where the progress and duration is unknown.
   if (this.mediaDuration == null) {
@@ -1398,6 +1408,7 @@ CastPlayer.prototype.enableProgressBar = function (enable) {
   let progress = document.getElementById('progress');
   let progress_indicator = document.getElementById('progress_indicator');
   let seekable_window = document.getElementById('seekable_window');
+  var range = document.getElementById("seek_range");
 
   if (enable) {
     // Enable UI
@@ -1412,6 +1423,7 @@ CastPlayer.prototype.enableProgressBar = function (enable) {
     progress.addEventListener('click', this.seekMediaListener);
     seekable_window.addEventListener('click', this.seekMediaListener);
     progress_indicator.addEventListener('dragend', this.seekMediaListener);
+    range.addEventListener('input', this.seekMediaListener);
   } else {
     // Disable UI
     // progress.style.backgroundImage = "url('./imagefiles/timeline_bg_buffer.png')";
