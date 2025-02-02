@@ -454,6 +454,10 @@ CastPlayer.prototype.setupLocalPlayer = function () {
   playerTarget.updateCurrentTimeDisplay = function () {
     // Increment for local playback
     this.currentMediaTime += 1;
+    if (this.currentMediaTime >= Math.floor(this.mediaDuration)) {
+      console.log(this.currentMediaTime + " >= " + this.mediaDuration);
+      this.currentMediaTime = this.mediaDuration;
+    }
     this.playerHandler.setTimeString(document.getElementById('currentTime'), this.currentMediaTime);
   }.bind(this);
 
