@@ -105,6 +105,8 @@ foreach ($collections[$machine_name]['items'] as $i => $item) {
     'subtitle' => 'vplaylist',
   ];
 }
+// Make sure JS indices line up with index values.
+$mediaInfo = array_reverse($mediaInfo);
 
 $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
 
@@ -291,15 +293,15 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
 
 	<div class="listing-box">
 	<div class="listing">
-	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
+	<?php foreach ($collections[$machine_name]['items'] as $i => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
-			$thumbnail = 'serve.php?collection=' . $machine_name . '&index=' . $index . '&file=.jpg';
-			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
+			$thumbnail = 'serve.php?collection=' . $machine_name . '&index=' . $i . '&file=.jpg';
+			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $i;
 		?>
 
 		<div class="thumbnail">
-		<a class="vid-link" data-id="<?php print $index; ?>" href="<?php print $vid_link; ?>">
+		<a class="vid-link" data-id="<?php print $i; ?>" href="<?php print $vid_link; ?>">
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">

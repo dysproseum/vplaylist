@@ -66,7 +66,8 @@ const PROGRESS_BAR_WIDTH = 700;
  * Time in milliseconds for minimal progress update.
  * @const {number}
  */
-const TIMER_STEP = 1000;
+// const TIMER_STEP = 1000;
+const TIMER_STEP = 500;
 
 /**
  * Cast volume upon initial connection.
@@ -827,8 +828,9 @@ CastPlayer.prototype.setupRemotePlayer = function () {
         document.getElementById('media_subtitle').innerHTML = '';
       } else {
         document.getElementById('playerstate').innerHTML =
-          mediaTitle + media.playerState + ' on ' +
+          /* mediaTitle + */ media.playerState + ' on ' +
           castSession.getCastDevice().friendlyName;
+        document.getElementById('vid_title').innerHTML = mediaTitle;
 
         // media_info view
         document.getElementById('media_title').innerHTML = mediaTitle;
@@ -1229,9 +1231,13 @@ CastPlayer.prototype.updateProgressBarByTimer = function () {
  */
 CastPlayer.prototype.endPlayback = function () {
   this.currentMediaTime = 0;
-  this.stopProgressTimer();
+  // Allow timer to restart on looping videos.
+  // this.stopProgressTimer();
   this.playerState = PLAYER_STATE.IDLE;
   this.playerHandler.updateDisplay();
+
+  // if looping, have remote player play?
+  // this.playerHandler.play();
 
   document.getElementById('play').style.display = 'block';
   document.getElementById('pause').style.display = 'none';
