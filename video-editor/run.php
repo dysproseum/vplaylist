@@ -75,6 +75,8 @@ foreach ($queue as $link) {
 
   // Clean up characters before conversion.
   $title = str_replace('/', '_', $title);
+  $title = str_replace('⧸', '_', $title);
+  $title = str_replace(':', '- ', $title);
   $title = str_replace('"', '', $title);
   $title = iconv('UTF-8', 'ASCII//TRANSLIT',  $title);
   $title = str_replace('?', '', $title);
@@ -136,7 +138,7 @@ foreach ($queue as $link) {
   }
   else {
     $q->setTitle(array_shift($after), $id);
-    dlog("No new downloads found");
+    dlog("No new mp4 found");
     if (DEBUG == 2) print_r($after);
   }
 
