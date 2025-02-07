@@ -21,6 +21,7 @@
 let mediaSwitching = false;
 console.log(mediaJSON.media);
 console.log({currentMediaIndex});
+let mediaQueue = [];
 
 // import {
 //   breakClipsJSON,
@@ -201,12 +202,45 @@ CastPlayer.prototype.initializeCastPlayer = function () {
       this.switchPlayer(e.value);
     }.bind(this)
   );
+
+  // Event handler for any event.
+  this.remotePlayerController = new cast.framework.RemotePlayerController(this.remotePlayer);
+  this.remotePlayerController.addEventListener(
+    cast.framework.RemotePlayerEventType.ANY_CHANGE,
+    function (e) {
+
+      // Update timestamps.
+      if (e.field == "currentTime") {
+        this.currentMediaTime = this.playerHandler.getCurrentMediaTime();
+        this.mediaDuration = this.playerHandler.getMediaDuration();
+        this.playerHandler.updateDurationDisplay();
+        this.playerHandler.updateCurrentTimeDisplay();
+        return;
+      }
+
+      // console.log(e);
+      this.playerHandler.updateDisplay();
+
+      // Try to get queue.
+      let media = cast.framework.CastContext.getInstance().getCurrentSession().getMediaSession();
+      if (media && media.items) {
+        if (media.items !== mediaQueue) {
+          console.log("QUEUE_DATA_CHANGED");
+          mediaQueue = media.items;
+          media.items.forEach((item) => {
+            console.log(item.media.metadata.title + ": " + item.media.contentId);
+          });
+        }
+      }
+    }.bind(this)
+  );
 };
 
 /**
  * Switch between the remote and local players.
  */
 CastPlayer.prototype.switchPlayer = function () {
+  console.log("switchPlayer");
   this.playerStateBeforeSwitch = this.playerState;
 
   this.stopProgressTimer();
@@ -223,11 +257,12 @@ CastPlayer.prototype.switchPlayer = function () {
 
   let imageSub = document.querySelector(".imageSub");
   imageSub.style.display = imageSub.style.display == "none" ? "block" : "none";
-  // switch back when done
+  // Re-enable local player when done.
   let vidPlayer = document.getElementById("video_element");
   if (imageSub.style.display == "none") {
     vidPlayer.pause();
-    vidPlayer.currentTime = 0;
+    // Keep playing from current spot.
+    // vidPlayer.currentTime = 0;
     vidPlayer.style.display = "block";
   }
 };
@@ -390,6 +425,7 @@ var PlayerHandler = function (castPlayer) {
  * Set the PlayerHandler target to use the video-element player
  */
 CastPlayer.prototype.setupLocalPlayer = function () {
+  console.log("setupLocalPlayer");
   // Cleanup remote player UI
   document.getElementById('live_indicator').style.display = 'none';
   this.removeAdMarkers();
@@ -519,6 +555,7 @@ CastPlayer.prototype.setupLocalPlayer = function () {
  * Add event listeners for player changes which may occur outside sender app.
  */
 CastPlayer.prototype.setupRemotePlayer = function () {
+  console.log("setupRemotePlayer");
   // Triggers when the media info or the player state changes
   this.remotePlayerController.addEventListener(
     cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED,
@@ -711,6 +748,53 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       request.queueData.name = "Sample Queue for Live";
     }
 
+    var loop = document.querySelector('input[name=vid_loop]');
+    var autoplay = document.querySelector('input[name=vid_autoplay]');
+    var shuffle = document.querySelector('input[name=vid_shuffle]');
+    var repeat = document.querySelector('input[name=vid_repeat]');
+
+    // Try and queue items.
+    // media can be manually queued by calling this.queueMedia(mediaIndex)
+    if (loop.checked == true) {
+      // if repeat one
+      let item = new chrome.cast.media.QueueItem(mediaInfo);
+      request.queueData = new chrome.cast.media.QueueData('vplaylist');
+      request.queueData.items = [item];
+      request.queueData.repeatMode = chrome.cast.media.RepeatMode.SINGLE;
+    }
+    else if (autoplay.checked == true) {
+      // if autoplay
+      let items = [];
+      mediaJSON.media.forEach((media) => {
+        let mediaInfo = new chrome.cast.media.MediaInfo(MEDIA_SOURCE_ROOT + media['contentUrl'], media['contentType']);
+        mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
+        mediaInfo.metadata = new chrome.cast.media.TvShowMediaMetadata();
+        mediaInfo.metadata.title = media['title'];
+        mediaInfo.metadata.subtitle = media['subtitle'];
+        mediaInfo.metadata.images = [{
+          'url': MEDIA_SOURCE_ROOT + media['thumb']
+        }];
+        let item = new chrome.cast.media.QueueItem(mediaInfo);
+        items.push(item);
+      });
+
+      request.queueData = new chrome.cast.media.QueueData('vplaylist');
+      request.queueData.items = items;
+
+      if (shuffle.checked == true) {
+        // if shuffle
+        request.queueData.repeatMode = chrome.cast.media.RepeatMode.ALL_AND_SHUFFLE;
+      }
+
+      if (repeat.checked == true) {
+        // if repeat all
+        request.queueData.repeatMode = chrome.cast.media.RepeatMode.ALL;
+      }
+    }
+
+    // try to manually update repeatMode
+    // cast.framework.CastContext.getInstance().getCurrentSession().getMediaSession().queueData.repeatMode
+
     // Do not immediately start playing if the player was previously PAUSED.
     if (!this.playerStateBeforeSwitch || this.playerStateBeforeSwitch == PLAYER_STATE.PAUSED) {
       request.autoplay = false;
@@ -718,7 +802,11 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       request.autoplay = true;
     }
 
-    cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(
+    // dont load media if its already playing?
+    let session = cast.framework.CastContext.getInstance().getCurrentSession();
+    console.log(session);
+    if (session && session.Y && !session.Y.includes("Casting: ")) {
+      session.loadMedia(request).then(
       function () {
         console.log('Remote media loaded');
       }.bind(this),
@@ -728,6 +816,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
           CastPlayer.getErrorMessage(errorCode));
         this.playerHandler.updateDisplay();
       }.bind(this));
+    }
   }.bind(this);
 
   playerTarget.isMediaLoaded = function (mediaIndex) {
@@ -779,6 +868,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
   }.bind(this);
 
   playerTarget.updateDisplay = function () {
+    // console.log("updateDisplay");
     let castSession = cast.framework.CastContext.getInstance().getCurrentSession();
 
     if (castSession && castSession.getMediaSession() && castSession.getMediaSession().media) {
@@ -803,6 +893,10 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       document.getElementById('playerstate').style.display = 'block';
       document.getElementById('playerstatebg').style.display = 'block';
       document.getElementById('video_image_overlay').style.display = 'block';
+      vi.style.display = 'block';
+      var vp = document.getElementById('video_element');
+      vp.style.display = 'none';
+
 
       let mediaTitle = '';
       let mediaEpisodeTitle = '';
@@ -858,17 +952,18 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       console.log("NO MEDIA");
       console.log(currentMediaIndex + " of " + mediaJSON.media.length);
 
-      // load next media
-      if (!mediaSwitching && mediaJSON.media[currentMediaIndex + 1]) {
-        mediaSwitching = true;
-        currentMediaIndex++;
-        this.currentMediaIndex = currentMediaIndex;
-        // reset timestamp to zero
-        this.stopProgressTimer();
-        this.currentMediaTime = 0;
+      // // load next media without queue
+      // if (!mediaSwitching && mediaJSON.media[currentMediaIndex + 1]) {
+      //   mediaSwitching = true;
+      //   currentMediaIndex++;
+      //   this.currentMediaIndex = currentMediaIndex;
+      //   // reset timestamp to zero
+      //   this.stopProgressTimer();
+      //   this.currentMediaTime = 0;
+      //
+      //   this.setupRemotePlayer();
+      // }
 
-        this.setupRemotePlayer();
-      }
     } else {
       console.log("NO MEDIA, NO CAST SESSION");
 
@@ -1033,6 +1128,35 @@ CastPlayer.prototype.selectMedia = function (mediaIndex) {
 
   this.playerState = PLAYER_STATE.IDLE;
   this.playerHandler.play();
+};
+
+/**
+ * Queue a media content
+ * @param {number} mediaIndex A number for media index
+ */
+CastPlayer.prototype.queueMedia = function (mediaIndex) {
+  console.log('Media index selected: ' + mediaIndex);
+    // Try and queue items.
+    let media = mediaJSON['media'][mediaIndex];
+
+    let mediaInfo = new chrome.cast.media.MediaInfo(MEDIA_SOURCE_ROOT + media['contentUrl'], media['contentType']);
+    mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
+    mediaInfo.metadata = new chrome.cast.media.TvShowMediaMetadata();
+    mediaInfo.metadata.title = media['title'];
+    mediaInfo.metadata.subtitle = media['subtitle'];
+    mediaInfo.metadata.images = [{
+      'url': MEDIA_SOURCE_ROOT + media['thumb']
+    }];
+    let item = new chrome.cast.media.QueueItem(mediaInfo);
+
+    let castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+    let mediaInstance = castSession.getMediaSession();
+    mediaInstance.queueAppendItem(item, function() {
+      console.log("Queue append success");
+    }, function(error) {
+      console.log("Queue append error");
+    });
+
 };
 
 /**
@@ -1231,13 +1355,12 @@ CastPlayer.prototype.updateProgressBarByTimer = function () {
  */
 CastPlayer.prototype.endPlayback = function () {
   this.currentMediaTime = 0;
-  // Allow timer to restart on looping videos.
+
+  // Keep timer for local looping playback.
   // this.stopProgressTimer();
+
   this.playerState = PLAYER_STATE.IDLE;
   this.playerHandler.updateDisplay();
-
-  // if looping, have remote player play?
-  // this.playerHandler.play();
 
   document.getElementById('play').style.display = 'block';
   document.getElementById('pause').style.display = 'none';
@@ -1662,6 +1785,7 @@ CastPlayer.prototype.addVideoThumbs = function () {
   var ni = document.getElementById('carousel');
   var newdiv = null;
   var divIdName = null;
+  var a = null;
   for (var i = 0; i < this.mediaContents.length; i++) {
     newdiv = document.createElement('div');
     divIdName = 'thumb' + i + 'Div';
@@ -1670,8 +1794,15 @@ CastPlayer.prototype.addVideoThumbs = function () {
     newdiv.innerHTML =
       '<img src="' + MEDIA_SOURCE_ROOT + this.mediaContents[i]['thumb'] +
       '" class="thumbnail">';
+    // Action to play media item directly.
     newdiv.addEventListener('click', this.selectMedia.bind(this, i));
     ni.appendChild(newdiv);
+
+    // Action to add the item to the queue.
+    a = document.createElement('a');
+    a.innerHTML = 'Queue ' + i;
+    a.addEventListener('click', this.queueMedia.bind(this, i));
+    ni.append(a);
   }
 };
 

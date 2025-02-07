@@ -523,3 +523,14 @@ google-cast-launcher {
   display: block;
   margin: 60px auto;
 }
+
+#carousel a {
+  display: block;
+  float: left;
+  color: white;
+  cursor: pointer;
+}
+
+video::-internal-media-controls-overlay-cast-button {
+  display: none;
+}
