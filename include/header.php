@@ -2,6 +2,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<link rel="stylesheet" href="include/cast.css">
 <script src="include/util.js"></script>
 <script src="include/player.js"></script>
 <script src="include/fullscreen.js"></script>
@@ -9,6 +10,8 @@
   const start_muted = <?php print $conf['start_muted']; ?>;
   const use_ajax = <?php print $conf['use_ajax']; ?>;
 </script>
+<script src="include/cast.js" type="module"></script>
+<script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 <?php
   $title = "vplaylist";
   if (isset($vid_title) && $vid_title != '') {
@@ -36,4 +39,3 @@
 		<input type="text" maxlength="64" name="q" placeholder="search" />
 	</form>
 </div>
-

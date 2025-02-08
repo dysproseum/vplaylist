@@ -18,7 +18,7 @@ global $vid_player;
 $vid_player = FALSE;
 global $controls;
 $controls = 'controls';
-$vid_player_id = '';
+$vid_player_id = 'video_element';
 $loop = '';
 $shuffle = false;
 $repeat = '';
@@ -87,16 +87,54 @@ if (isset($_REQUEST['collection']) && $_REQUEST['collection'] != '') {
 // Add'l body classes are set depending on vid_player.
 require_once 'include/header.php';
 
+// Prepare mediaInfo sources.
+$vid_src = "serve.php?collection=$machine_name&index=$index&file=.mp4";
+$vid_img = "serve.php?collection=$machine_name&index=$index&file=.jpg";
+
+$mediaInfo = [];
+foreach ($collections[$machine_name]['items'] as $i => $item) {
+  $basename = basename($item['filename'], '.mp4');
+  $thumbnail = "serve.php?collection=$machine_name&index=$i&file=.jpg";
+  $vid_link = "serve.php?collection=$machine_name&index=$i&file=.mp4";
+  $duration = 596;
+  $size = human_filesize($item['size']);
+  $mediaInfo[] = [
+    'title' => $basename,
+    'contentUrl' => $vid_link,
+    'contentType' => 'video/mp4',
+    'thumb' => $thumbnail,
+    'duration' => $duration,
+    'subtitle' => 'vplaylist',
+  ];
+}
+// Make sure JS indices line up with index values.
+$mediaInfo = array_reverse($mediaInfo);
+
+$mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
+
 ?>
 
 <?php if ($vid_player): ?>
+
+  <script type="text/javascript">
+    let mediaJSON = {
+      'media': <?php print $mediaInfoJSON; ?>
+    };
+    let currentMediaIndex = <?php print $index; ?>;
+  </script>
+
 	<div class="player">
-	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> height="360" id="<?php print $vid_player_id; ?>">
-		<?php if (is_mobile()): ?>
-			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
-		<?php else: ?>
-			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
-		<?php endif; ?>
+
+          <div class="imageSub" style="display: none">
+            <!-- Put Your Image Width -->
+            <div class="blackbg" id="playerstatebg">IDLE</div>
+            <div class=label id="playerstate">IDLE</div>
+            <img src="imagefiles/bunny.jpg" id="video_image">
+            <div id="video_image_overlay"></div>
+          </div>
+          <div id="skip" style="display: none">Skip Ad</div>
+
+	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>" src="<?php print $vid_src; ?>">
 	</video>
 	<span id="vid_title" class="label">
 		<?php print $vid_title; ?>
@@ -138,15 +176,62 @@ require_once 'include/header.php';
 	</div>
 
 <?php elseif (!(isset($collections[$machine_name]))): ?>
+
 	<div class="subnav">
 		<h2>Collection not found</h2>
 		<?php header("HTTP/1.0 404 Not Found"); ?>
 	</div>
+
 <?php elseif (sizeof($collections[$machine_name]['items']) == 0): ?>
+
 	<div class="subnav">
 		<h2>Collection is empty.</h2>
 	</div>
+
 <?php else: ?>
+
+	<?php if ($vid_player): ?>
+          <div class="castbar">
+            <div id="main_video">
+              <div id="media_control">
+                <div id="play"></div>
+                <div id="pause"></div>
+                <div id="audio_bg"></div>
+                <div id="audio_bg_track"></div>
+                <div id="audio_indicator"></div>
+                <div id="audio_bg_level"></div>
+                <div id="audio_on"></div>
+                <div id="audio_off"></div>
+                <div id="progress_bar_container">
+                  <div id="progress_bg"></div>
+                  <div id="seekable_window"></div>
+                  <div id="progress"></div>
+                  <div id="unseekable_overlay"></div>
+                  <div id="progress_indicator"></div>
+                </div>
+                <input type="range" value="0" min="0" step="1" id="seek_range" />
+                <div id="fullscreen_expand"></div>
+                <div id="fullscreen_collapse"></div>
+                <google-cast-launcher id="castbutton"></google-cast-launcher>
+                <div id="currentTime">00:00:00</div>
+                <div id="duration">00:00:00</div>
+                <img id="live_indicator">
+              </div>
+            </div>
+            <div id="media_info">
+              <div id="media_title"></div>
+              <div id="feature_toggle_container">
+                <input type="radio" id="none" name="feature" value="none" checked>None<br>
+                <input type="radio" id="ads" name="feature" value="ads">Ads<br>
+                <input type="radio" id="live" name="feature" value="live">Live
+              </div>
+              <div id="media_subtitle"></div>
+            </div>
+          </div>
+	<?php endif; ?>
+
+	<div class="subnav">
+	<h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
 	<?php if ($vid_player): ?>
         <div class="supernav">
           <div class="supernav-left-side">
@@ -243,8 +328,14 @@ require_once 'include/header.php';
 			<?php endif; ?>
 			/>
 		</h4>
-		</div>
-            </div>
+		<h4>
+			<label for="vid_muted">Muted</label>
+			<input type="checkbox" name="vid_muted" id="vid_muted"
+			<?php if ($muted !== ''): ?>
+				checked="checked"
+			<?php endif; ?>
+			/>
+		</h4>
           </div>
         </div>
 	<div class="subnav">
@@ -263,20 +354,25 @@ require_once 'include/header.php';
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=name&order=desc">Sort z-a</a></h4>
 		<h4><a href="index.php?collection=<?php print $machine_name; ?>&sort=date&order=desc">Oldest first</a></h4>
           </div>
-	</div>
 	<?php endif; ?>
+	</div>
+
+	<?php if ($vid_player): ?>
+  <div id="carousel"></div>
+	<?php endif; ?>
+	</div>
 
 	<div class="listing-box">
 	<div class="listing">
-	<?php foreach ($collections[$machine_name]['items'] as $index => $item): ?>
+	<?php foreach ($collections[$machine_name]['items'] as $i => $item): ?>
 		<?php
 			$basename = basename($item['filename'], '.mp4');
-			$thumbnail = 'serve.php?collection=' . $machine_name . '&index=' . $index . '&file=.jpg';
-			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $index;
+			$thumbnail = 'serve.php?collection=' . $machine_name . '&index=' . $i . '&file=.jpg';
+			$vid_link = 'index.php?collection=' . $machine_name . '&index=' . $i;
 		?>
 
 		<div class="thumbnail">
-		<a class="vid-link" data-id="<?php print $index; ?>" href="<?php print $vid_link; ?>">
+		<a class="vid-link" data-id="<?php print $i; ?>" href="<?php print $vid_link; ?>">
 			<img src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">

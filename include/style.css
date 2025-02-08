@@ -108,7 +108,8 @@ body.nocontrols {
 .player video {
 	display: inherit;
 	margin: 0 auto;
-	margin-top: 20px;
+	padding: 10px;
+	margin-top: -10px;
 	background: black;
 	border-radius: 8px;
 	box-shadow: 0 0 20px 10px black;
@@ -123,15 +124,15 @@ body.nocontrols {
 }
 
 #background-video {
-	width: 100vw;
-	height: 100vh;
-	object-fit: cover;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
 }
 
 .player .label {
@@ -469,6 +470,11 @@ h4 a:hover {
 	cursor: pointer;
 }
 
+.subnav input {
+	margin-top: 9px;
+	float: left;
+}
+
 .subnav-right-side {
 	float: right;
 }
@@ -480,7 +486,7 @@ h4 a:hover {
 	padding: 0px 10px 0px 5px;
 }
 
-.subnav a:hover {
+.subnav-right-side h4:hover, .subnav a:hover {
 	background: mediumpurple;
 }
 
@@ -904,3 +910,37 @@ h1 {
   background: #2B1800;
   border: 1px solid #999999;
 }
+
+/* Chromecast styles */
+
+.castbar {
+  display: block;
+  float: left;
+  background: gray;
+  border-bottom: 1px solid lightgray;
+  width: 100%;
+}
+
+google-cast-launcher {
+  display: block;
+  float: left;
+}
+
+#media_control {
+  opacity: 1 !important;
+}
+
+.imageSub img {
+  display: block;
+  margin: 60px auto;
+}
+
+#carousel a {
+  display: block;
+  float: left;
+  color: white;
+  cursor: pointer;
+}
+
+video::-internal-media-controls-overlay-cast-button {
+  display: none;
