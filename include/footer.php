@@ -8,5 +8,6 @@
 			</h6>
 		</div>
 		<?php print analytics(); ?>
+		<script src="https://kit.fontawesome.com/619da17a85.js" crossorigin="anonymous"></script>
 	</body>
 </html>

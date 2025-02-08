@@ -5,6 +5,12 @@ require_once 'include/queue.php';
 global $conf;
 
 $q = new Queue($conf['json_queue']);
+if (!$q) {
+  error_log("Invalid queue");
+  header("HTTP/1.1 500 Server Error");
+  exit;
+}
+
 $q->load();
 
 /*
