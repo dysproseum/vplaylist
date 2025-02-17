@@ -8,7 +8,6 @@ function loadPing(url) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        var msg = document.getElementById('imports');
         var data = [];
         try {
           data = JSON.parse(this.responseText);
@@ -18,7 +17,15 @@ function loadPing(url) {
           data = [];
         }
 
-        msg.innerHTML = '';
+        var msg = document.getElementById('imports');
+        if (data.error) {
+          console.error(data.error + " at " + new Date());
+          setTimeout(timeOut, initialDelay);
+          return;
+        }
+        else {
+          msg.innerHTML = '';
+        }
 
         // @todo only replace if different?
         var active = false;
@@ -75,18 +82,21 @@ function loadPing(url) {
               // Count up from timestamp.
               timeDiff = epochTime() - link.time_downloading;
               // Function that approaches 100; y(x)=100(1−e^(−bx)).
-              width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * timeDiff / 2));
+              width = 50 * (1 - Math.exp((-0.01 * timeDiff)));
               break;
             case 'processing':
               // Check ffmpeg progress.
-              width = 50 + (25 * link.progress);
+              width = 50 + (25 * link.progress / link.duration);
+              if (link.speed) {
+                output += humanReadableTime((link.duration - link.progress) / link.speed) + " remaining (" + link.speed.trim() + "x)";
+              }
               break;
             case 'refreshing':
               // Count down remaining time.
-              timeDiff = epochTime() - link.time_processing;
+              timeDiff = epochTime() - link.time_refreshing;
               var collection_count = 200;
               var processing_factor = 4;
-              var total_estimate = parseInt(link.duration) / processing_factor + collection_count;
+              var total_estimate = collection_count / processing_factor;
               width = 75 + (25 * timeDiff / total_estimate);
               var left = total_estimate - timeDiff;
               if (left < 0) {

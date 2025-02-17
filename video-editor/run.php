@@ -19,18 +19,13 @@ $p = $video_editor_dir . "/links.json";
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
 // 1. Check pending requests.
-if (!file_exists($p)) {
-  exit;
-}
-
-// 2. Check for job in progress.
 $queue = [];
 $q = new Queue($p);
 $q->pruneCompleted();
 $queue = $q->queueLink();
 $links = $q->getActiveLinks();
 
-// If active, indicate progress in log file.
+// 2. If job in progress, indicate progress in log file.
 if (!empty($links)) {
   print ".";
   exit;
@@ -86,7 +81,7 @@ foreach ($queue as $link) {
   vcmd($cmd, "Downloading...");
   print " (" . (time() - $elapsed) . "s)";
 
-  // Get filename.
+  // Get downloaded filename.
   $after = glob($download_dir . "/*");
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
@@ -115,63 +110,44 @@ foreach ($queue as $link) {
   $mp4_dir = $video_editor_dir . "/mp4";
   $before = glob($mp4_dir . "/*");
   $elapsed = time();
-
-  // Extrapolate these commands out?
-  // so we can watch progress with popen()?
   chdir($video_editor_dir);
   $cmd = "./collect_mp4.sh";
 
-  // function liveExecuteCommand($cmd): $proc?
-  while (@ ob_end_flush()); // end all output buffers if any
-
-  // $proc = popen("$cmd 2>&1 ; echo Exit status : $?", 'r');
+  while (@ob_end_flush()); // end all output buffers if any
   $proc = popen("$cmd 2>&1", 'r');
-
-  $live_output     = "";
-  $complete_output = "";
-
-  $speed = 0;
-  while (!feof($proc))
-  {
-      // $live_output     = fread($proc, 4096);
-      $line = fgets($proc, 4096);
+  if (!$proc) {
+    dlog("Failed to open command for reading: $cmd");
+  }
+  else {
+    $speed = 0;
+    $seconds = 0;
+    while ($line = fgets($proc, 4096)) {
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
         $speed = str_replace('x', '', $speed);
-        echo "Speed: $speed\n";
+        // echo "Speed: $speed\n";
       }
       if (strstr($line, "out_time=")) {
         // echo $line;
         $min_sec = explode('=', $line)[1];
         $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
-        echo "Duration: $seconds/$duration\n";
-        // @todo calculate speed
-        // $remaining_time = ($duration - $seconds / $speed);
-        $q->setProgress($seconds / $duration, $id);
+        // echo "Duration: $seconds/$duration\n";
+      }
+      if ($speed != 0 && $seconds != 0) {
+        // echo "Speed and duration\n";
+        $q->setProgress($seconds, $speed, $id);
+        $speed = 0;
+        $seconds = 0;
       }
 
-      // $lines = explode("\n", $live_output);
-      // foreach ($lines as $line) {
-      //   if (strstr($line, "frame=")) {
-      //     // echo $line;
-      //   }
-      //   if (strstr($line, "out_time=")) {
-      //     echo $line;
-      //   }
-      // }
-
-      @ flush();
+      @flush();
+    }
   }
-  $q->setProgress(1, $id);
-
+  $q->setProgress($duration, 1, $id);
   pclose($proc);
-  // } // end function
-
-  // $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
-  // vcmd($cmd, "Processing media...");
   print " (" . (time() - $elapsed) . "s)";
 
-  // Get filename.
+  // Get processed filename.
   $after = glob($mp4_dir . "/*");
   $diff = array_diff($after, $before);
   if (!empty($diff)) {
@@ -185,7 +161,7 @@ foreach ($queue as $link) {
     if (DEBUG == 2) print_r($after);
   }
 
-  // Verify import collection exist.
+  // Verify import collection exists.
   $machine_name = $link['collection'];
   $import_dir = $conf['video_dir'] . '/' . $machine_name;
   if (!is_dir($import_dir)) {
@@ -202,7 +178,6 @@ foreach ($queue as $link) {
   // Move downloads into originals folder or they get regenerated.
   $cmd = "mv download/* originals/";
   vcmd($cmd);
-
 
   // 5. Refresh.
   $q->setStatus('refreshing', $id);
