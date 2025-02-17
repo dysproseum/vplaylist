@@ -14,7 +14,7 @@ class Queue {
     $this->links = [];
   }
 
-  function load() {
+  function load($resave = true) {
     $data = file_get_contents($this->path);
 
     if ($data === false) {
@@ -26,6 +26,11 @@ class Queue {
       print json_last_error_msg();
       return false;
     }
+
+    if ($resave == false) {
+      return $this->links;
+    }
+
     // Set new id values.
     foreach ($this->links as $index => $link) {
       if (!isset($link['id'])) {
@@ -114,6 +119,12 @@ class Queue {
     $this->load();
     $this->links[$this->get($index)]['status'] = $status;
     $this->links[$this->get($index)]["time_$status"] = time();
+    $this->save();
+  }
+
+  function setProgress($progress, $index) {
+    $this->load();
+    $this->links[$this->get($index)]['progress'] = $progress;
     $this->save();
   }
 
