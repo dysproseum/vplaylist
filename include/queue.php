@@ -5,13 +5,12 @@ class Queue {
   var $path;
   var $links;
 
-  function Queue($path) {
-    $this->path = $path;
-  }
-
   function __construct($path) {
     $this->path = $path;
     $this->links = [];
+    if (!file_exists($this->path)) {
+      $this->save();
+    }
   }
 
   function load($resave = true) {
@@ -49,7 +48,7 @@ class Queue {
   function save() {
     $fp = fopen($this->path, 'wb');
     if ($fp) {
-      fputs($fp, json_encode($this->links, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+      fputs($fp, $this->json());
       fputs($fp, PHP_EOL);
       fclose($fp);
     }
@@ -122,9 +121,10 @@ class Queue {
     $this->save();
   }
 
-  function setProgress($progress, $index) {
-    $this->load();
+  function setProgress($progress, $speed, $index) {
+    $this->load(false);
     $this->links[$this->get($index)]['progress'] = $progress;
+    $this->links[$this->get($index)]['speed'] = $speed;
     $this->save();
   }
 
