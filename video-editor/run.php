@@ -146,7 +146,7 @@ foreach ($queue as $link) {
       @flush();
     }
   }
-  $q->setProgress($duration, 1, $id);
+  $q->setProgress($duration, "1", $id);
   pclose($proc);
   print " (" . (time() - $elapsed) . "s)";
 
