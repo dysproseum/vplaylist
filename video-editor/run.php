@@ -46,6 +46,7 @@ foreach ($queue as $link) {
   }
   $id = $link['id'];
   print "\n  [Slot $id] " . $link['url'];
+  $q->setStatus('downloading', $id);
 
   // Get duration.
   $cmd = "yt-dlp --get-duration " . $link['url'];
@@ -75,8 +76,8 @@ foreach ($queue as $link) {
   $before = glob($download_dir . "/*");
   chdir($download_dir);
 
-  $q->setStatus('downloading', $id);
   $elapsed = time();
+  // @todo --progress --newline?
   $cmd = "yt-dlp -o \"$title.%(ext)s\" " . $link['url'];
   vcmd($cmd, "Downloading...");
   print " (" . (time() - $elapsed) . "s)";
@@ -111,8 +112,10 @@ foreach ($queue as $link) {
   $before = glob($mp4_dir . "/*");
   $elapsed = time();
   chdir($video_editor_dir);
+  print "\nProcessing media...";
   $cmd = "./collect_mp4.sh";
 
+  // Follow command output for progress.
   while (@ob_end_flush()); // end all output buffers if any
   $proc = popen("$cmd 2>&1", 'r');
   if (!$proc) {
@@ -124,7 +127,7 @@ foreach ($queue as $link) {
     while ($line = fgets($proc, 4096)) {
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
-        $speed = str_replace('x', '', $speed);
+        $speed = trim(str_replace('x', '', $speed));
         // echo "Speed: $speed\n";
       }
       if (strstr($line, "out_time=")) {
@@ -185,20 +188,43 @@ foreach ($queue as $link) {
 
   $elapsed = time();
   $cmd = "php update.php diff " . $machine_name;
+
   vcmd($cmd, "Comparing files...");
   print " (" . (time() - $elapsed) . "s)";
+  $collection_size = sizeof($collections[$machine_name]['items']);
+  print "\n  Collection " . $machine_name . ": " . $collection_size;
+  $q->setCollectionSize($collection_size + 1, $id);
 
-  print "\n  Collection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
-
-  // @todo extrapolate this command to get progress?
-  // or just don't run them all?
   $elapsed = time();
-  $cmd = "php update.php gen " . $machine_name . " --overwrite";
-  vcmd($cmd, "Writing collection...");
+  $cmd = "php update.php gen " . $machine_name . " --overwrite --progress";
+  print "\nWriting collection...";
+
+  // Follow command output for progress.
+  $q->setProgress(0, 1, $id);
+  while (@ob_end_flush()); // end all output buffers if any
+  $proc = popen("$cmd 2>&1", 'r');
+  if (!$proc) {
+    dlog("Failed to open command for reading: $cmd");
+  }
+  else {
+    $count = 0;
+    while ($line = fgets($proc, 4096)) {
+      if (strstr($line, "done=")) {
+        $count++;
+        $speed = explode('=', $line)[1];
+        $speed = trim($speed);
+        $q->setProgress($count, $speed, $id);
+      }
+    }
+    @flush();
+  }
+  pclose($proc);
   print " (" . (time() - $elapsed) . "s)";
 
+  // 6. Completed.
   $collections = load_collections();
-  print "\n  Collection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
+  $collection_size = sizeof($collections[$machine_name]['items']);
+  print "\n  Collection " . $machine_name . ": " . $collection_size;
 
   $q->setStatus('completed', $id);
 

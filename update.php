@@ -27,6 +27,16 @@ else if ($action != "list") {
   exit;
 }
 
+$overwrite = false;
+if (isset($argv[3]) && $argv[3] == "--overwrite") {
+  $overwrite = true;
+}
+
+$progress = false;
+if (isset($argv[4]) && $argv[4] == "--progress") {
+  $progress = true;
+}
+
 if ($action == "list") {
   foreach ($collections as $name => $object) {
     print $object['name'] . " (" . $name . ") " . sizeof($object['items']);
@@ -190,7 +200,7 @@ if ($action == "gen") {
   $out = array($name => $collections[$name]);
   $json = json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-  if (isset($argv[3]) && $argv[3] == "--overwrite") {
+  if ($overwrite) {
     // Write out new json file.
     $target = $htmlpath . '/collections/' . $name . '.json';
     $fp = fopen($target, 'wb');
@@ -201,8 +211,14 @@ if ($action == "gen") {
     // Regenerate thumbnails on update:
     // If files were added or removed they can be outdated.
     chdir($htmlpath);
-    $cmd = "php generate.php $name -y";
-    vcmd($cmd);
+    if ($progress) {
+      $cmd = "php generate.php $name -y --progress";
+      echo passthru($cmd);
+    }
+    else {
+      $cmd = "php generate.php $name -y";
+      vcmd($cmd);
+    }
   }
   else {
     // Output updated json preview.

@@ -86,24 +86,21 @@ function loadPing(url) {
               break;
             case 'processing':
               // Check ffmpeg progress.
-              width = 50 + (25 * link.progress / link.duration);
-              if (link.speed) {
+              width = 50;
+              if (link.progress && link.speed) {
+                width = 50 + (25 * link.progress / link.duration);
                 output += humanReadableTime((link.duration - link.progress) / link.speed) + " remaining (" + link.speed.trim() + "x)";
               }
               break;
             case 'refreshing':
-              // Count down remaining time.
+              // Check thumbnail generation progress.
               timeDiff = epochTime() - link.time_refreshing;
-              var collection_count = 200;
-              var processing_factor = 4;
-              var total_estimate = collection_count / processing_factor;
-              width = 75 + (25 * timeDiff / total_estimate);
-              var left = total_estimate - timeDiff;
-              if (left < 0) {
-                output += humanReadableTime(Math.abs(left)) + " past estimate";
-              }
-              else {
-                output += humanReadableTime(left) + " remaining";
+              width = 75;
+              // var left = 45;
+              if (link.progress && link.speed) {
+                width = 75 + (25 * link.progress / link.collection_size);
+                left = (link.collection_size - link.progress) * link.speed;
+		output += humanReadableTime(left) + " remaining";
               }
               break;
             case 'completed':

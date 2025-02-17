@@ -128,6 +128,12 @@ class Queue {
     $this->save();
   }
 
+  function setCollectionSize($size, $index) {
+    $this->load();
+    $this->links[$this->get($index)]['collection_size'] = $size;
+    $this->save();
+  }
+
   function setTitle($title, $index) {
     $this->load();
     $this->links[$this->get($index)]['title'] = $title;
