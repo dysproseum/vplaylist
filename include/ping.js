@@ -56,7 +56,7 @@ function loadPing(url) {
           }
 
           // Thumbnail.
-          if (link.index && link.status == "completed") {
+          if (link.index !== undefined && link.status == "completed") {
             var uri = "/vplaylist/serve.php?collection=" + link.collection + "&index=" + link.index + "&file=.jpg";
             var thumbnail = clone.querySelector(".icon .thumb");
             thumbnail.src = uri;
@@ -78,13 +78,16 @@ function loadPing(url) {
               width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * timeDiff / 2));
               break;
             case 'processing':
+              // Check ffmpeg progress.
+              width = 50 + (25 * link.progress);
+              break;
             case 'refreshing':
               // Count down remaining time.
               timeDiff = epochTime() - link.time_processing;
               var collection_count = 200;
               var processing_factor = 4;
               var total_estimate = parseInt(link.duration) / processing_factor + collection_count;
-              width = 50 + (timeDiff / total_estimate) * 50;
+              width = 75 + (25 * timeDiff / total_estimate);
               var left = total_estimate - timeDiff;
               if (left < 0) {
                 output += humanReadableTime(Math.abs(left)) + " past estimate";

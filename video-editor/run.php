@@ -56,18 +56,9 @@ foreach ($queue as $link) {
   $cmd = "yt-dlp --get-duration " . $link['url'];
   $min_sec = exec($cmd);
   $q->setDisplayDuration($min_sec, $id);
-
-  $segs = explode(":", $min_sec);
-  $duration = 0;
-  switch(sizeof($segs)) {
-    case 2:
-      $duration += $segs[0] * 60 + $segs[1];
-      break;
-    case 3:
-      $duration += $segs[0] * 60 * 60 + $segs[1] * 60 + $segs[2];
-      break;
-  }
+  $duration = clock_time_to_seconds($min_sec);
   print "\n  Duration: $duration seconds";
+
   // Get title.
   $cmd = "yt-dlp --get-title " . $link['url'];
   $title = exec($cmd);
@@ -124,8 +115,60 @@ foreach ($queue as $link) {
   $mp4_dir = $video_editor_dir . "/mp4";
   $before = glob($mp4_dir . "/*");
   $elapsed = time();
-  $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
-  vcmd($cmd, "Processing media...");
+
+  // Extrapolate these commands out?
+  // so we can watch progress with popen()?
+  chdir($video_editor_dir);
+  $cmd = "./collect_mp4.sh";
+
+  // function liveExecuteCommand($cmd): $proc?
+  while (@ ob_end_flush()); // end all output buffers if any
+
+  // $proc = popen("$cmd 2>&1 ; echo Exit status : $?", 'r');
+  $proc = popen("$cmd 2>&1", 'r');
+
+  $live_output     = "";
+  $complete_output = "";
+
+  $speed = 0;
+  while (!feof($proc))
+  {
+      // $live_output     = fread($proc, 4096);
+      $line = fgets($proc, 4096);
+      if (strstr($line, "speed=")) {
+        $speed = explode('=', $line)[1];
+        $speed = str_replace('x', '', $speed);
+        echo "Speed: $speed\n";
+      }
+      if (strstr($line, "out_time=")) {
+        // echo $line;
+        $min_sec = explode('=', $line)[1];
+        $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
+        echo "Duration: $seconds/$duration\n";
+        // @todo calculate speed
+        // $remaining_time = ($duration - $seconds / $speed);
+        $q->setProgress($seconds / $duration, $id);
+      }
+
+      // $lines = explode("\n", $live_output);
+      // foreach ($lines as $line) {
+      //   if (strstr($line, "frame=")) {
+      //     // echo $line;
+      //   }
+      //   if (strstr($line, "out_time=")) {
+      //     echo $line;
+      //   }
+      // }
+
+      @ flush();
+  }
+  $q->setProgress(1, $id);
+
+  pclose($proc);
+  // } // end function
+
+  // $cmd = "cd $video_editor_dir && ./collect_mp4.sh";
+  // vcmd($cmd, "Processing media...");
   print " (" . (time() - $elapsed) . "s)";
 
   // Get filename.
@@ -172,6 +215,8 @@ foreach ($queue as $link) {
 
   print "\n  Collection " . $machine_name . ": " . sizeof($collections[$machine_name]['items']);
 
+  // @todo extrapolate this command to get progress?
+  // or just don't run them all?
   $elapsed = time();
   $cmd = "php update.php gen " . $machine_name . " --overwrite";
   vcmd($cmd, "Writing collection...");

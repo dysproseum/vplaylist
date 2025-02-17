@@ -118,6 +118,44 @@ function name_compare_desc($a1, $a2) {
   return name_compare($a2, $a1);
 }
 
+function get_video_duration($filename) {
+  $cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"$filename\"";
+  return exec($cmd);
+}
+
+function get_video_framerate($filename) {
+  $cmd = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"$filename\"";
+  return exec($cmd);
+}
+
+function seconds_to_clock_time($seconds) {
+  $secs = $seconds % 60;
+  $hrs = $seconds / 60;
+  $mins = $hrs % 60;
+  $hrs = $hrs / 60;
+
+  return sprintf("%02d:%02d:%02d", $hrs, $mins, $secs);
+}
+
+function clock_time_to_seconds($min_sec) {
+  // Get duration.
+  // $min_sec = exec($cmd);
+  // $q->setDisplayDuration($min_sec, $id);
+
+  $segs = explode(":", $min_sec);
+  $duration = 0;
+  switch(sizeof($segs)) {
+    case 2:
+      $duration += $segs[0] * 60 + $segs[1];
+      break;
+    case 3:
+      $duration += $segs[0] * 60 * 60 + $segs[1] * 60 + $segs[2];
+      break;
+  }
+  // print "\n  Duration: $duration seconds";
+  return $duration;
+}
+
 function is_mobile() {
 	return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|boost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
 }

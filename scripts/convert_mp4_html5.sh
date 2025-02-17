@@ -21,8 +21,8 @@ HEIGHT=$(ffprobe -loglevel error -select_streams v:0 -show_entries stream=height
 
 if [ $WIDTH -lt $HEIGHT ]; then
   # vertical
-  ffmpeg -loglevel quiet -i "$IN" -n -acodec aac -b:a 400k -vcodec libx264 -preset medium -f mp4 -crf 18 -pix_fmt yuv420p -qcomp 0.8 -s 360x640 -x264-params ref=4 -profile:v baseline -level 3.1 -movflags +faststart "$OUT.mp4"
+  ffmpeg -progress - -nostats -loglevel quiet -i "$IN" -n -acodec aac -b:a 400k -vcodec libx264 -preset medium -f mp4 -crf 18 -pix_fmt yuv420p -qcomp 0.8 -s 360x640 -x264-params ref=4 -profile:v baseline -level 3.1 -movflags +faststart "$OUT.mp4"
 else
   # horizontal
-  ffmpeg -loglevel quiet -i "$IN" -n -acodec aac -b:a 400k -vcodec libx264 -preset medium -f mp4 -crf 18 -pix_fmt yuv420p -qcomp 0.8 -s 640x360 -x264-params ref=4 -profile:v baseline -level 3.1 -movflags +faststart "$OUT.mp4"
+  ffmpeg -progress - -nostats -loglevel quiet -i "$IN" -n -acodec aac -b:a 400k -vcodec libx264 -preset medium -f mp4 -crf 18 -pix_fmt yuv420p -qcomp 0.8 -s 640x360 -x264-params ref=4 -profile:v baseline -level 3.1 -movflags +faststart "$OUT.mp4"
 fi

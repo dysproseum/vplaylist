@@ -5,7 +5,7 @@ require_once 'include/queue.php';
 global $conf;
 
 $q = new Queue($conf['json_queue']);
-$q->load();
+$q->load(false);
 
 /*
 $q->links[] = [
