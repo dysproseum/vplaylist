@@ -138,10 +138,6 @@ function seconds_to_clock_time($seconds) {
 }
 
 function clock_time_to_seconds($min_sec) {
-  // Get duration.
-  // $min_sec = exec($cmd);
-  // $q->setDisplayDuration($min_sec, $id);
-
   $segs = explode(":", $min_sec);
   $duration = 0;
   switch(sizeof($segs)) {
@@ -152,7 +148,6 @@ function clock_time_to_seconds($min_sec) {
       $duration += $segs[0] * 60 * 60 + $segs[1] * 60 + $segs[2];
       break;
   }
-  // print "\n  Duration: $duration seconds";
   return $duration;
 }
 
