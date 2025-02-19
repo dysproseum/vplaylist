@@ -82,14 +82,19 @@ function loadPing(url) {
               // Count up from timestamp.
               timeDiff = epochTime() - link.time_downloading;
               // Function that approaches 100; y(x)=100(1−e^(−bx)).
-              width = 50 * (1 - Math.exp((-0.01 * timeDiff)));
+              // width = 50 * (1 - Math.exp((-0.01 * timeDiff)));
+
+              if (link.progress && link.speed !== undefined) {
+                width = 50 * link.progress;
+                output += humanReadableTime(link.speed) + " remaining";
+              }
               break;
             case 'processing':
               // Check ffmpeg progress.
               width = 50;
               if (link.progress && link.speed) {
                 width = 50 + (25 * link.progress / link.duration);
-                output += humanReadableTime((link.duration - link.progress) / link.speed) + " remaining (" + link.speed.trim() + "x)";
+                output += humanReadableTime((link.duration - link.progress) / link.speed) + " remaining (" + link.speed + "x)";
               }
               break;
             case 'refreshing':

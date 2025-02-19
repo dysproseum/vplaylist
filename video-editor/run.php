@@ -46,7 +46,6 @@ foreach ($queue as $link) {
   }
   $id = $link['id'];
   print "\n  [Slot $id] " . $link['url'];
-  $q->setStatus('downloading', $id);
 
   // Get duration.
   $cmd = "yt-dlp --get-duration " . $link['url'];
@@ -77,9 +76,65 @@ foreach ($queue as $link) {
   chdir($download_dir);
 
   $elapsed = time();
-  // @todo --progress --newline?
-  $cmd = "yt-dlp -o \"$title.%(ext)s\" " . $link['url'];
-  vcmd($cmd, "Downloading...");
+  $cmd = "yt-dlp --progress --newline -o \"$title.%(ext)s\" " . $link['url'];
+  print "\nDownloading...";
+  $q->setStatus('downloading', $id);
+
+  /*
+  [download] 100.0% of ~   712.00B at    2.33KiB/s ETA Unknown (frag 0/37)
+  [download]   1.4% of ~  51.45KiB at    2.33KiB/s ETA Unknown (frag 1/37)
+  [download] 100.0% of ~ 116.10MiB at   10.52MiB/s ETA 00:00 (frag 37/37)
+  [download]  99.0% of ~ 117.33MiB at   10.52MiB/s ETA 00:00 (frag 38/37)
+  */
+
+  // Follow command output for progress.
+  while (@ob_end_flush()); // end all output buffers if any
+  $proc = popen("$cmd 2>&1", 'r');
+  if (!$proc) {
+    dlog("Failed to open command for reading: $cmd");
+  }
+  else {
+    $progress = 0;
+    $use_frag = false;
+    while ($line = fgets($proc, 4096)) {
+      if (strstr($line, "[download]") && !strstr($line, "Destination")) {
+        // Percentages can vary for each fragment.
+        $frag_pos = strpos($line, "frag");
+        if ($frag_pos) {
+          $use_frag = true;
+          $frag_pos += 5;
+          $frag_slash = strpos($line, "/", $frag_pos);
+          $frag_paren = strpos($line, ")", $frag_pos);
+
+          $frag = intval(substr($line, $frag_pos, $frag_slash - $frag_pos));
+          $frag_total = intval(substr($line, $frag_slash + 1, $frag_paren - $frag_slash));
+
+          if ($frag > $progress && $frag_total >= $frag) {
+            if (DEBUG == 2) echo "frag: [$frag]/[$frag_total]\n";
+            $q->setProgress($frag / $frag_total, $frag_total - $frag, $id);
+            $progress = $frag;
+          }
+        }
+        else if ($use_frag == false) {
+          // Fallback to percentages if no frag
+          $percent = trim(substr($line, 11, 5));
+          $percent = str_replace('%', '', $percent);
+          $eta = 100 - $percent;
+
+          if ($percent > $progress) {
+            if (DEBUG == 2) echo "Percent: $percent\n";
+            $q->setProgress($percent / 100, $eta, $id);
+            $progress = $percent;
+          }
+        }
+        else {
+          // Skip progress on extra format frags at the end.
+        }
+      }
+      @flush();
+    }
+  }
+  pclose($proc);
   print " (" . (time() - $elapsed) . "s)";
 
   // Get downloaded filename.
@@ -128,16 +183,12 @@ foreach ($queue as $link) {
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
         $speed = trim(str_replace('x', '', $speed));
-        // echo "Speed: $speed\n";
       }
       if (strstr($line, "out_time=")) {
-        // echo $line;
         $min_sec = explode('=', $line)[1];
         $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
-        // echo "Duration: $seconds/$duration\n";
       }
       if ($speed != 0 && $seconds != 0) {
-        // echo "Speed and duration\n";
         $q->setProgress($seconds, $speed, $id);
         $speed = 0;
         $seconds = 0;

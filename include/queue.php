@@ -118,14 +118,20 @@ class Queue {
     $this->load();
     $this->links[$this->get($index)]['status'] = $status;
     $this->links[$this->get($index)]["time_$status"] = time();
+
+    // Unset progress between states.
+    unset($this->links[$this->get($index)]['progress']);
+    unset($this->links[$this->get($index)]['speed']);
     $this->save();
   }
 
-  function setProgress($progress, $speed, $index) {
+  function setProgress($progress, $speed, $index, $resave = true) {
     $this->load(false);
     $this->links[$this->get($index)]['progress'] = $progress;
     $this->links[$this->get($index)]['speed'] = $speed;
-    $this->save();
+    if ($resave) {
+      $this->save();
+    }
   }
 
   function setCollectionSize($size, $index) {
