@@ -21,17 +21,21 @@ $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 // 1. Check pending requests.
 $queue = [];
 $q = new Queue($p);
+if (!$q) {
+  dlog("Failed to instantiate new Queue");
+  exit;
+}
 $q->pruneCompleted();
-$queue = $q->queueLink();
-$links = $q->getActiveLinks();
 
 // 2. If job in progress, indicate progress in log file.
+$links = $q->getActiveLinks();
 if (!empty($links)) {
   print ".";
   exit;
 }
 
 // Nothing to do.
+$queue = $q->queueLink();
 if (empty($queue)) {
   if (DEBUG == 2) print "No unqueued links\n";
   exit;
@@ -64,6 +68,7 @@ foreach ($queue as $link) {
   $title = str_replace('⧸', '_', $title);
   $title = str_replace(':', '- ', $title);
   $title = str_replace('"', '', $title);
+  $title = str_replace('\'', '', $title);
   $title = iconv('UTF-8', 'ASCII//TRANSLIT',  $title);
   $title = str_replace('?', '', $title);
   if (strlen($title) > 255) {
@@ -119,7 +124,7 @@ foreach ($queue as $link) {
           // Fallback to percentages if no frag
           $percent = trim(substr($line, 11, 5));
           $percent = str_replace('%', '', $percent);
-          $eta = 100 - $percent;
+          $eta = 100 - (float) $percent;
 
           if ($percent > $progress) {
             if (DEBUG == 2) echo "Percent: $percent\n";
@@ -151,8 +156,11 @@ foreach ($queue as $link) {
     if (DEBUG == 2) print_r($after);
 
     // Can't continue to match with final id without filename.
+    // But the downloaded file may have been leftover.
+    // @todo clear the downloads at the beginning?
     $q->setError("Downloaded file not found", $id);
-    continue;
+    // continue;
+    exit;
   }
 
   // Get video duration.
@@ -180,6 +188,7 @@ foreach ($queue as $link) {
     $speed = 0;
     $seconds = 0;
     while ($line = fgets($proc, 4096)) {
+//echo $line;
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
         $speed = trim(str_replace('x', '', $speed));
@@ -189,7 +198,13 @@ foreach ($queue as $link) {
         $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
       }
       if ($speed != 0 && $seconds != 0) {
-        $q->setProgress($seconds, $speed, $id);
+        dlog("Setting progress $seconds $speed...");
+        $result = $q->setProgress($seconds, $speed, $id);
+        if (!$result) {
+          dlog("Failed to setProgress $seconds $speed");
+          $q->setError("Failed to setProgress", $id);
+          exit;
+        }
         $speed = 0;
         $seconds = 0;
       }
