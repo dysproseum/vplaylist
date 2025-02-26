@@ -11,7 +11,8 @@ $video_editor_dir = $conf['video_dir'] . "/video-editor";
 $p = $video_editor_dir . "/links.json";
 
 $q = new Queue($p);
-$links = $q->load();
+//$links = $q->load();
+$links = [];
 
 // Example data.
 $links[] = [

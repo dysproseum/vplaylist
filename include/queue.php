@@ -9,11 +9,16 @@ class Queue {
     $this->path = $path;
     $this->links = [];
     if (!file_exists($this->path)) {
-      $this->save();
+      $this->save(true);
+      chmod($this->path, 0777);
+    }
+    $result = $this->load();
+    if (!$result) {
+      return false;
     }
   }
 
-  function load($resave = true) {
+  function load() {
     $data = file_get_contents($this->path);
 
     if ($data === false) {
@@ -22,40 +27,57 @@ class Queue {
     }
     $this->links = json_decode($data, true);
     if (json_last_error() !== 0) {
-      print json_last_error_msg();
+      error_log(json_last_error_msg());
       return false;
-    }
-
-    if ($resave == false) {
-      return $this->links;
     }
 
     // Set new id values.
+    // Needs to be done right now because newly posted items don't have ids yet.
+    $resave = false;
     foreach ($this->links as $index => $link) {
       if (!isset($link['id'])) {
-        if (isset($this->links[$index - 1]['id'])) {
-          $this->links[$index]['id'] = $this->links[$index - 1]['id'] + 1;
-        }
-        else {
-          $this->links[$index]['id'] = $index;
+        error_log("Invalid queue id in load: status " . $link['status']);
+
+        if ($link['status'] == "new") {
+          if (isset($this->links[$index - 1]['id'])) {
+            $this->links[$index]['id'] = $this->links[$index - 1]['id'] + 1;
+          }
+          else {
+            $this->links[$index]['id'] = $index;
+          }
+          $this->links[$index]['status'] = 'queued';
+          $resave = true;
         }
       }
     }
-    $this->save();
-    return $this->links;
+    if ($resave == true) {
+      return $this->save();
+    }
+    return true;
   }
 
-  function save() {
-    $fp = fopen($this->path, 'wb');
-    if ($fp) {
-      fputs($fp, $this->json());
-      fputs($fp, PHP_EOL);
-      fclose($fp);
-    }
-    else {
-      error_log("Error saving queue file: " . $this->path);
+  function save($allow_zero = false) {
+    // Don't save if zero links.
+    if (!$allow_zero && sizeof($this->links) == 0) {
+      error_log("Zero links in save");
       return false;
     }
+
+    $fp = fopen($this->path, 'wb');
+    if (!$fp) {
+      error_log("Error opening queue file: " . $this->path);
+      return false;
+    }
+    $json = $this->json();
+    if ($json) {
+      fputs($fp, $json);
+      fputs($fp, PHP_EOL);
+    }
+    else {
+      error_log("Error saving json: " . $this->path);
+      return false;
+    }
+    fclose($fp);
     return true;
   }
 
@@ -65,6 +87,14 @@ class Queue {
 
   // Array indices may be incorrect after pruning.
   function get($id) {
+    if (!$this->links) {
+      error_log("No links in get");
+      return false;
+    }
+    if (sizeof($this->links) == 0) {
+      error_log("Sizeof links is zero in get");
+      return false;
+    }
     foreach ($this->links as $index => $link) {
       if ($link['id'] == $id) {
         // return pointer? no
@@ -80,6 +110,7 @@ class Queue {
         return $index;
       }
     }
+    return false;
   }
 
   function getLinks() {
@@ -125,12 +156,51 @@ class Queue {
     $this->save();
   }
 
-  function setProgress($progress, $speed, $index, $resave = true) {
-    $this->load(false);
-    $this->links[$this->get($index)]['progress'] = $progress;
-    $this->links[$this->get($index)]['speed'] = $speed;
+  function setProgress($progress, $speed, $index) { // $resave = true) {
+    $result = $this->load();
+    if (!$result) {
+      error_log("Fail to load in setProgress");
+      return false;
+    }
+
+    $resave = false;
+
+    $id = $this->get($index); 
+    if ($id !== false && isset($this->links[$id])) {
+      if (isset($this->links[$id]['progress'])) {
+        $p1 = $this->links[$id]['progress'];
+        if ($p1 != $progress) {
+          $this->links[$id]['progress'] = $progress;
+          $resave = true;
+        }
+      }
+      else {
+        $this->links[$id]['progress'] = $progress;
+        $resave = true;
+      }
+      if (isset($this->links[$id]['speed'])) {
+        $s1 = $this->links[$id]['speed'];
+        if ($s1 != $speed) {
+          $this->links[$id]['speed'] = $speed;
+          $resave = true;
+        }
+      }
+      else {
+        $this->links[$id]['speed'] = $speed;
+        $resave = true;
+      }
+    }
+    else {
+      // error and don't save the file if no id
+      error_log("No id in setProgress, looking for: " . $index . ".");
+      return false;
+    }
+
     if ($resave) {
-      $this->save();
+      return $this->save();
+    }
+    else {
+      return true;
     }
   }
 
