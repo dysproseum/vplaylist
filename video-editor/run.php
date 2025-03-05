@@ -188,17 +188,18 @@ foreach ($queue as $link) {
     $speed = 0;
     $seconds = 0;
     while ($line = fgets($proc, 4096)) {
-//echo $line;
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
         $speed = trim(str_replace('x', '', $speed));
+        if (strstr($speed, 'fps')) {
+          $speed = 0;
+        }
       }
       if (strstr($line, "out_time=")) {
         $min_sec = explode('=', $line)[1];
         $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
       }
       if ($speed != 0 && $seconds != 0) {
-        dlog("Setting progress $seconds $speed...");
         $result = $q->setProgress($seconds, $speed, $id);
         if (!$result) {
           dlog("Failed to setProgress $seconds $speed");

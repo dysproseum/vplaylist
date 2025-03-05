@@ -59,7 +59,7 @@ class Queue {
   function save($allow_zero = false) {
     // Don't save if zero links.
     if (!$allow_zero && sizeof($this->links) == 0) {
-      error_log("Zero links in save");
+      // error_log("Zero links in save");
       return false;
     }
 
@@ -156,7 +156,7 @@ class Queue {
     $this->save();
   }
 
-  function setProgress($progress, $speed, $index) { // $resave = true) {
+  function setProgress($progress, $speed, $index) {
     $result = $this->load();
     if (!$result) {
       error_log("Fail to load in setProgress");
@@ -270,7 +270,7 @@ class Queue {
       }
     }
     $this->links = array_values($this->links);
-    $this->save();
+    $this->save(true);
   }
 
   function setError($msg, $index) {
