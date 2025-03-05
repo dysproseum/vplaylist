@@ -101,7 +101,6 @@ function loadPing(url) {
               // Check thumbnail generation progress.
               timeDiff = epochTime() - link.time_refreshing;
               width = 75;
-              // var left = 45;
               if (link.progress && link.speed) {
                 width = 75 + (25 * link.progress / link.collection_size);
                 left = (link.collection_size - link.progress) * link.speed;
