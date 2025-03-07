@@ -81,7 +81,10 @@ foreach ($queue as $link) {
   chdir($download_dir);
 
   $elapsed = time();
-  $cmd = "yt-dlp --progress --newline -o \"$title.%(ext)s\" " . $link['url'];
+  // Do we need to use cleaned up title?
+  // $cmd = "yt-dlp --progress --newline -o \"$title.%(ext)s\" " . $link['url'];
+  $cmd = "yt-dlp --progress --newline " . $link['url'];
+
   print "\nDownloading...";
   $q->setStatus('downloading', $id);
 

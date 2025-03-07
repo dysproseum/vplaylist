@@ -455,19 +455,19 @@ form#imports .target-text a:hover {
 }
 
 form#imports .queued {
-  background-image: url(/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
+  background-image: url(/vplaylist/include/queued.gif);
 }
 
 form#imports .downloading {
-  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);*/
+  background-image: url(/vplaylist/include/downloading.gif);
 }
 
 form#imports .processing {
-  background-image: url(https://cur.cursors-4u.net/food/images1/foo35.gif);
+  background-image: url(/vplaylist/include/processing.gif);
 }
 
 form#imports .refreshing {
-  background-image: url(https://cur.cursors-4u.net/games/images/gam71.gif);
+  background-image: url(/vplaylist/include/refreshing.gif);
 }
 
 form#imports .error .progress-bar span {
