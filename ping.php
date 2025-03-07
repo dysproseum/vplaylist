@@ -6,8 +6,6 @@ header('Content-type: application/json');
 if (file_exists($conf['json_queue'])) {
   $data = file_get_contents($conf['json_queue']);
   if ($data && strlen($data) > 0) {
-    // convert to json object,
-    // and append from progress.txt?
     print $data;
     exit;
   }
