@@ -187,6 +187,9 @@ foreach ($collections[$name]['items'] as &$item) {
 
   // Add framerate.
   $item['framerate'] = get_video_framerate($item['filename']);
+
+  // Add height?
+  $item['height'] = get_video_height($item['filename']);
 }
 
 if ($action == "gen") {

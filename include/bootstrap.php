@@ -128,6 +128,16 @@ function get_video_framerate($filename) {
   return exec($cmd);
 }
 
+function get_video_height($filename) {
+  $cmd = "ffprobe -loglevel error -select_streams v:0 -show_entries stream=height -of csv=s=,:p=0 \"$filename\"";
+  return exec($cmd);
+}
+
+function get_video_width($filename) {
+  $cmd = "ffprobe -loglevel error -select_streams v:0 -show_entries stream=width -of csv=s=,:p=0 \"$filename\"";
+  return exec($cmd);
+}
+
 function seconds_to_clock_time($seconds) {
   $secs = $seconds % 60;
   $hrs = $seconds / 60;
