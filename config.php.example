@@ -17,6 +17,9 @@ $conf['video_dir'] = '/var/www/html/vplaylist';
 // Path to JSON queue for importing videos.
 $conf['json_queue'] = $conf['video_dir'] . "/video-editor/links.json";
 
+// Buffer size.
+$conf['buffer_size'] = 1024 * 1024;
+
 // External media processor.
 $conf['external_media'] = false;
 $conf['media_hostname'] = 'user@example.com';

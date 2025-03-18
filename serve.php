@@ -54,6 +54,9 @@ $filename = basename($filepath);
 $offset = 0;
 $length = $filesize;
 $buffer_size = 1024 * 1024;
+if (isset($conf['buffer_size'])) {
+  $buffer_size = $conf['buffer_size'];
+}
 
 $fp = fopen($filepath, "rb");
 if (!$fp) {
