@@ -17,16 +17,15 @@ else {
 global $vid_player;
 $vid_player = FALSE;
 global $controls;
-$controls = 'controls';
+$controls = 'nocontrols';
 $vid_player_id = 'video_element';
 $loop = '';
 $shuffle = false;
 $repeat = '';
-if ($conf['start_muted']) {
-	$muted = 'muted';
-}
-else {
-	$muted = '';
+$autoplay = false;
+$muted = '';
+if (isset($conf['start_muted'])) {
+	$muted = ($conf['start_muted'] == true) ? 'muted' : '';
 }
 
 if (isset($_REQUEST['index']) && $machine_name != '') {
@@ -45,12 +44,15 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 
 	// No controls: kiosk mode, autoplay.
 	if (isset($_REQUEST['controls'])) {
-		$controls = '';
-	        $vid_player_id = 'background-video';
-		$autoplay = true;
+		$controls = ($_REQUEST['controls'] == 1) ? 'controls' : 'nocontrols';
 	}
-	else {
-		$autoplay = isset($_REQUEST['autoplay']) ? true : false;
+        // if ($controls)
+	//	$controls = '';
+	//      $vid_player_id = 'background-video';
+	//	$autoplay = true;
+	//}
+	if (isset($_REQUEST['autoplay'])) {
+		$autoplay = ($_REQUEST['autoplay'] == 1) ? true : false;
 	}
 
 	if (isset($_REQUEST['muted']))
@@ -96,14 +98,13 @@ foreach ($collections[$machine_name]['items'] as $i => $item) {
   $basename = basename($item['filename'], '.mp4');
   $thumbnail = "serve.php?collection=$machine_name&index=$i&file=.jpg";
   $vid_link = "serve.php?collection=$machine_name&index=$i&file=.mp4";
-  $duration = 596;
   $size = human_filesize($item['size']);
   $mediaInfo[] = [
     'title' => $basename,
     'contentUrl' => $vid_link,
     'contentType' => 'video/mp4',
     'thumb' => $thumbnail,
-    'duration' => $duration,
+    'duration' => $item['duration'],
     'subtitle' => 'vplaylist',
   ];
 }
@@ -134,7 +135,7 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
           </div>
           <div id="skip" style="display: none">Skip Ad</div>
 
-	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>" src="<?php print $vid_src; ?>">
+	<video <?php print $autoplay ? "autoplay" : ""; ?> <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> width="640" id="<?php print $vid_player_id; ?>" src="<?php print $vid_src; ?>">
 	</video>
 	<span id="vid_title" class="label">
 		<?php print $vid_title; ?>
@@ -230,8 +231,6 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
           </div>
 	<?php endif; ?>
 
-	<div class="subnav">
-	<h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
 	<?php if ($vid_player): ?>
         <div class="supernav">
           <div class="supernav-left-side">
@@ -324,14 +323,6 @@ $mediaInfoJSON = json_encode($mediaInfo, JSON_PRETTY_PRINT);
 			</label>
 			<input type="checkbox" name="vid_loop" id="vid_loop"
 			<?php if ($loop): ?>
-				checked="checked"
-			<?php endif; ?>
-			/>
-		</h4>
-		<h4>
-			<label for="vid_muted">Muted</label>
-			<input type="checkbox" name="vid_muted" id="vid_muted"
-			<?php if ($muted !== ''): ?>
 				checked="checked"
 			<?php endif; ?>
 			/>

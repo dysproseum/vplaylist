@@ -5,6 +5,9 @@ var state;
 var counter;
 var framerate = 0;
 
+var volslider;
+var volvalue;
+
 function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 }
@@ -100,8 +103,8 @@ getNextVideo = function() {
 
 videoVolumeListener = function(event) {
 	var volume = player.volume;
-	var volslider = document.getElementById("volslider");
-	var volvalue = document.getElementById("volvalue");
+	// var volslider = document.getElementById("volslider");
+	// var volvalue = document.getElementById("volvalue");
 	volslider.value = volume * 100;
         const sliderValue = volslider.value;
 	volvalue.innerText = Math.round(volume * 100);
@@ -123,6 +126,7 @@ videoPlayingListener = function() {
 	// Set persistent volume if cookie exists.
 	var volume = getCookie("volume");
 	player.volume = volume;
+        volslider.value = volume * 100;
 	var muted = getCookie("muted");
 	if (muted == 1) {
 		player.muted = true;
@@ -135,6 +139,9 @@ videoPlayingListener = function() {
 
 	var vidspeed = document.getElementById("vidspeed");
 	player.playbackRate = vidspeed.value;
+
+        InitPanner()
+          .then(InitEqualizer());
 };
 
 addListener = function() {
@@ -204,37 +211,50 @@ function waitForVideo() {
 }
 
 function InitPanner() {
-if (context) {
-  return;
-}
-// for cross browser
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
-context = new AudioContext();
+  return new Promise((resolve, reject) => {
+    if (context) {
+      return;
+    }
+    // for cross browser
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    context = new AudioContext();
+    
+    // load some sound
+    const audioElement = document.querySelector('audio');
+    //const track = context.createMediaElementSource(audioElement);
+    source = context.createMediaElementSource(player);
+    
+    // panning
+    const pannerOptions = {pan: 0};
+    const panner = new StereoPannerNode(context, pannerOptions);
+    
+    const pannerControl = document.getElementById("panner");
+    pannerControl.addEventListener('input', function() {
+    	panner.pan.value = this.value;
+    }, false);
+    
+    // volume
+    //const gainNode = context.createGain();
+    
+    // connect our graph
+    //track.connect(gainNode).connect(panner).connect(audioCtx.destination);
+    source.connect(panner).connect(context.destination);
 
-// load some sound
-const audioElement = document.querySelector('audio');
-//const track = context.createMediaElementSource(audioElement);
-source = context.createMediaElementSource(player);
-
-// panning
-const pannerOptions = {pan: 0};
-const panner = new StereoPannerNode(context, pannerOptions);
-
-const pannerControl = document.getElementById("panner");
-pannerControl.addEventListener('input', function() {
-	panner.pan.value = this.value;
-}, false);
-
-// volume
-//const gainNode = context.createGain();
-
-// connect our graph
-//track.connect(gainNode).connect(panner).connect(audioCtx.destination);
-source.connect(panner).connect(context.destination);
+    resolve();
+  });
 }
 
 window.onload = function(){
+
+	// Set persistent volume if cookie exists.
+	volslider = document.getElementById("volslider");
+	volvalue = document.getElementById("volvalue");
+	var volume = getCookie("volume");
+	// player.volume = volume;
+        volslider.value = volume * 100;
+	volvalue.innerText = Math.round(volume * 100);
+
 	waitForVideo();
 
 	// Define onclick functions.
@@ -409,8 +429,6 @@ window.onload = function(){
 		InitEqualizer();
 	});
 
-	var volslider = document.getElementById("volslider");
-	var volvalue = document.getElementById("volvalue");
 	volslider.addEventListener("input", function(e) {
 		volume = this.value / 100;
 		player.volume = volume;

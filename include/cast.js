@@ -439,7 +439,7 @@ CastPlayer.prototype.setupLocalPlayer = function () {
   var playerTarget = {};
 
   playerTarget.play = function () {
-    localPlayer.play();
+    // localPlayer.play();
 
     var vi = document.getElementById('video_image');
     vi.style.display = 'none';
@@ -490,7 +490,7 @@ CastPlayer.prototype.setupLocalPlayer = function () {
 
   playerTarget.updateCurrentTimeDisplay = function () {
     // Increment for local playback
-    this.currentMediaTime += 1;
+    // this.currentMediaTime += 1;
     if (this.currentMediaTime >= Math.floor(this.mediaDuration)) {
       console.log(this.currentMediaTime + " >= " + this.mediaDuration);
       this.currentMediaTime = this.mediaDuration;
@@ -500,6 +500,7 @@ CastPlayer.prototype.setupLocalPlayer = function () {
 
   playerTarget.updateDurationDisplay = function () {
     this.playerHandler.setTimeString(document.getElementById('duration'), this.mediaDuration);
+    this.playerHandler.setTimeString(document.getElementById('player-duration'), this.mediaDuration);
   }.bind(this);
 
   playerTarget.setTimeString = function (element, time) {
@@ -687,6 +688,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
     var vi = document.getElementById('video_image');
     vi.style.display = '';
     var localPlayer = document.getElementById('video_element');
+    localPlayer.pause();
     localPlayer.style.display = 'none';
   }.bind(this);
 
@@ -779,6 +781,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
       });
 
       request.queueData = new chrome.cast.media.QueueData('vplaylist');
+      // try m3u playlist too
       request.queueData.items = items;
 
       if (shuffle.checked == true) {
@@ -980,10 +983,12 @@ CastPlayer.prototype.setupRemotePlayer = function () {
 
   playerTarget.updateCurrentTimeDisplay = function () {
     this.playerHandler.setTimeString(document.getElementById('currentTime'), this.playerHandler.getCurrentMediaTime());
+    this.playerHandler.setTimeString(document.getElementById('player-time'), this.playerHandler.getCurrentMediaTime());
   }.bind(this);
 
   playerTarget.updateDurationDisplay = function () {
     this.playerHandler.setTimeString(document.getElementById('duration'), this.playerHandler.getMediaDuration());
+    this.playerHandler.setTimeString(document.getElementById('player-duration'), this.playerHandler.getMediaDuration());
   }.bind(this);
 
   playerTarget.setTimeString = function (element, time) {
@@ -1274,6 +1279,7 @@ CastPlayer.prototype.updateProgressBarByTimer = function () {
   var range = document.getElementById("seek_range");
   range.max = this.mediaDuration;
   range.value = this.currentMediaTime;
+  // setTimeString
 
   // Live situation where the progress and duration is unknown.
   if (this.mediaDuration == null) {
@@ -1737,8 +1743,17 @@ CastPlayer.prototype.initializeUI = function () {
   // Enable play/pause buttons
   document.getElementById('play').addEventListener(
     'click', this.playerHandler.play.bind(this.playerHandler));
+  document.getElementById('player-play').addEventListener(
+    'click', this.playerHandler.play.bind(this.playerHandler));
   document.getElementById('pause').addEventListener(
     'click', this.playerHandler.pause.bind(this.playerHandler));
+  document.getElementById('player-pause').addEventListener(
+    'click', this.playerHandler.pause.bind(this.playerHandler));
+  document.getElementById('player-stop').addEventListener(
+    'click', function() {
+      this.playerHandler.pause();
+      
+  });
 
   document.getElementById('progress_indicator').draggable = true;
 

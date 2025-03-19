@@ -22,3 +22,6 @@ $conf['external_media'] = false;
 $conf['media_hostname'] = 'user@example.com';
 $conf['store_hostname'] = 'user@example.com';
 $conf['store_target'] = '/var/www/vplaylist';
+
+$conf['chromecast_enable'] = true;
+$conf['chromecast_only'] = false;
