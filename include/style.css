@@ -115,6 +115,33 @@ body.nocontrols {
 	opacity: 1 !important;
 }
 
+.player video::-internal-media-controls-overlay-cast-button {
+    display: none;
+}
+
+.fixed-supernav .player {
+  position: absolute;
+  top: 48px;
+  bottom: 96px;
+}
+
+.fixed-supernav .player video {
+  height: 71vh;
+}
+
+.fixed-supernav .listing-box {
+  margin-top: 100vh;
+}
+
+.fixed-supernav .header {
+  position: absolute;
+  top: 0;
+}
+
+.fixed-supernav .footer {
+  margin-bottom: 96px;
+}
+
 .backlight .player video {
 	margin-top: -10px;
 	box-shadow: 0 0 10px white;
@@ -139,7 +166,7 @@ body.nocontrols {
 	float: left;
 	text-align: center;
 	width: 100%;
-	padding: 10px 0 20px 0;
+	padding: 20px 0 20px 0;
 	background: -webkit-linear-gradient(top, rgba(0, 0, -1, 0), rgba(0, 0, 0, 1));
 	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 	text-shadow: -2px 0px black;
@@ -180,7 +207,7 @@ body.behind-video .header {
 }
 
 .header h1 a {
-	color: white;
+	color: #cccccc;
 	text-shadow: 3px 0px 2px black;
 	font-size: 20px;
 	padding: 12px;
@@ -203,7 +230,7 @@ form.search {
 	top: 0;
 	right: 0;
 	margin: 6px 6px 0px 0px;
-	width:30%;
+	width:20%;
 	text-align: right;
 }
 
@@ -212,6 +239,11 @@ form.search input[type=text] {
 	height: 36px;
 	border: 0 none;
 	padding: 0px 0px 0px 10px;
+	margin-left: 10px;
+}
+
+form.search a {
+	cursor: pointer;
 }
 
 h2 {
@@ -227,15 +259,15 @@ h2 {
 
 h4 {
 	float: left;
-	color: white;
+	color: #cccccc;
 	text-shadow: 2px 0px 2px black;
 	line-height: 32px;
 	height: 32px;
-	margin: 0;
+	margin-right: 14px;
 }
 
 h4 a {
-	color: white;
+	color: #cccccc;
 	padding: 8px;
 }
 
@@ -249,8 +281,6 @@ h4 a:hover {
 	width: 100%;
 	height: 96px;
 	background: #555555;
-/*	background: -webkit-linear-gradient(bottom, rgba(0, 0, -1, 0), rgba(0, 0, 0, 1));
-	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)); */
 	border-top: 1px solid #cccccc;
 	position: relative;
 	z-index: 1;
@@ -291,7 +321,7 @@ h4 a:hover {
 	width: 220px;
 	height: 70px;
 	float: left;
-	margin-left: 18px;
+	margin-left: 10px;
 	margin-top: 12px;
 	background: url(stars.jpg);
 	border: 1px solid #cccccc;
@@ -301,20 +331,29 @@ h4 a:hover {
 	padding-right: 10px;
 }
 
+.supernav-left-side #volvalue {
+	position: relative;
+	top: 40px;
+	left: -2px;
+	text-align: right;
+	width: 32px;
+}
+
+.supernav-right-side #speedvalue {
+	position: relative;
+	top: 10px;
+	left: 20px;
+}
+
 .supernav-left-side .player-controls {
 	width: unset;
 	float: left;
 }
 
-.supernav-left-side .player-controls label {
-	padding: unset;
-}
-
 .supernav-left-side h4 {
 	border: 0;
 	border-radius: 42px;
-	padding: 10px;
-	margin: 20px;
+	margin-left: 10px;
 	border-top: 1px solid #cccccc;
 	border-bottom: 4px solid #2B1800;
 }
@@ -324,31 +363,27 @@ h4 a:hover {
 }
 
 .supernav .time-box {
-	padding: 10px;
+	width: 220px;
+	height: 64px;
+	overflow: hidden;
+	padding: 10px 10px 0px 10px;
 	background: url(stars.jpg);
 	color: #cccccc;
-	float: right;
-	margin: 8px;
+	float: left;
+	margin: 10px;
 	border-radius: 8px;
 	border: 1px solid #cccccc;
 	box-shadow: 0 0 4px white;
 	font-weight: bold;
-}
-
-.supernav-right-side #player-time {
-	float: left;
-}
-
-.supernav-right-side #player-duration {
-	float: right;
-	white-space: break-spaces;
+	line-height: 18px;
+	text-align: center;
 }
 
 .supernav-right-side #player-status {
 	min-width: 20px;
 	min-height: 20px;
-	padding-left: 10px;
-	margin-left: 10px;
+	padding-left: 0px;
+	margin-left: 0px;
 	margin-top: 10px;
 
 	color: #cccccc;
@@ -378,9 +413,9 @@ h4 a:hover {
 }
 
 .supernav-right-side .player-controls {
-	position: absolute;
 	right: 10px;
 	top: 55px;
+	float: left;
 }
 
 .player-controls input[type=checkbox] {
@@ -462,7 +497,7 @@ h4 a:hover {
 }
 
 .subnav a {
-	color: white;
+	color: #cccccc;
 }
 
 .subnav label, .subnav input {
@@ -475,9 +510,10 @@ h4 a:hover {
 
 .behind-video .subnav-right-side h4 label {
 	display: block;
-	float: right;
 	height: 100%;
-	padding: 0px 10px 0px 5px;
+	padding: 0;
+	width: 32px;
+	text-align: center;
 }
 
 .subnav a:hover {
@@ -680,7 +716,7 @@ form#imports .queued {
 }
 
 form#imports .downloading {
-  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);*/
+  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);
 }
 
 form#imports .processing {
@@ -789,7 +825,7 @@ input[type="range"] {
   cursor: pointer;
   outline: none;
   border-radius: 15px;
-  height: 6px;
+  height: 8px;
   display: block;
   float: left;
   margin-top: 28px;

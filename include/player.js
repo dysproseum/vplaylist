@@ -4,6 +4,9 @@ var player;
 var state;
 var counter;
 var framerate = 0;
+var range;
+var seeking = false;
+var resizeListener;
 
 function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
@@ -94,6 +97,7 @@ getNextVideo = function() {
 	if (repeat.checked == true) {
 		ajaxUrl += '&repeat=1';
 	}
+	state.innerHTML = 'LOADING...';
 	loadDoc(ajaxUrl);
 
 }
@@ -105,7 +109,7 @@ videoVolumeListener = function(event) {
 	volslider.value = volume * 100;
         const sliderValue = volslider.value;
 	volvalue.innerText = Math.round(volume * 100);
-	volslider.style.background = `linear-gradient(to right, #f50 ${sliderValue}%, #ccc ${sliderValue}%)`;
+	// volslider.style.background = `linear-gradient(to right, #f50 ${sliderValue}%, #ccc ${sliderValue}%)`;
 
 	var muted = document.querySelector('input[name=vid_muted]');
 	if (player.muted == true) {
@@ -149,26 +153,34 @@ addListener = function() {
 
 		addListenerMulti(player, events, function(e) {
 			if (e.type == 'timeupdate') {
-					var q = player.getVideoPlaybackQuality();
-					var dropped = q.droppedVideoFrames;
-					var total = q.totalVideoFrames;
-					var pcnt = (dropped / total * 100).toFixed(2);
-					var frames = framerate;
-					if (!Number.isInteger(framerate)) {
-						frames = frames.toFixed(2);
-					}
-					frames += "fps";
-					state.hidden = false;
-					state.innerHTML = frames + " tracking " + pcnt + "%<br>" + dropped + "/" + total;
-				var current = counter.innerHTML;
-				var update = secondsToClockTime(player.currentTime) + " ";
-					counter.innerHTML = update;
-				if (current != update) {
-
-					if (debug) {
-						console.log("Dropped " + dropped + ", " + pcnt + "%");
-					}
+				// Support input[type=range]
+				if (!seeking) {
+				  range.value = player.currentTime;
+				  range.max = player.duration;
 				}
+
+				var q = player.getVideoPlaybackQuality();
+				var dropped = q.droppedVideoFrames;
+				var total = q.totalVideoFrames;
+				var pcnt = 0;
+				if (total > 0) {
+				  pcnt = (dropped / total * 100).toFixed(2);
+				}
+				var frames = framerate;
+				if (!Number.isInteger(framerate)) {
+					frames = frames.toFixed(2);
+				}
+				frames += "fps";
+
+				var height = '';
+				if (vidHeight != 0) {
+				  height = vidHeight + "p";
+				}
+
+				state.hidden = false;
+				state.innerHTML = frames + " " + height + " " + pcnt + "%"; // +  dropped + "/" + total;
+
+				counter.innerHTML = secondsToClockTime(player.currentTime);
 			}
 			else {
 				if (debug) {
@@ -196,6 +208,7 @@ addListener = function() {
 
 function waitForVideo() {
 	var result = addListener();
+	InitPanner();
 	if (!result) {
 		setTimeout(function() {
 			waitForVideo();
@@ -204,34 +217,37 @@ function waitForVideo() {
 }
 
 function InitPanner() {
-if (context) {
-  return;
-}
-// for cross browser
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
-context = new AudioContext();
+	if (context) {
+	  return;
+	}
+	// for cross browser
+	const AudioContext = window.AudioContext || window.webkitAudioContext;
+	const audioCtx = new AudioContext();
+	context = new AudioContext();
 
-// load some sound
-const audioElement = document.querySelector('audio');
-//const track = context.createMediaElementSource(audioElement);
-source = context.createMediaElementSource(player);
+	// load some sound
+	const audioElement = document.querySelector('audio');
+	//const track = context.createMediaElementSource(audioElement);
+	source = context.createMediaElementSource(player);
 
-// panning
-const pannerOptions = {pan: 0};
-const panner = new StereoPannerNode(context, pannerOptions);
+	// panning
+	const pannerOptions = {pan: 0};
+	const panner = new StereoPannerNode(context, pannerOptions);
 
-const pannerControl = document.getElementById("panner");
-pannerControl.addEventListener('input', function() {
-	panner.pan.value = this.value;
-}, false);
+	const pannerControl = document.getElementById("panner");
+	pannerControl.addEventListener('input', function() {
+		panner.pan.value = this.value;
+	}, false);
 
-// volume
-//const gainNode = context.createGain();
+	// volume
+	//const gainNode = context.createGain();
 
-// connect our graph
-//track.connect(gainNode).connect(panner).connect(audioCtx.destination);
-source.connect(panner).connect(context.destination);
+	// connect our graph
+	//track.connect(gainNode).connect(panner).connect(audioCtx.destination);
+	source.connect(panner).connect(context.destination);
+
+	// must happen after panner is initialized
+	InitEqualizer();
 }
 
 window.onload = function(){
@@ -283,6 +299,12 @@ window.onload = function(){
 		if (!pause.classList.contains("pressed")) {
 			player.play();
 		}
+		prev.classList.remove("pressed");
+		clearInterval(prevInterval);
+		if (next.classList.contains("pressed")) {
+			next.classList.remove("pressed");
+			player.playbackRate = 1;
+		}
 	});
 
 	stop.addEventListener("mousedown", function() {
@@ -290,36 +312,110 @@ window.onload = function(){
 		player.currentTime = 0;
 		play.classList.remove("pressed");
 		this.classList.add("pressed");
+		prev.classList.remove("pressed");
+		clearInterval(prevInterval);
+		next.classList.remove("pressed");
 		setTimeout(function() {
 			stop.classList.remove("pressed");
 		}, 500);
 	});
 
-	prev.addEventListener("mousedown", function() {
-		if (play.classList.contains("pressed")) {
-			this.classList.toggle("pressed");
-			if (this.classList.contains("pressed")) {
-				// setInterval
-			}
-			else {
-				// clearInterval
-			}
+	var rew = false;
+	var prevTimer;
+	var prevInterval;
+	prev.addEventListener("mousedown", function(e) {
+		// no right click.
+		if (e.button == 2) {
+			return false;
+		}
+		if (!play.classList.contains("pressed")) {
+			//getPreviousVideo();
+			return;
+		}
+
+		this.classList.toggle("pressed");
+		if (next.classList.contains("pressed")) {
+			next.classList.remove("pressed");
+			clearTimeout(nextTimer);
+			player.playbackRate = 1;
+		}
+
+		if (this.classList.contains("pressed")) {
+			// setInterval
+			prevTimer = setTimeout(function() {
+				rew = true;
+				player.pause();
+				play.classList.remove("pressed");
+				player.currentTime--;
+				prevInterval = setInterval(function() {
+					player.pause();
+					player.currentTime--;
+				}, 500);
+			}, 1000);
+		}
+		else {
+			// clearInterval
+			clearInterval(prevInterval);
 		}
 	});
+	prev.addEventListener("mouseup", function() {
+		this.classList.remove("pressed");
+		clearTimeout(prevTimer);
+		clearInterval(prevInterval);
+		if (rew) {
+			rew = false;
+			player.play();
+		}
+		else {
+			player.currentTime = 0;
+		}
+		play.classList.add("pressed");
+	});
 
-	next.addEventListener("mousedown", function() {
-		if (play.classList.contains("pressed")) {
-			this.classList.toggle("pressed");
-			if (this.classList.contains("pressed")) {
-				// setInterval
-			}
-			else {
-				// clearInterval
-			}
+	var ffwd = false;
+	var nextTimer;
+	next.addEventListener("mousedown", function(e) {
+		// no right click.
+		if (e.button == 2) {
+			return false;
+		}
+		if (!play.classList.contains("pressed")) {
+			//getNextVideo();
+			return;
+		}
+
+		this.classList.toggle("pressed");
+		if (prev.classList.contains("pressed")) {
+			prev.classList.remove("pressed");
+			clearTimeout(prevTimer);
+			clearInterval(prevInterval);
+			player.play();
+		}
+
+		if (this.classList.contains("pressed")) {
+			nextTimer = setTimeout(function() {
+				ffwd = true;
+				play.classList.remove("pressed");
+				player.playbackRate = 2;
+			}, 1000);
+		}
+		else {
+			ffwd = false;
+			play.classList.add("pressed");
+			player.playbackRate = 1;
+		}
+	});
+	next.addEventListener("mouseup", function(e) {
+		this.classList.remove("pressed");
+		clearTimeout(nextTimer);
+		if (ffwd) {
+			ffwd = false;
+			player.playbackRate = 1;
 		}
 		else {
 			getNextVideo();
 		}
+		play.classList.add("pressed");
 	});
 
 	pause.addEventListener("mousedown", function(e) {
@@ -406,7 +502,7 @@ window.onload = function(){
 
 	var canvas = document.getElementById("canvas");
 	canvas.addEventListener("click", function() {
-		InitEqualizer();
+		// InitEqualizer();
 	});
 
 	var volslider = document.getElementById("volslider");
@@ -418,11 +514,56 @@ window.onload = function(){
 
 	var pan = document.getElementById("panner");
 	pan.addEventListener("click", function(e) {
-		InitPanner();
+		// InitPanner();
 	});
 
 	var vidspeed = document.getElementById("vidspeed");
+	var speedvalue = document.getElementById("speedvalue");
 	vidspeed.addEventListener("input", function(e) {
 		player.playbackRate = this.value;
+		speedvalue.innerHTML = parseFloat(this.value).toFixed(1) + "x";
+	});
+
+	range = document.getElementById("seek_range");
+	range.addEventListener("mousedown", function() {
+		seeking = true;
+	});
+	range.addEventListener("mouseup", function() {
+		seeking = false;
+	});
+	range.addEventListener("change", function(e) {
+		player.currentTime = this.value;
+	});
+
+	var backlight = document.getElementById("player-backlight");
+	backlight.addEventListener("click", function() {
+		body.classList.toggle('backlight');
+	});
+
+	resizeListener = function(e) {
+		if (body.classList.contains("fixed-supernav")) {
+	                const header = 48;
+			const footer = 48;
+			const padding = 125;
+			const height = window.innerHeight - header - footer - padding;
+			player.style.height = height + "px";
+		}
+	};
+	window.addEventListener("resize", resizeListener);
+
+	var mode = document.getElementById("player-mode");
+	mode.addEventListener("click", function() {
+		body.classList.toggle('fixed-supernav');
+		if (body.classList.contains('fixed-supernav')) {
+			resizeListener();
+		}
+		else {
+			player.style.height = null;
+		}
+	});
+
+	var maximize = document.getElementById("maximize");
+	maximize.addEventListener("click", function() {
+		toggleFullscreen();
 	});
 };

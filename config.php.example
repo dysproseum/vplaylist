@@ -8,9 +8,6 @@ $config['debug'] = 0;
 // Unmuting failed and the element was paused instead because the user didn't interact with the document before. https://goo.gl/xX8pDD
 $conf['start_muted'] = true;
 
-// Load next video via ajax.
-$conf['use_ajax'] = true;
-
 // Path to directory containing video files.
 $conf['video_dir'] = '/var/www/html/vplaylist';
 
@@ -19,6 +16,12 @@ $conf['json_queue'] = $conf['video_dir'] . "/video-editor/links.json";
 
 // Buffer size.
 $conf['buffer_size'] = 1024 * 1024;
+
+// Load next video via ajax.
+$conf['use_ajax'] = true;
+
+// Hide controls by default.
+$conf['controls'] = false;
 
 // External media processor.
 $conf['external_media'] = false;

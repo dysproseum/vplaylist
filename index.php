@@ -16,8 +16,12 @@ else {
 
 global $vid_player;
 $vid_player = FALSE;
-global $controls;
-$controls = 'controls';
+if (isset($conf['controls']) && $conf['controls'] == true) {
+  $controls = 'controls';
+}
+else {
+  $controls = '';
+}
 $vid_player_id = '';
 $loop = '';
 $shuffle = false;
@@ -40,6 +44,7 @@ if (isset($_REQUEST['index']) && $machine_name != '') {
 		$vid_title = basename($item['filename'], '.mp4');
 		$duration = seconds_to_clock_time($item['duration']);
 		$framerate = isset($item['framerate']) ? $item['framerate'] : 0;
+		$vid_height = isset($item['height']) ? $item['height'] : 0;
 		$vid_player = TRUE;
 	}
 
@@ -147,10 +152,9 @@ require_once 'include/header.php';
 		<h2>Collection is empty.</h2>
 	</div>
 <?php else: ?>
-	<?php if ($vid_player): ?>
+	<?php if ($vid_player && $controls == ''): ?>
         <div class="supernav">
           <div class="supernav-left-side">
-            <?php include "include/javascript-equalizer.html"; ?>
             <div class="player-controls">
 		<h4>
 			<label for="vid_muted">
@@ -162,9 +166,12 @@ require_once 'include/header.php';
 			<?php endif; ?>
 			/>
 		</h4>
+            </div>
+            <?php include "include/javascript-equalizer.html"; ?>
+            <div class="player-controls">
 		<div id="volvalue">0</div>
-		<input type="range" class="vertical" id="volslider" />
-		<input type="range" class="horizontal" min="-1" max="1" step="0.1" id="panner" />
+		<input type="range" class="vertical" id="volslider" title="Volume" />
+		<input type="range" class="horizontal" min="-1" max="1" step="0.1" id="panner" title="Pan Left/Right" />
             </div>
           </div>
           <div class="supernav-middle">
@@ -190,16 +197,37 @@ require_once 'include/header.php';
 	    </div>
           </div>
           <div class="supernav-right-side">
-		<input type="range" class="vertical" min="0.1" max="2" step="0.05" id="vidspeed" />
-	    <div class="time-box">
-              <div id="player-time">00:00:00</div>
-              <div id="player-duration">&nbsp;/ <?php print $duration; ?></div>
-              <div id="player-status" hidden>&nbsp;</div>
-              <script type="text/javascript">framerate = <?php print $framerate; ?>;</script>
+            <div class="player-controls">
+		<div id="speedvalue">1.0x</div>
+		<input type="range" class="horizontal" value="0" min="0" step="0.1" id="seek_range" title="Seek Range" />
+		<input type="range" class="vertical" min="0.1" max="2" step="0.1" value="1" id="vidspeed" title="Speed" />
             </div>
-            <a onclick="body.classList.toggle('backlight')">Backlight</a>
-            <a onclick="body.classList.toggle('fixed-supernav')">Mode</a>
-            <a id="maximize" onclick="toggleFullscreen()">Fullscreen</a>
+	    <div class="time-box">
+              <div id="player-timeline">
+                <span id="player-time">00:00:00</span>
+                /
+                <span id="player-duration"><?php print $duration; ?></span>
+              </div>
+              <div id="player-status" hidden>&nbsp;</div>
+              <script type="text/javascript">
+                framerate = <?php print $framerate; ?>;
+		vidHeight = <?php print $vid_height; ?>;
+	      </script>
+            </div>
+
+            <div class="player-controls">
+		<h4>
+			<a id="nextsong">
+				<i class="fa-sharp fa-solid fa-forward-fast" title="Mute"></i>
+			</a>
+		</h4>
+            </div>
+
+          </div>
+        </div>
+	<div class="subnav">
+	  <h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
+          <div class="subnav-right-side">
               <div class="player-controls">
 		<input type="hidden" name="vid_count" value="<?php print sizeof($collections[$machine_name]['items']); ?>" />
 
@@ -244,12 +272,6 @@ require_once 'include/header.php';
 			/>
 		</h4>
 		</div>
-            </div>
-          </div>
-        </div>
-	<div class="subnav">
-	  <h4><a href="index.php">Home</a>|<a href="index.php?collection=<?php print $machine_name; ?>"><?php print $collections[$machine_name]['name']; ?></a></h4>
-          <div class="subnav-right-side">
           </div>
 	</div>
 	<?php else: ?>

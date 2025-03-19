@@ -33,6 +33,16 @@
 	<h1><a href="/vplaylist/index.php">vplaylist</a></h1>
 
 	<form class="search" action="/vplaylist/search.php" method="get">
+	  <?php if ($vid_player): ?>
+            <a id="player-backlight">
+              <i class="fa-solid fa-lightbulb" title="Backlight"></i>
+            </a>
+            <a id="player-mode">
+              <i class="fa-solid fa-up-right-and-down-left-from-center" title="Mode"></i>
+            <a id="maximize">
+              <i class="fa-solid fa-expand" title="Fullscreen"></i>
+            </a>
+	  <?php endif; ?>
 		<input type="text" maxlength="64" name="q" placeholder="search" />
 	</form>
 </div>

@@ -18,9 +18,12 @@ function loadDoc(url) {
         label.innerText = data.filename;
 
 	var duration = document.querySelector("#player-duration");
-	duration.innerText = " / " + secondsToClockTime(data.duration);
+	duration.innerText = secondsToClockTime(data.duration);
 
 	framerate = eval(data.framerate);
+	if (data.height) {
+	  vidHeight = data.height;
+	}
 
         document.title = data.filename + " | vplaylist";
         var urlParams = new URLSearchParams(window.location.search);
