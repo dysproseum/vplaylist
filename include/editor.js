@@ -1,5 +1,6 @@
 var player;
 var recorder;
+var previewing = false;
 
 window.addEventListener("load", function() {
   player = document.getElementById("source");
@@ -31,6 +32,8 @@ window.addEventListener("load", function() {
 
   var btnPreview = document.getElementById("preview");
   btnPreview.addEventListener("click", function() {
+    previewing = true;
+
     player.style.filter = "brightness(0)";
     recorder.style.filter = "brightness(0)";
     //player.currentTime = 0;
@@ -55,7 +58,10 @@ window.addEventListener("load", function() {
   });
 
   player.addEventListener("timeupdate", function() {
-   
+    if (previewing == false) {
+      return;
+    }
+
     // do the switch
     // audio insert
     // sourceMarkInValue: unmute
@@ -79,12 +85,8 @@ window.addEventListener("load", function() {
       player.pause();
       recorder.pause();
       console.log("source pause");
-    }
-
-    if (recorder.currentTime >= Number(targetMarkOutValue.value) + 5) {
-      player.pause();
-      recorder.pause();
-      console.log("target pause");
+      previewing = false;
     }
   });
+
 });
