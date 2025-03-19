@@ -147,6 +147,20 @@ function seconds_to_clock_time($seconds) {
   return sprintf("%02d:%02d:%02d", $hrs, $mins, $secs);
 }
 
+function clock_time_to_seconds($min_sec) {
+  $segs = explode(":", $min_sec);
+  $duration = 0;
+  switch(sizeof($segs)) {
+    case 2:
+      $duration += $segs[0] * 60 + $segs[1];
+      break;
+    case 3:
+      $duration += $segs[0] * 60 * 60 + $segs[1] * 60 + $segs[2];
+      break;
+  }
+  return $duration;
+}
+
 function is_mobile() {
 	return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|boost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
 }

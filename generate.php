@@ -3,7 +3,7 @@
 require_once 'include/bootstrap.php';
 
 $machine_names = array();
-$ffmpeg = 'ffmpeg -loglevel quiet';
+$ffmpeg = 'ffmpeg -progress - -nostats -loglevel quiet';
 $ffprobe_width = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=width -of csv=s=,:p=0 ';
 $ffprobe_height = 'ffprobe -loglevel error -select_streams v:0 -show_entries stream=height -of csv=s=,:p=0 ';
 $ffprobe_length = 'ffprobe -loglevel error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ';
@@ -32,6 +32,11 @@ if (isset($argv[2]) && $argv[2] == '-y') {
   $overwrite = true;
 }
 
+$progress = false;
+if (isset($argv[3]) && $argv[3] == '--progress') {
+	$progress = true;
+}
+
 foreach ($machine_names as $name) {
 
 	$out_dir = THUMBS_PATH . $name;
@@ -41,6 +46,8 @@ foreach ($machine_names as $name) {
         }
 
 	foreach ($collections[$name]['items'] as $item) {
+                $before = floor(microtime(true) * 1000);
+
 		$input = $item['filename'];
 		$output = $item['thumbnail'];
 
@@ -60,6 +67,14 @@ foreach ($machine_names as $name) {
 
 		// @todo if ($height > $width)
 		$cmd = $ffmpeg . ' -ss ' . $thumb_timestamp . ' -i "' . $input . '" -vf \'scale=320:320:force_original_aspect_ratio=decrease\' -vframes 1 "' . $output . '"';
-		vcmd($cmd);
+
+		if ($progress) {
+                  vcmd($cmd);
+                  $after = floor(microtime(true) * 1000);
+                  echo "done=" . ($after - $before) / 1000 . "\n";
+		}
+                else {
+		  vcmd($cmd);
+                }
 	}
 }

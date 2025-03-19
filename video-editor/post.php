@@ -74,7 +74,7 @@ else {
 $item = [
   'url' => $url,
   'collection' => $machine_name,
-  'status' => 'queued',
+  'status' => 'new',
   'timestamp' => time(),
 ];
 
