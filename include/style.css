@@ -946,3 +946,25 @@ h1 {
   background: #2B1800;
   border: 1px solid #999999;
 }
+
+/* Video Editor */
+.video-editor {
+  box-sizing: border-box;
+}
+
+.video-editor .player {
+  width: 48%;
+  border: 1px solid gray;
+  background: gray;
+  margin: 10px 0px 10px 10px;
+}
+
+.video-editor .player h2 {
+  width: 100%;
+  text-align: center;
+}
+
+.video-editor .player video {
+  border: 1px solid gray;
+  width: 85%;
+}
