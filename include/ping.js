@@ -8,6 +8,7 @@ function loadPing(url) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
+        var msg = document.getElementById('imports');
         var data = [];
         try {
           data = JSON.parse(this.responseText);
@@ -17,15 +18,7 @@ function loadPing(url) {
           data = [];
         }
 
-        var msg = document.getElementById('imports');
-        if (data.error) {
-          console.error(data.error + " at " + new Date());
-          setTimeout(timeOut, initialDelay);
-          return;
-        }
-        else {
-          msg.innerHTML = '';
-        }
+        msg.innerHTML = '';
 
         // @todo only replace if different?
         var active = false;
@@ -63,7 +56,7 @@ function loadPing(url) {
           }
 
           // Thumbnail.
-          if (link.index !== undefined && link.status == "completed") {
+          if (link.index && link.status == "completed") {
             var uri = "/vplaylist/serve.php?collection=" + link.collection + "&index=" + link.index + "&file=.jpg";
             var thumbnail = clone.querySelector(".icon .thumb");
             thumbnail.src = uri;
@@ -82,29 +75,22 @@ function loadPing(url) {
               // Count up from timestamp.
               timeDiff = epochTime() - link.time_downloading;
               // Function that approaches 100; y(x)=100(1−e^(−bx)).
-              // width = 50 * (1 - Math.exp((-0.01 * timeDiff)));
-
-              if (link.progress && link.speed !== undefined) {
-                width = 50 * link.progress;
-                output += humanReadableTime(link.speed) + " remaining";
-              }
+              width = 50 * (1 - Math.exp((0.01 * Math.log(0.2)) * timeDiff / 2));
               break;
             case 'processing':
-              // Check ffmpeg progress.
-              width = 50;
-              if (link.progress && link.speed) {
-                width = 50 + (25 * link.progress / link.duration);
-                output += humanReadableTime((link.duration - link.progress) / link.speed) + " remaining (" + link.speed + "x)";
-              }
-              break;
             case 'refreshing':
-              // Check thumbnail generation progress.
-              timeDiff = epochTime() - link.time_refreshing;
-              width = 75;
-              if (link.progress && link.speed) {
-                width = 75 + (25 * link.progress / link.collection_size);
-                left = (link.collection_size - link.progress) * link.speed;
-		output += humanReadableTime(left) + " remaining";
+              // Count down remaining time.
+              timeDiff = epochTime() - link.time_processing;
+              var collection_count = 200;
+              var processing_factor = 4;
+              var total_estimate = parseInt(link.duration) / processing_factor + collection_count;
+              width = 50 + (timeDiff / total_estimate) * 50;
+              var left = total_estimate - timeDiff;
+              if (left < 0) {
+                output += humanReadableTime(Math.abs(left)) + " past estimate";
+              }
+              else {
+                output += humanReadableTime(left) + " remaining";
               }
               break;
             case 'completed':

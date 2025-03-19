@@ -504,25 +504,19 @@ h4 a:hover {
 	cursor: pointer;
 }
 
-.subnav input {
-	margin-top: 9px;
-	float: left;
-}
-
 .subnav-right-side {
 	float: right;
 }
 
 .behind-video .subnav-right-side h4 label {
 	display: block;
-	float: right;
 	height: 100%;
 	padding: 0;
 	width: 32px;
 	text-align: center;
 }
 
-.subnav-right-side h4:hover, .subnav a:hover {
+.subnav a:hover {
 	background: mediumpurple;
 }
 
@@ -718,19 +712,19 @@ form#imports .target-text a:hover {
 }
 
 form#imports .queued {
-  background-image: url(/vplaylist/include/queued.gif);
+  background-image: url(http://alt.dysproseum.com/vplaylist/b54889ba0757a0c36b9dde05ae6a98c9feb8ed67.gifv);
 }
 
 form#imports .downloading {
-  background-image: url(/vplaylist/include/downloading.gif);
+  background-image: url(https://www.randomnoun.com/wpf/shell32-avi/tshell32_170.gif);
 }
 
 form#imports .processing {
-  background-image: url(/vplaylist/include/processing.gif);
+  background-image: url(https://cur.cursors-4u.net/food/images1/foo35.gif);
 }
 
 form#imports .refreshing {
-  background-image: url(/vplaylist/include/refreshing.gif);
+  background-image: url(https://cur.cursors-4u.net/games/images/gam71.gif);
 }
 
 form#imports .error .progress-bar span {
@@ -761,4 +755,188 @@ form#imports .refreshing .progress-bar span {
 form#imports .completed .progress-bar span {
   background-color: mediumaquamarine;
   width: 100% !important;
+}
+
+/*
+ * Pressable, iOS Compatible CSS Button
+ * https://codepen.io/jemware/pen/kPoYbe
+ */
+.button {
+  position:relative;
+  display:inline-block;
+  margin:4px;
+}
+
+.button a {
+	color: #cccccc;
+	font-weight:bold;
+	font-size:16px;
+	text-align: center;
+	text-decoration:none;
+	background-color:#666666;
+	display:block;
+	position:relative;
+	padding:5px;
+
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	text-shadow: 0px 2px 0px #000;
+	filter: dropshadow(color=#000, offx=0px, offy=1px);
+
+	-webkit-box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+	-moz-box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+	box-shadow:inset 0 1px 0 #cccccc, 0 10px 0 #444444;
+
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.button a.pressed,
+.button a:active{
+	top:10px;
+	background-color:#666666;
+	-webkit-box-shadow:inset 0 1px 0 #cccccc, inset 0 -3px 0 #444444;
+	-moz-box-shadow:inset 0 1px 0 #cccccc, inset 0 -3pxpx 0 #444444;
+}
+
+.button:after{
+	content:"";
+	height:100%;
+	width:100%;
+	padding:4px;
+	position: absolute;
+	bottom:-15px;
+	left:-4px;
+	z-index:-1;
+	background-color:#2B1800;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+/*
+ * Custom slider
+ * https://codepen.io/ibaslogic/pen/GRYRgay
+ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 78px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 8px;
+  display: block;
+  float: left;
+  margin-top: 28px;
+}
+
+/* Thumb: webkit */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 30px;
+  width: 9px;
+ background-color: #aaaaaa;
+/*   background-image: url("https://ibaslogic.github.io/hosted-assets/smile.png");*/
+  background-size: cover;
+/*   border-radius: 50%;*/
+  border: none;
+  transition: .2s ease-in-out;
+  /*  rotate thumb  */
+  transform: rotateZ(var(--thumb-rotate, 0deg));
+  border-left: 4px solid black;
+  border-right: 4px solid black;
+}
+
+/* Thumb: Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 30px;
+  width: 30px;
+/*   background-color: #f50; */
+  background-image: url("https://ibaslogic.github.io/hosted-assets/smile.png");
+  background-size: cover;
+  border-radius: 50%;
+  border: none;
+  transition: .2s ease-in-out;
+  /*  rotate thumb  */
+  transform: rotateZ(var(--thumb-rotate, 0deg));
+}
+
+/* Hover, active & focus Thumb: Webkit */
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+input[type="range"]:focus::-webkit-slider-thumb {
+  /*box-shadow: 0 0 0 13px rgba(255,85,0, .2)*/
+}
+
+/* Hover, active & focus Thumb: Firfox */
+
+input[type="range"]::-moz-range-thumb:hover {
+  box-shadow: 0 0 0 10px rgba(255,85,0, .1)
+}
+input[type="range"]:active::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+input[type="range"]:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 13px rgba(255,85,0, .2)
+}
+
+/*=============
+Aesthetics
+=========================*/
+
+body {
+/*  font-family: system-ui;*/
+}
+
+h1 {
+ /* color: #4b4949; */
+ /*  text-align: center;*/
+}
+
+.wrapper {
+  color: #4b4949;
+  background: #f50;
+  max-width: 400px;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+  height: 4rem;
+  width: 80%;
+  background: #fff;
+  padding: 0px 10px;
+}
+
+.value {
+  font-size: 26px;
+  width: 50px;
+  text-align: center;
+}
+
+.horizontal {
+/*  background: linear-gradient(to right, rgb(255, 85, 0) 32%, rgb(204, 204, 204) 32%); */
+  background: #2B1800;
+  border: 1px solid #999999;
+}
+
+.vertical {
+  transform: rotate(-90deg);
+  background: #2B1800;
+  border: 1px solid #999999;
 }
