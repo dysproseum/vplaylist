@@ -14,12 +14,30 @@ else {
 	$machine_name = '';
 }
 
-$editing_jobs = [];
-if (isset($_REQUEST['edit'])) {
-  // send a message to addJob($_REQUEST);
+// read edit jobs file.
+$path = $conf['json_editor'];
+$json = file_get_contents($path);
+$jobs = json_decode($json, true);
 
-  $editing_jobs[] = $_REQUEST['edit'];
+// check for new edit posted.
+if (isset($_REQUEST['edit'])) {
+  $new = $_REQUEST;
+  $new['timestamp'] = time();
+  $new['status'] = 'new';
+  $jobs[] = $new;
+  $out = json_encode($jobs, JSON_PRETTY_PRINT);
+  file_put_contents($path, $out);
+  chmod($path, 0777);
+
+  // can we unset these or just redirect?
+  foreach ($_REQUEST as $key => $value) {
+      unset($_REQUEST[$key]);
+  }
+
+  header('Location: /vplaylist/editor.php?' . $_SERVER['QUERY_STRING']);
+  exit;
 }
+
 
 $indexes = ['source', 'target'];
 $items = [];
@@ -44,6 +62,7 @@ foreach ($indexes as $index) {
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<script type="text/javascript" src="include/util.js"></script>
 <script type="text/javascript" src="include/editor.js"></script>
 <title>vplaylist | video editor</title>
 </head>
@@ -104,9 +123,20 @@ foreach ($indexes as $index) {
   </div>
   </form>
 
-  <?php if ($editing_jobs): ?>
+  <?php if ($jobs): ?>
     <div class="jobs">
-      <?php print_r($_REQUEST); ?>
+      <?php foreach($jobs as $job): ?>
+        <div class="job">
+          <?php print date('Y-m-d h:i:s a', $job['timestamp']); ?>
+          Edit action: <?php print $job['edit']; ?>
+          Status: <?php print $job['status']; ?>
+          <?php if ($job['status'] == 'completed'): ?>
+            <a href="/vplaylist/index.php?collection=<?php print $job['collection']; ?>&index=<?php print $job['index']; ?>">
+              <?php print $job['title']; ?>
+            </a>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   <?php endif; ?>
 
