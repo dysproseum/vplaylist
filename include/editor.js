@@ -15,7 +15,14 @@ window.addEventListener("load", function() {
   var btnSourceMarkIn = document.getElementById("source-mark-in");
   var sourceMarkInValue = document.getElementById("source-mark-in-value");
   btnSourceMarkIn.addEventListener("click", function(e) {
-   sourceMarkInValue.value = player.currentTime.toFixed(2);
+   // account for fractions
+   var total = player.currentTime;
+   var whole = parseInt(total);
+   var diff = total - whole;
+   diff = diff.toFixed(2);
+   var output = secondsToClockTime(whole);
+   output += diff.replace('0', '');
+   sourceMarkInValue.value = output;
   });
 
   var btnTargetMarkIn = document.getElementById("target-mark-in");
@@ -27,7 +34,14 @@ window.addEventListener("load", function() {
   var btnSourceMarkOut = document.getElementById("source-mark-out");
   var sourceMarkOutValue = document.getElementById("source-mark-out-value");
   btnSourceMarkOut.addEventListener("click", function(e) {
-   sourceMarkOutValue.value = player.currentTime.toFixed(2);
+   // account for fractions
+   var total = player.currentTime;
+   var whole = parseInt(total);
+   var diff = total - whole;
+   diff = diff.toFixed(2);
+   var output = secondsToClockTime(whole);
+   output += diff.replace('0', '');
+   sourceMarkOutValue.value = output;
   });
 
   var btnTargetMarkOut = document.getElementById("target-mark-out");

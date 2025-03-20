@@ -948,7 +948,7 @@ h1 {
 }
 
 /* Video Editor */
-.editor .video-editor {
+.editor div {
   box-sizing: border-box;
   float: left;
 }
@@ -986,5 +986,7 @@ h1 {
 }
 
 .editor .jobs {
+  float: left;
   color: white;
+  padding: 10px;
 }
