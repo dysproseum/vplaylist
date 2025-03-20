@@ -948,8 +948,9 @@ h1 {
 }
 
 /* Video Editor */
-.video-editor {
+.editor .video-editor {
   box-sizing: border-box;
+  float: left;
 }
 
 .video-editor .player {
@@ -964,7 +965,26 @@ h1 {
   text-align: center;
 }
 
+.video-editor .player-source, .video-editor .player-target {
+  float: left;
+  width: 100%;
+  min-height: 360px;
+  background: black;
+}
+
 .video-editor .player video {
-  border: 1px solid gray;
+  border: 1px solid #333333;
   width: 85%;
+}
+
+.editor .control-panel {
+  float: left;
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: gray;
+}
+
+.editor .jobs {
+  color: white;
 }

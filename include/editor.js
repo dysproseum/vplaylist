@@ -1,10 +1,16 @@
 var player;
 var recorder;
+var playerSource;
+var playerTarget;
 var previewing = false;
 
 window.addEventListener("load", function() {
   player = document.getElementById("source");
   recorder = document.getElementById("target");
+  playerSource = document.querySelector(".player-source");
+  playerTarget = document.querySelector(".player-target");
+  var audioInsert = document.getElementById("audio-insert");
+  var videoInsert = document.getElementById("video-insert");
 
   var btnSourceMarkIn = document.getElementById("source-mark-in");
   var sourceMarkInValue = document.getElementById("source-mark-in-value");
@@ -34,25 +40,27 @@ window.addEventListener("load", function() {
   btnPreview.addEventListener("click", function() {
     previewing = true;
 
-    player.style.filter = "brightness(0)";
-    recorder.style.filter = "brightness(0)";
-    //player.currentTime = 0;
-    //recorder.currentTime = 0;
-
-    setTimeout(function() {
-
-    player.currentTime = sourceMarkInValue.value - 5
-    recorder.currentTime = targetMarkInValue.value - 5;
-
-    // check options
     player.muted = true;
     recorder.muted = false;
+    player.style.filter = "brightness(0)";
+    recorder.style.filter = "brightness(0)";
 
-    player.play();
-    recorder.play();
+    // cue up at -5 seconds
+    setTimeout(function() {
+      player.currentTime = sourceMarkInValue.value - 5
+      recorder.currentTime = targetMarkInValue.value - 5;
 
-    player.style.filter = null;
-    recorder.style.filter = null;
+      // check options
+      if (audioInsert.checked) {
+        //player.muted = true;
+        //recorder.muted = false;
+      }
+
+      player.play();
+      recorder.play();
+
+      player.style.filter = null;
+      recorder.style.filter = null;
     }, 1000);
     
   });
@@ -62,31 +70,65 @@ window.addEventListener("load", function() {
       return;
     }
 
-    // do the switch
-    // audio insert
-    // sourceMarkInValue: unmute
+    // do the switch at sourceMarkInValue
     if (player.currentTime >= sourceMarkInValue.value) {
-      player.muted = false;
-      recorder.muted = true;
+      // audio insert
+      if (audioInsert.checked) {
+        player.muted = false;
+        recorder.muted = true;
+      }
+
+      // video insert
+      if (videoInsert.checked) {
+        recorder.style.display = "none";
+        playerTarget.append(player);
+      }
     }
 
-    // switch back
-    // audio insert
-    // sourceMarkOutValue: mute
+    // switch back at sourceMarkOutValue
     if (player.currentTime >= sourceMarkOutValue.value) {
-      player.muted = true;
-      recorder.muted = false;
-      console.log("source switch back");
+      // audio insert
+      if (audioInsert.checked) {
+        // console.log("source switch back");
+        player.muted = true;
+        recorder.muted = false;
+      }
+
+      // video insert
+      if (videoInsert.checked) {
+        recorder.style.display = null;
+        playerSource.append(player);
+      }
     }
 
-    // end 
+    // end at +5 seconds
     if (player.currentTime >= Number(sourceMarkOutValue.value) + 5) {
-      console.log(player.currentTime + " " + sourceMarkOutValue.value);
+      // console.log(player.currentTime + " " + sourceMarkOutValue.value);
+      // console.log("source pause");
+
       player.pause();
       recorder.pause();
-      console.log("source pause");
       previewing = false;
     }
+  });
+
+  recorder.addEventListener("timeupdate", function() {
+    // @todo add events here also?
+  });
+
+  var btnStop = document.getElementById("stop");
+  btnStop.addEventListener("click", function() {
+    player.pause();
+    recorder.pause();
+    previewing = false;
+  });
+
+  var btnRecord = document.getElementById("record");
+  btnRecord.addEventListener("click", function() {
+    // collection, source and target
+    // along with set mark ins and outs
+    // and edit type
+    // are submitted with form
   });
 
 });
