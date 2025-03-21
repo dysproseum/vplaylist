@@ -27,6 +27,7 @@ window.addEventListener("load", function() {
   var btnPlayerMarkOut = document.getElementById("player-mark-out");
   var playerMarkOutValue = document.getElementById("player-mark-out-value");
   btnPlayerMarkOut.addEventListener("click", function(e) {
+   // @todo unset other mark out?
    playerMarkOutValue.value = secondsToTimeCode(player.currentTime);
   });
 

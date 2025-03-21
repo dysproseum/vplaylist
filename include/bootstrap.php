@@ -162,12 +162,13 @@ function clock_time_to_seconds($min_sec) {
 }
 
 function seconds_to_time_code($seconds) {
-  $whole = intval($seconds);
-  $tmp = seconds_to_clock_time($whole);
-  $diff = $seconds - $whole;
+  dlog("seconds_to_time_code: $seconds"); // 5.68
+  $whole = intval($seconds); // 5
+  $tmp = seconds_to_clock_time($whole); // 00:00:05
+  $diff = $seconds - $whole; // 0.68
   $parts = explode('.', $diff);
-  $decimal = substr($parts, 0, 2);
-  $timecode = "$tmp.$decimal";
+  $decimal = substr($parts[1], 0, 2);
+  $timecode = "$tmp.$decimal"; // 00:00:05.68
   return $timecode;
 }
 
