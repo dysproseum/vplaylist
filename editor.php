@@ -110,10 +110,10 @@ foreach ($indexes as $index) {
     <button type="button" id="stop">Stop</button>
     <input type="submit" id="record" value="Record" />
 
-    <input type="checkbox" id="audio-insert" value="audio_insert" />
+    <input type="checkbox" name="audio-insert" id="audio-insert" value="1" />
     <label for="audio-insert">Audio Insert</label>
 
-    <input type="checkbox" id="video-insert" value="video_insert" />
+    <input type="checkbox" name="video-insert" id="video-insert" value="1" />
     <label for="video-insert">Video Insert</label>
 
     <input type="radio" name="edit" id="edit-insert" value="insert" />

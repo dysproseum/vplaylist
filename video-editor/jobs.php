@@ -197,10 +197,12 @@ foreach ($queue as $link) {
   }
 
   //---------------------------------------------------------------------------
-  // VIDEO INSERT
+  // INSERT MODE
   // fn(source_start, source_end, target_start) : target video
   //---------------------------------------------------------------------------
   elseif ($edit == "insert") {
+    $video_insert = isset($link['video-insert']) ? $link['video-insert'] : false;
+    $audio_insert = isset($link['audio-insert']) ? $link['audio-insert'] : false;
     dlog("Insert Mode");
 
     $machine_name = $link['collection'];
@@ -221,13 +223,16 @@ foreach ($queue as $link) {
     $target_end = $link['recorder-mark-out-value'];
 
     // @todo validate and compute which diff
-    $diff_source = time_code_to_seconds($source_end) - time_code_to_seconds($source_start);
-    $diff_target = time_code_to_seconds($target_end) - time_code_to_seconds($target_start);
-    dlog("Diff_source $diff_source, Diff_target $diff_target");
+    if ($source_end == "") {
+      $diff_target = time_code_to_seconds($target_end) - time_code_to_seconds($target_start);
+      dlog("Diff_target $diff_target");
+      $end_seconds = time_code_to_seconds($source_start) + $diff_target;
+      $source_end = seconds_to_time_code($end_seconds);
+    }
 
     $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
 
-    // might need multiple steps
+    // video insert needs multiple steps
     // cut the first part from the target
     //  clip > tmp1
     $cmd = "ffmpeg -ss 00:00:00 -to $target_start -i \"$target_filename\" -c copy tmp1.mp4";
@@ -246,23 +251,40 @@ foreach ($queue as $link) {
     dlog($cmd);
     exec($cmd);
 
-    // overlay the video from source onto middle target
-    // -ss $source_start -to $source_end?
-    // $cmd = ffmpeg -i input_video.mp4 -i input_image.jpg -filter_complex "overlay=x:y" output_video.mp4
-    $diff = seconds_to_time_code($diff_target);
-    $cmd = "ffmpeg -i tmp2.mp4 -i \"$source_filename\" -ss 00:00:00 -to $diff -filter_complex \"overlay=0:0\" tmp4.mp4";
-    dlog($cmd);
-    exec($cmd);
+    // overlay the track from source onto middle target
+    if ($video_insert && $audio_insert) {
+      // @todo assemble edit?
+    }
+    elseif ($video_insert) {
+      $diff = seconds_to_time_code($diff_target);
+      $cmd = "ffmpeg -i tmp2.mp4 -i \"$source_filename\" -ss $source_start -to $source_end -filter_complex \"overlay=0:0\" tmp4.mp4";
+      dlog($cmd);
+      // @todo show progress on this command
+      exec($cmd);
+    }
+    elseif ($audio_insert) {
+      // clip the source audio into tmp2a.mp4
+      $cmd = "ffmpeg -ss $source_start -to $source_end -i \"$source_filename\" -c copy tmp2a.mp4";
+      dlog($cmd);
+      exec($cmd);
+
+      // just do a video insert from tmp2.mp4 into tmp4.mp4
+      $cmd = "ffmpeg -i tmp2a.mp4 -i tmp2.mp4 -c:v copy -map 1:v -map 0:a tmp4.mp4";
+      dlog($cmd);
+      exec($cmd);
+    }
+
+    // @todo audio mixing
+    // $cmd = ffmpeg -i file_1.mp3 -i file_2.mp3 -filter_complex [0:a:0][1:a:0]amix=inputs=2:duration=longest[aout] -map [aout] "file_out.ogg"
 
     // recombine
     //   assemble with tmp1 + tmp4 + tmp3
-    // $cmd = ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1" -vsync vfr output.mp4
     $cmd = "ffmpeg -i tmp1.mp4 -i tmp4.mp4 -i tmp3.mp4 -filter_complex \"[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1\" -vsync vfr \"$output\"";
     dlog($cmd);
     exec($cmd);
 
     // remove tmp files
-    $cmd = "rm tmp1.mp4 tmp2.mp4 tmp3.mp4 tmp4.mp4";
+    $cmd = "rm tmp1.mp4 tmp2.mp4 tmp2a.mp4 tmp3.mp4 tmp4.mp4";
     dlog($cmd);
     exec($cmd);
 
@@ -283,6 +305,8 @@ foreach ($queue as $link) {
     $q->setTitle(array_shift($after), $id);
     dlog("No new mp4 found");
     if (DEBUG == 2) print_r($after);
+    $q->setError("Downloaded file not found", $id);
+    exit;
   }
 
   // Verify import collection exists.
