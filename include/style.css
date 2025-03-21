@@ -965,7 +965,7 @@ h1 {
   text-align: center;
 }
 
-.video-editor .player-source, .video-editor .player-target {
+.video-editor .player-player, .video-editor .player-recorder {
   float: left;
   width: 100%;
   min-height: 360px;
@@ -989,4 +989,8 @@ h1 {
   float: left;
   color: white;
   padding: 10px;
+}
+
+.editor .job {
+  width: 100%;
 }

@@ -55,70 +55,141 @@ foreach ($queue as $link) {
   $elapsed = time();
   chdir($video_editor_dir);
 
-  // Get details.
   $edit = $link['edit'];
-  $machine_name = $link['collection'];
-  $source = $link['source'];
-  print "\n  [Slot $id] [Edit $edit] $machine_name";
+  print "\n  [Slot $id] [Edit type: $edit]";
 
-  // get $filename
-  $item = $collections[$machine_name]['items'][$source];
-  $filename = $item['filename'];
-  $title = basename($filename, '.mp4');
-  dlog("Filename: $filename");
-  // get $edit_start
-  $edit_start = $link['source-mark-in-value'];
-  // get $edit_end
-  $edit_end = $link['source-mark-out-value'];
-  // set $output filename
-  $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
-
+  // IF CLIP EDIT
   if ($edit == "clip") {
+
+    // Get details.
+    $machine_name = $link['collection'];
+    $source = $link['player'];
+    $item = $collections[$machine_name]['items'][$source];
+    $filename = $item['filename'];
+    $title = basename($filename, '.mp4');
+    dlog("Filename: $filename");
+    // get $edit_start
+    $edit_start = $link['player-mark-in-value'];
+    // get $edit_end
+    $edit_end = $link['player-mark-out-value'];
+    // set $output filename
+    $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
+
+    // https://stackoverflow.com/questions/18444194/cutting-multimedia-files-based-on-start-and-end-time-using-ffmpeg
     // $cmd = "ffmpeg -i input.mp4 -ss 5.5 -t 4.75 -c copy output.mp4";
     $cmd = "ffmpeg -ss $edit_start -to $edit_end -i \"$filename\" -c copy \"$output\"";
     dlog($cmd);
-  }
 
-  print "\nProcessing media...";
+    print "\nProcessing media...";
 
-  // Follow command output for progress.
-  while (@ob_end_flush()); // end all output buffers if any
-  $proc = popen("$cmd 2>&1", 'r');
-  if (!$proc) {
-    dlog("Failed to open command for reading: $cmd");
-  }
-  else {
-    $speed = 0;
-    $seconds = 0;
-    while ($line = fgets($proc, 4096)) {
-      if (strstr($line, "speed=")) {
-        $speed = explode('=', $line)[1];
-        $speed = trim(str_replace('x', '', $speed));
-        if (strstr($speed, 'fps')) {
-          $speed = 0;
-        }
-      }
-      if (strstr($line, "out_time=")) {
-        $min_sec = explode('=', $line)[1];
-        $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
-      }
-      if ($speed != 0 && $seconds != 0) {
-        $result = $q->setProgress($seconds, $speed, $id);
-        if (!$result) {
-          dlog("Failed to setProgress $seconds $speed");
-          $q->setError("Failed to setProgress", $id);
-          exit;
-        }
-        $speed = 0;
-        $seconds = 0;
-      }
-
-      @flush();
+    // Follow command output for progress.
+    while (@ob_end_flush()); // end all output buffers if any
+    $proc = popen("$cmd 2>&1", 'r');
+    if (!$proc) {
+      dlog("Failed to open command for reading: $cmd");
     }
+    else {
+      $speed = 0;
+      $seconds = 0;
+      while ($line = fgets($proc, 4096)) {
+        if (strstr($line, "speed=")) {
+          $speed = explode('=', $line)[1];
+          $speed = trim(str_replace('x', '', $speed));
+          if (strstr($speed, 'fps')) {
+            $speed = 0;
+          }
+        }
+        if (strstr($line, "out_time=")) {
+          $min_sec = explode('=', $line)[1];
+          $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
+        }
+        if ($speed != 0 && $seconds != 0) {
+          $result = $q->setProgress($seconds, $speed, $id);
+          if (!$result) {
+            dlog("Failed to setProgress $seconds $speed");
+            $q->setError("Failed to setProgress", $id);
+            exit;
+          }
+          $speed = 0;
+          $seconds = 0;
+        }
+        @flush();
+      }
+    }
+    // $q->setProgress($duration, "1", $id);
+    pclose($proc);
+    print " (" . (time() - $elapsed) . "s)";
   }
-  // $q->setProgress($duration, "1", $id);
-  pclose($proc);
-  print " (" . (time() - $elapsed) . "s)";
+
+  // ELSE IF ASSEMBLE EDIT
+  elseif ($edit == "assemble") {
+    dlog("Assemble");
+
+    $machine_name = $link['collection'];
+    $source = $link['player'];
+    $source_item = $collections[$machine_name]['items'][$source];
+    $source_filename = $source_item['filename'];
+
+    $target = $link['recorder'];
+    $target_item = $collections[$machine_name]['items'][$target];
+    $target_filename = $target_item['filename'];
+    $title = basename($target_filename, '.mp4');
+
+    dlog("Working title: $title");
+
+    $source_start = $link['player-mark-in-value'];
+    $source_end = $link['player-mark-out-value'];
+    $target_start = $link['recorder-mark-in-value'];
+    $edit_end = $link['recorder-mark-out-value'];
+
+    $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
+
+    // https://creatomate.com/blog/how-to-join-multiple-videos-into-one-using-ffmpeg
+    // $cmd = ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1" -vsync vfr output.mp4
+    $cmd = "ffmpeg -i \"$target_filename\" -i \"$source_filename\" -filter_complex \"[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1\" -vsync vfr \"$output\"";
+
+    dlog($cmd);
+
+    print "\nProcessing media...";
+
+    // Follow command output for progress.
+    while (@ob_end_flush()); // end all output buffers if any
+    $proc = popen("$cmd 2>&1", 'r');
+    if (!$proc) {
+      dlog("Failed to open command for reading: $cmd");
+    }
+    else {
+      $speed = 0;
+      $seconds = 0;
+      while ($line = fgets($proc, 4096)) {
+        if (strstr($line, "speed=")) {
+          $speed = explode('=', $line)[1];
+          $speed = trim(str_replace('x', '', $speed));
+          if (strstr($speed, 'fps')) {
+            $speed = 0;
+          }
+        }
+        if (strstr($line, "out_time=")) {
+          $min_sec = explode('=', $line)[1];
+          $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
+        }
+        if ($speed != 0 && $seconds != 0) {
+          $result = $q->setProgress($seconds, $speed, $id);
+          if (!$result) {
+            dlog("Failed to setProgress $seconds $speed");
+            $q->setError("Failed to setProgress", $id);
+            exit;
+          }
+          $speed = 0;
+          $seconds = 0;
+        }
+        @flush();
+      }
+    }
+    // $q->setProgress($duration, "1", $id);
+    pclose($proc);
+    print " (" . (time() - $elapsed) . "s)";
+  }
 
   // Get processed filename.
   $after = glob($mp4_dir . "/*");

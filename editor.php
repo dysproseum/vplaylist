@@ -14,6 +14,9 @@ else {
 	$machine_name = '';
 }
 
+$player = isset($_REQUEST['player']) ? $_REQUEST['player'] : null;
+$recorder = isset($_REQUEST['recorder']) ? $_REQUEST['recorder'] : null;
+
 // read edit jobs file.
 $path = $conf['json_editor'];
 $json = file_get_contents($path);
@@ -39,7 +42,7 @@ if (isset($_REQUEST['edit'])) {
 }
 
 
-$indexes = ['source', 'target'];
+$indexes = ['player', 'recorder'];
 $items = [];
 foreach ($indexes as $index) {
   if (isset($_REQUEST[$index]) && $machine_name != '') {
@@ -131,9 +134,9 @@ foreach ($indexes as $index) {
           Edit action: <?php print $job['edit']; ?>
           Status: <?php print $job['status']; ?>
           <?php if ($job['status'] == 'completed'): ?>
-            <a href="/vplaylist/index.php?collection=<?php print $job['collection']; ?>&index=<?php print $job['index']; ?>">
-              <?php print $job['title']; ?>
-            </a>
+            <a href="/vplaylist/index.php?collection=<?php print $job['collection']; ?>&index=<?php print $job['index']; ?>" title="<?php print $job['title']; ?>">Watch Now</a>
+            <a href="/vplaylist/editor.php?collection=<?php print $job['collection']; ?>&player=<?php print $job['index']; ?>&recorder=<?php print $recorder; ?>">Load player</a>
+            <a href="/vplaylist/editor.php?collection=<?php print $job['collection']; ?>&player=<?php print $player; ?>&recorder=<?php print $job['index']; ?>">Load recorder</a>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
