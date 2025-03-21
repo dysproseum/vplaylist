@@ -125,3 +125,20 @@ function secondsToClockTime(seconds) {
   date.setSeconds(seconds); // specify value for SECONDS here
   return date.toISOString().substring(11, 19);
 }
+
+function secondsToTimeCode(seconds) {
+  // account for fractions
+  var whole = parseInt(seconds);
+  var diff = seconds - whole;
+  diff = diff.toFixed(2);
+  var output = secondsToClockTime(whole);
+  output += diff.replace('0', '');
+  return output;
+}
+
+function timeCodeToSeconds(tc) {
+  var [timeStr, fraction] = tc.split('.');
+  var [h,m,s] = timeStr.split(':');
+  var output = Number(h) * 60 * 60 + Number(m) * 60 + Number(s) + Number("0." + fraction);
+  return output;
+}

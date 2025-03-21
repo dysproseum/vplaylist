@@ -1,67 +1,39 @@
 var player;
 var recorder;
-var playerSource;
-var playerTarget;
+var playerContainer;
+var recorderContainer;
 var previewing = false;
 
 window.addEventListener("load", function() {
   player = document.getElementById("player");
   recorder = document.getElementById("recorder");
-  playerSource = document.querySelector(".player-player");
-  playerTarget = document.querySelector(".player-recorder");
+  playerContainer = document.querySelector(".player-player");
+  recorderContainer = document.querySelector(".player-recorder");
   var audioInsert = document.getElementById("audio-insert");
   var videoInsert = document.getElementById("video-insert");
 
-  var btnSourceMarkIn = document.getElementById("player-mark-in");
+  var btnPlayerMarkIn = document.getElementById("player-mark-in");
   var playerMarkInValue = document.getElementById("player-mark-in-value");
-  btnSourceMarkIn.addEventListener("click", function(e) {
-   // account for fractions
-   var total = player.currentTime;
-   var whole = parseInt(total);
-   var diff = total - whole;
-   diff = diff.toFixed(2);
-   var output = secondsToClockTime(whole);
-   output += diff.replace('0', '');
-   playerMarkInValue.value = output;
+  btnPlayerMarkIn.addEventListener("click", function(e) {
+   playerMarkInValue.value = secondsToTimeCode(player.currentTime);
   });
 
-  var btnTargetMarkIn = document.getElementById("recorder-mark-in");
+  var btnRecorderMarkIn = document.getElementById("recorder-mark-in");
   var recorderMarkInValue = document.getElementById("recorder-mark-in-value");
-  btnTargetMarkIn.addEventListener("click", function(e) {
-   // account for fractions
-   var total = recorder.currentTime;
-   var whole = parseInt(total);
-   var diff = total - whole;
-   diff = diff.toFixed(2);
-   var output = secondsToClockTime(whole);
-   output += diff.replace('0', '');
-   recorderMarkInValue.value = output;
+  btnRecorderMarkIn.addEventListener("click", function(e) {
+   recorderMarkInValue.value = secondsToTimeCode(recorder.currentTime);
   });
 
-  var btnSourceMarkOut = document.getElementById("player-mark-out");
+  var btnPlayerMarkOut = document.getElementById("player-mark-out");
   var playerMarkOutValue = document.getElementById("player-mark-out-value");
-  btnSourceMarkOut.addEventListener("click", function(e) {
-   // account for fractions
-   var total = player.currentTime;
-   var whole = parseInt(total);
-   var diff = total - whole;
-   diff = diff.toFixed(2);
-   var output = secondsToClockTime(whole);
-   output += diff.replace('0', '');
-   playerMarkOutValue.value = output;
+  btnPlayerMarkOut.addEventListener("click", function(e) {
+   playerMarkOutValue.value = secondsToTimeCode(player.currentTime);
   });
 
-  var btnTargetMarkOut = document.getElementById("recorder-mark-out");
+  var btnRecorderMarkOut = document.getElementById("recorder-mark-out");
   var recorderMarkOutValue = document.getElementById("recorder-mark-out-value");
-  btnTargetMarkOut.addEventListener("click", function(e) {
-   // account for fractions
-   var total = recorder.currentTime;
-   var whole = parseInt(total);
-   var diff = total - whole;
-   diff = diff.toFixed(2);
-   var output = secondsToClockTime(whole);
-   output += diff.replace('0', '');
-   recorderMarkOutValue.value = output;
+  btnRecorderMarkOut.addEventListener("click", function(e) {
+   recorderMarkOutValue.value = secondsToTimeCode(recorder.currentTime);
   });
 
   var btnPreview = document.getElementById("preview");
@@ -75,8 +47,8 @@ window.addEventListener("load", function() {
 
     // cue up at -5 seconds
     setTimeout(function() {
-      player.currentTime = playerMarkInValue.value - 5
-      recorder.currentTime = recorderMarkInValue.value - 5;
+      player.currentTime = timeCodeToSeconds(playerMarkInValue.value) - 5
+      recorder.currentTime = timeCodeToSeconds(recorderMarkInValue.value) - 5;
 
       // check options
       if (audioInsert.checked) {
@@ -99,7 +71,7 @@ window.addEventListener("load", function() {
     }
 
     // do the switch at playerMarkInValue
-    if (player.currentTime >= playerMarkInValue.value) {
+    if (player.currentTime >= timeCodeToSeconds(playerMarkInValue.value)) {
       // audio insert
       if (audioInsert.checked) {
         player.muted = false;
@@ -109,12 +81,12 @@ window.addEventListener("load", function() {
       // video insert
       if (videoInsert.checked) {
         recorder.style.display = "none";
-        playerTarget.append(player);
+        recorderContainer.append(player);
       }
     }
 
     // switch back at playerMarkOutValue
-    if (player.currentTime >= playerMarkOutValue.value) {
+    if (player.currentTime >= timeCodeToSeconds(playerMarkOutValue.value)) {
       // audio insert
       if (audioInsert.checked) {
         // console.log("player switch back");
@@ -125,12 +97,12 @@ window.addEventListener("load", function() {
       // video insert
       if (videoInsert.checked) {
         recorder.style.display = null;
-        playerSource.append(player);
+        playerContainer.append(player);
       }
     }
 
     // end at +5 seconds
-    if (player.currentTime >= Number(playerMarkOutValue.value) + 5) {
+    if (player.currentTime >= timeCodeToSeconds(playerMarkOutValue.value) + 5) {
       // console.log(player.currentTime + " " + playerMarkOutValue.value);
       // console.log("player pause");
 
@@ -149,6 +121,8 @@ window.addEventListener("load", function() {
     player.pause();
     recorder.pause();
     previewing = false;
+    player.style.filter = null;
+    recorder.style.filter = null;
   });
 
   var btnRecord = document.getElementById("record");
