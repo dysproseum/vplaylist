@@ -161,6 +161,23 @@ function clock_time_to_seconds($min_sec) {
   return $duration;
 }
 
+function seconds_to_time_code($seconds) {
+  $whole = intval($seconds);
+  $tmp = seconds_to_clock_time($whole);
+  $diff = $seconds - $whole;
+  $parts = explode('.', $diff);
+  $decimal = substr($parts, 0, 2);
+  $timecode = "$tmp.$decimal";
+  return $timecode;
+}
+
+function time_code_to_seconds($tc) {
+  $time = explode('.', $tc);
+  $seconds = clock_time_to_seconds($time[0]);
+  $seconds += "0." . $time[1];
+  return $seconds;
+}
+
 function is_mobile() {
 	return preg_match("/(android|webos|avantgo|iphone|ipad|ipod|blackberry|iemobile|bolt|boost|cricket|docomo|fone|hiptop|mini|opera mini|kitkat|mobi|palm|phone|pie|tablet|up\.browser|up\.link|webos|wos)/i", $_SERVER["HTTP_USER_AGENT"]);
 }

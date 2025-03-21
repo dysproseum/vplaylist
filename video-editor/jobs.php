@@ -58,7 +58,10 @@ foreach ($queue as $link) {
   $edit = $link['edit'];
   print "\n  [Slot $id] [Edit type: $edit]";
 
-  // IF CLIP EDIT
+  //---------------------------------------------------------------------------
+  // CLIP EDIT
+  // fn(source_start, source_end) : target video
+  //---------------------------------------------------------------------------
   if ($edit == "clip") {
 
     // Get details.
@@ -121,9 +124,11 @@ foreach ($queue as $link) {
     print " (" . (time() - $elapsed) . "s)";
   }
 
-  // ELSE IF ASSEMBLE EDIT
+  //--------------------------------------------------------------------------
+  // ASSEMBLE EDIT
+  // fn(source_video, target_video): target video
+  //---------------------------------------------------------------------------
   elseif ($edit == "assemble") {
-    dlog("Assemble");
 
     $machine_name = $link['collection'];
     $source = $link['player'];
@@ -189,6 +194,81 @@ foreach ($queue as $link) {
     // $q->setProgress($duration, "1", $id);
     pclose($proc);
     print " (" . (time() - $elapsed) . "s)";
+  }
+
+  //---------------------------------------------------------------------------
+  // VIDEO INSERT
+  // fn(source_start, source_end, target_start) : target video
+  //---------------------------------------------------------------------------
+  elseif ($edit == "insert") {
+    dlog("Insert Mode");
+
+    $machine_name = $link['collection'];
+    $source = $link['player'];
+    $source_item = $collections[$machine_name]['items'][$source];
+    $source_filename = $source_item['filename'];
+
+    $target = $link['recorder'];
+    $target_item = $collections[$machine_name]['items'][$target];
+    $target_filename = $target_item['filename'];
+    $title = basename($target_filename, '.mp4');
+
+    dlog("Working title: $title");
+
+    $source_start = $link['player-mark-in-value'];
+    $source_end = $link['player-mark-out-value'];
+    $target_start = $link['recorder-mark-in-value'];
+    $target_end = $link['recorder-mark-out-value'];
+
+    // @todo validate and compute which diff
+    $diff_source = time_code_to_seconds($source_end) - time_code_to_seconds($source_start);
+    $diff_target = time_code_to_seconds($target_end) - time_code_to_seconds($target_start);
+    dlog("Diff_source $diff_source, Diff_target $diff_target");
+
+    $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
+
+    // might need multiple steps
+    // cut the first part from the target
+    //  clip > tmp1
+    $cmd = "ffmpeg -ss 00:00:00 -to $target_start -i \"$target_filename\" -c copy tmp1.mp4";
+    dlog($cmd);
+    exec($cmd);
+
+    // cut the end part from the target
+    //  clip > tmp3
+    $cmd = "ffmpeg -ss $target_end -i \"$target_filename\" -c copy tmp3.mp4";
+    dlog($cmd);
+    exec($cmd);
+
+    // cut the middle part from the target
+    //  clip > tmp2
+    $cmd = "ffmpeg -ss $target_start -to $target_end -i \"$target_filename\" -c copy tmp2.mp4";
+    dlog($cmd);
+    exec($cmd);
+
+    // overlay the video from source onto middle target
+    // -ss $source_start -to $source_end?
+    // $cmd = ffmpeg -i input_video.mp4 -i input_image.jpg -filter_complex "overlay=x:y" output_video.mp4
+    $diff = seconds_to_time_code($diff_target);
+    $cmd = "ffmpeg -i tmp2.mp4 -i \"$source_filename\" -ss 00:00:00 -to $diff -filter_complex \"overlay=0:0\" tmp4.mp4";
+    dlog($cmd);
+    exec($cmd);
+
+    // recombine
+    //   assemble with tmp1 + tmp4 + tmp3
+    // $cmd = ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1" -vsync vfr output.mp4
+    $cmd = "ffmpeg -i tmp1.mp4 -i tmp4.mp4 -i tmp3.mp4 -filter_complex \"[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1\" -vsync vfr \"$output\"";
+    dlog($cmd);
+    exec($cmd);
+
+    // remove tmp files
+    $cmd = "rm tmp1.mp4 tmp2.mp4 tmp3.mp4 tmp4.mp4";
+    dlog($cmd);
+    exec($cmd);
+
+    print "\nProcessing media...";
+    print " (" . (time() - $elapsed) . "s)";
+
   }
 
   // Get processed filename.
