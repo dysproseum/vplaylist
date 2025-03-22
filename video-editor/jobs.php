@@ -293,6 +293,35 @@ foreach ($queue as $link) {
 
   }
 
+  //---------------------------------------------------------------------------
+  // AUDIO DUB
+  // fn(source_audio, target_video) : target video
+  //---------------------------------------------------------------------------
+  elseif ($edit == "dub") {
+    dlog("Audio Dub");
+
+    $machine_name = $link['collection'];
+    $source = $link['player'];
+    $source_item = $collections[$machine_name]['items'][$source];
+    $source_filename = $source_item['filename'];
+
+    $target = $link['recorder'];
+    $target_item = $collections[$machine_name]['items'][$target];
+    $target_filename = $target_item['filename'];
+    $title = basename($target_filename, '.mp4');
+
+    dlog("Working title: $title");
+
+    // no need for timestamps
+    $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
+
+    // copy over with shortest
+    $cmd = "ffmpeg -i \"$source_filename\" -i \"$target_filename\" -c:v copy -c:a copy -map 0:a -map 1:v -shortest \"$output\"";
+    dlog($cmd);
+    exec($cmd);
+
+  }
+
   // Get processed filename.
   $after = glob($mp4_dir . "/*");
   $diff = array_diff($after, $before);
