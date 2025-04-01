@@ -47,10 +47,18 @@ foreach ($queue as $link) {
     continue;
   }
   $id = $link['id'];
+  // $project = $link['project'];
+  $project = '18fe23866ff04783cc274263373a24a8';
+  $result = preg_replace("/[^a-zA-Z0-9]+/", "", $project);
 
   // Process videos locally.
   $q->setStatus('processing', $id);
-  $mp4_dir = $video_editor_dir . "/mp4";
+  $mp4_dir = $video_editor_dir . "/projects/$project";
+  dlog($mp4_dir);
+  if (!is_dir($mp4_dir)) {
+    mkdir($mp4_dir);
+  }
+
   $before = glob($mp4_dir . "/*");
   $elapsed = time();
   chdir($video_editor_dir);
@@ -60,13 +68,14 @@ foreach ($queue as $link) {
 
   //---------------------------------------------------------------------------
   // CLIP EDIT
-  // fn(source_start, source_end) : target video
+  //
+  // Clip one video down into a smaller target video.
   //---------------------------------------------------------------------------
   if ($edit == "clip") {
 
     // Get details.
-    $machine_name = $link['collection'];
-    $source = $link['player'];
+    $machine_name = $link['player_collection'];
+    $source = $link['player_id'];
     $item = $collections[$machine_name]['items'][$source];
     $filename = $item['filename'];
     $title = basename($filename, '.mp4');
@@ -82,61 +91,27 @@ foreach ($queue as $link) {
     // $cmd = "ffmpeg -i input.mp4 -ss 5.5 -t 4.75 -c copy output.mp4";
     $cmd = "ffmpeg -ss $edit_start -to $edit_end -i \"$filename\" -c copy \"$output\"";
     dlog($cmd);
+    exec($cmd);
 
     print "\nProcessing media...";
 
-    // Follow command output for progress.
-    while (@ob_end_flush()); // end all output buffers if any
-    $proc = popen("$cmd 2>&1", 'r');
-    if (!$proc) {
-      dlog("Failed to open command for reading: $cmd");
-    }
-    else {
-      $speed = 0;
-      $seconds = 0;
-      while ($line = fgets($proc, 4096)) {
-        if (strstr($line, "speed=")) {
-          $speed = explode('=', $line)[1];
-          $speed = trim(str_replace('x', '', $speed));
-          if (strstr($speed, 'fps')) {
-            $speed = 0;
-          }
-        }
-        if (strstr($line, "out_time=")) {
-          $min_sec = explode('=', $line)[1];
-          $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
-        }
-        if ($speed != 0 && $seconds != 0) {
-          $result = $q->setProgress($seconds, $speed, $id);
-          if (!$result) {
-            dlog("Failed to setProgress $seconds $speed");
-            $q->setError("Failed to setProgress", $id);
-            exit;
-          }
-          $speed = 0;
-          $seconds = 0;
-        }
-        @flush();
-      }
-    }
-    // $q->setProgress($duration, "1", $id);
-    pclose($proc);
-    print " (" . (time() - $elapsed) . "s)";
   }
 
   //--------------------------------------------------------------------------
   // ASSEMBLE EDIT
-  // fn(source_video, target_video): target video
+  //
+  // Add the source video+audio onto the end of the target video.
   //---------------------------------------------------------------------------
   elseif ($edit == "assemble") {
 
-    $machine_name = $link['collection'];
-    $source = $link['player'];
-    $source_item = $collections[$machine_name]['items'][$source];
+    $machine_name1 = $link['player_collection'];
+    $source = $link['player_id'];
+    $source_item = $collections[$machine_name1]['items'][$source];
     $source_filename = $source_item['filename'];
 
-    $target = $link['recorder'];
-    $target_item = $collections[$machine_name]['items'][$target];
+    $machine_name2 = $link['recorder_collection'];
+    $target = $link['recorder_id'];
+    $target_item = $collections[$machine_name2]['items'][$target];
     $target_filename = $target_item['filename'];
     $title = basename($target_filename, '.mp4');
 
@@ -154,64 +129,30 @@ foreach ($queue as $link) {
     $cmd = "ffmpeg -i \"$target_filename\" -i \"$source_filename\" -filter_complex \"[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1\" -vsync vfr \"$output\"";
 
     dlog($cmd);
+    exec($cmd);
 
     print "\nProcessing media...";
 
-    // Follow command output for progress.
-    while (@ob_end_flush()); // end all output buffers if any
-    $proc = popen("$cmd 2>&1", 'r');
-    if (!$proc) {
-      dlog("Failed to open command for reading: $cmd");
-    }
-    else {
-      $speed = 0;
-      $seconds = 0;
-      while ($line = fgets($proc, 4096)) {
-        if (strstr($line, "speed=")) {
-          $speed = explode('=', $line)[1];
-          $speed = trim(str_replace('x', '', $speed));
-          if (strstr($speed, 'fps')) {
-            $speed = 0;
-          }
-        }
-        if (strstr($line, "out_time=")) {
-          $min_sec = explode('=', $line)[1];
-          $seconds = clock_time_to_seconds(substr($min_sec, 0, 8));
-        }
-        if ($speed != 0 && $seconds != 0) {
-          $result = $q->setProgress($seconds, $speed, $id);
-          if (!$result) {
-            dlog("Failed to setProgress $seconds $speed");
-            $q->setError("Failed to setProgress", $id);
-            exit;
-          }
-          $speed = 0;
-          $seconds = 0;
-        }
-        @flush();
-      }
-    }
-    // $q->setProgress($duration, "1", $id);
-    pclose($proc);
-    print " (" . (time() - $elapsed) . "s)";
   }
 
   //---------------------------------------------------------------------------
   // INSERT MODE
-  // fn(source_start, source_end, target_start) : target video
+  //
+  // Replace the audio or video track of marked target with marked source
   //---------------------------------------------------------------------------
   elseif ($edit == "insert") {
     $video_insert = isset($link['video-insert']) ? $link['video-insert'] : false;
     $audio_insert = isset($link['audio-insert']) ? $link['audio-insert'] : false;
     dlog("Insert Mode");
 
-    $machine_name = $link['collection'];
-    $source = $link['player'];
-    $source_item = $collections[$machine_name]['items'][$source];
+    $machine_name1 = $link['player_collection'];
+    $source = $link['player_id'];
+    $source_item = $collections[$machine_name1]['items'][$source];
     $source_filename = $source_item['filename'];
 
-    $target = $link['recorder'];
-    $target_item = $collections[$machine_name]['items'][$target];
+    $machine_name2 = $link['recorder_collection'];
+    $target = $link['recorder_id'];
+    $target_item = $collections[$machine_name2]['items'][$target];
     $target_filename = $target_item['filename'];
     $title = basename($target_filename, '.mp4');
 
@@ -228,6 +169,12 @@ foreach ($queue as $link) {
       dlog("Diff_target $diff_target");
       $end_seconds = time_code_to_seconds($source_start) + $diff_target;
       $source_end = seconds_to_time_code($end_seconds);
+    }
+    else if ($target_end == "") {
+      $diff_target = time_code_to_seconds($source_end) - time_code_to_seconds($source_start);
+      dlog("Diff_target $diff_target");
+      $end_seconds = time_code_to_seconds($target_start) + $diff_target;
+      $target_end = seconds_to_time_code($end_seconds);
     }
 
     $output = "$mp4_dir/$title " . date('Y-m-d_h.i.s') . '.mp4';
@@ -256,8 +203,13 @@ foreach ($queue as $link) {
       // @todo assemble edit?
     }
     elseif ($video_insert) {
-      $diff = seconds_to_time_code($diff_target);
-      $cmd = "ffmpeg -i tmp2.mp4 -i \"$source_filename\" -ss $source_start -to $source_end -filter_complex \"overlay=0:0\" tmp4.mp4";
+      // clip the source into tmp2a.mp4
+      $cmd = "ffmpeg -ss $source_start -to $source_end -i \"$source_filename\" -c:v libx264 -c:a aac tmp2a.mp4";
+      dlog($cmd);
+      exec($cmd);
+
+      // $cmd = "ffmpeg -i tmp2.mp4 -i \"$source_filename\" -ss $source_start -to $source_end -filter_complex \"overlay=0:0\" tmp4.mp4";
+      $cmd = "ffmpeg -i tmp2.mp4 -i tmp2a.mp4 -c:v libx264 -c:a aac -map 1:v -map 0:a -shortest tmp4.mp4";
       dlog($cmd);
       // @todo show progress on this command
       exec($cmd);
@@ -269,7 +221,8 @@ foreach ($queue as $link) {
       exec($cmd);
 
       // just do a video insert from tmp2.mp4 into tmp4.mp4
-      $cmd = "ffmpeg -i tmp2a.mp4 -i tmp2.mp4 -c:v copy -map 1:v -map 0:a tmp4.mp4";
+      // $cmd = "ffmpeg -i tmp2a.mp4 -i tmp2.mp4 -c:v copy -map 1:v -map 0:a tmp4.mp4";
+      $cmd = "ffmpeg -i tmp2a.mp4 -i tmp2.mp4 -c:v copy -c:a copy -map 1:v -map 0:a tmp4.mp4";
       dlog($cmd);
       exec($cmd);
     }
@@ -295,18 +248,20 @@ foreach ($queue as $link) {
 
   //---------------------------------------------------------------------------
   // AUDIO DUB
-  // fn(source_audio, target_video) : target video
+  //
+  // Replace the audio of target video with audio from source video
   //---------------------------------------------------------------------------
   elseif ($edit == "dub") {
     dlog("Audio Dub");
 
-    $machine_name = $link['collection'];
-    $source = $link['player'];
-    $source_item = $collections[$machine_name]['items'][$source];
+    $machine_name1 = $link['player_collection'];
+    $source = $link['player_id'];
+    $source_item = $collections[$machine_name1]['items'][$source];
     $source_filename = $source_item['filename'];
 
-    $target = $link['recorder'];
-    $target_item = $collections[$machine_name]['items'][$target];
+    $machine_name2 = $link['recorder_collection'];
+    $target = $link['recorder_id'];
+    $target_item = $collections[$machine_name2]['items'][$target];
     $target_filename = $target_item['filename'];
     $title = basename($target_filename, '.mp4');
 
@@ -338,23 +293,12 @@ foreach ($queue as $link) {
     exit;
   }
 
-  // Verify import collection exists.
-  $machine_name = $link['collection'];
+  $machine_name = 'video_editor';
   $import_dir = $conf['video_dir'] . '/' . $machine_name;
-  if (!is_dir($import_dir)) {
-    chdir($htmlpath);
-    $cmd = 'php update.php create "' . $machine_name . '"';
-    vcmd($cmd);
-  }
-
-  // Move converted files to data directory.
-  chdir($video_editor_dir);
-  $cmd = "mv mp4/* $import_dir/";
+  // Move converted files to data directory?
+  chdir($mp4_dir);
+  $cmd = "mv * $import_dir/";
   vcmd($cmd);
-
-  // Move downloads into originals folder or they get regenerated.
-  //$cmd = "mv download/* originals/";
-  //vcmd($cmd);
 
   // 5. Refresh.
   $q->setStatus('refreshing', $id);
