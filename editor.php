@@ -7,15 +7,13 @@ if (!isset($collections)) {
 	exit;
 }
 
-if (isset($_REQUEST['collection'])) {
-	$machine_name = $_REQUEST['collection'];
-}
-else {
-	$machine_name = '';
-}
+// get player and recorder video id's
+$player_id = isset($_REQUEST['player_id']) ? $_REQUEST['player_id'] : null;
+$player_collection = isset($_REQUEST['player_collection']) ? $_REQUEST['player_collection'] : null;
+$recorder_id = isset($_REQUEST['recorder_id']) ? $_REQUEST['recorder_id'] : null;
+$recorder_collection = isset($_REQUEST['recorder_collection']) ? $_REQUEST['recorder_collection'] : null;
 
-$player = isset($_REQUEST['player']) ? $_REQUEST['player'] : null;
-$recorder = isset($_REQUEST['recorder']) ? $_REQUEST['recorder'] : null;
+// also set mark out's?
 
 // read edit jobs file.
 $path = $conf['json_editor'];
@@ -24,7 +22,9 @@ $jobs = json_decode($json, true);
 
 // check for new edit posted.
 if (isset($_REQUEST['edit'])) {
+  // @todo we only need id, collection, mark in/out from each player
   $new = $_REQUEST;
+
   $new['timestamp'] = time();
   $new['status'] = 'new';
   $jobs[] = $new;
@@ -32,21 +32,17 @@ if (isset($_REQUEST['edit'])) {
   file_put_contents($path, $out);
   chmod($path, 0777);
 
-  // can we unset these or just redirect?
-  foreach ($_REQUEST as $key => $value) {
-      unset($_REQUEST[$key]);
-  }
-
   header('Location: /vplaylist/editor.php?' . $_SERVER['QUERY_STRING']);
   exit;
 }
 
-
+// prepopulate player and/or recorder.
 $indexes = ['player', 'recorder'];
 $items = [];
 foreach ($indexes as $index) {
-  if (isset($_REQUEST[$index]) && $machine_name != '') {
-	$id = $_REQUEST[$index];
+  if (isset($_GET[$index . '_id']) && isset($_GET[$index . '_collection'])) {
+	$id = $_GET[$index . '_id'];
+	$machine_name = $_GET[$index . '_collection'];
 	if (!isset($collections[$machine_name]['items'][$id])) {
 		$items[$id] = false;
 		header("HTTP/1.0 404 Not Found");
@@ -54,6 +50,7 @@ foreach ($indexes as $index) {
 	else {
 	  $items[$index] = [
 		'id' => $id,
+                'machine_name' => $machine_name,
 		'item' => $collections[$machine_name]['items'][$id],
 	  ];
 	}
@@ -78,29 +75,61 @@ foreach ($indexes as $index) {
 	    <input type="text" maxlength="64" name="q" placeholder="search" />
 	</form>
   </div>
+
   <div class="subnav">
-    Video Editor
+    <h2>Video Editor</h2>
+    <div class="subnav-right-side">
+      <h4><a href="download.php">Import Status</a></h4>
+    </div>
   </div>
 
-  <form action="/vplaylist/editor.php?<?php print $_SERVER['QUERY_STRING']; ?>" method="post">
+  <form id="video-editor-form" action="/vplaylist/editor.php?<?php print $_SERVER['QUERY_STRING']; ?>" method="post">
+
+  <input type="text" placeholder="Working title" name="working_title"/>
+  <input type="hidden" name="project_id" value="<?php print $project; ?>" />
+  <input type="hidden" id="player_id" name="player_id" value="<?php print $player_id; ?>" />
+  <input type="hidden" id="player_collection" name="player_collection" value="<?php print $player_collection; ?>" />
+  <input type="hidden" id="recorder_id" name="recorder_id" value="<?php print $recorder_id; ?>" />
+  <input type="hidden" id="recorder_collection" name="recorder_collection" value="<?php print $recorder_collection; ?>" />
+
   <div class="video-editor">
     <?php foreach ($indexes as $index): ?>
       <div class="player <?php print $index; ?>">
-        <h2><?php print $index; ?></h2>
+
+        <h2 title="<?php print basename($items[$index]['item']['filename'], '.mp4'); ?>"><?php print $index; ?></h2>
+	<div class="video-select">
+          <!-- load video controls -->
+          <select name="collection" class="load-collection" data-player="<?php print $index; ?>">
+            <option>-- Select --</option>
+            <?php foreach ($collections as $machine_name => $c): ?>
+              <option value="<?php print $machine_name; ?>" <?php if ($machine_name == $items[$index]['machine_name']) print 'selected="selected"'; ?>><?php print $c['name']; ?></option>
+            <?php endforeach; ?>
+          </select>
+          <?php foreach ($collections as $machine_name => $c): ?>
+            <select class="load-item" id="<?php print $index; ?>-collection-<?php print $machine_name; ?>" data-player="<?php print $index; ?>" <?php if ($machine_name != $items[$index]['machine_name']) print 'style="display: none;"'; ?>>
+            <option>-- Select --</option>
+            <?php foreach ($c['items'] as $id => $item): ?>
+              <option value="<?php print $id; ?>" <?php if ($machine_name == $items[$index]['machine_name'] && $id == $items[$index]['id']) print 'selected="selected"'; ?>><?php print $item['title']; ?> (<?php print seconds_to_clock_time($item['duration']); ?>)</option>
+            <?php endforeach; ?>
+            </select>
+          <?php endforeach; ?>
+          <!-- load video controls -->
+	</div>
+
         <div class="player-<?php print $index; ?>">
 	  <video controls id="<?php print $index; ?>">
-            <source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $items[$index]['id']; ?>&file=.mp4" type="video/mp4" />
+            <source src="serve.php?collection=<?php print $items[$index]['machine_name']; ?>&index=<?php print $items[$index]['id']; ?>&file=.mp4" type="video/mp4" />
 	  </video>
+          <canvas id="canvas-<?php print $index; ?>" style="display: none;"></canvas>
         </div>
 
-	<span id="vid_title" class="label">
-		<?php print basename($items[$index]['item']['filename'], '.mp4'); ?>
+	<span id="vid_marks" class="label">
+		<button type="button" id="<?php print $index; ?>-mark-in">Mark In</button>
+		<input type="text" id="<?php print $index; ?>-mark-in-value" name="<?php print $index; ?>-mark-in-value" />
+		<span id="<?php print $index; ?>-time-counter">00:00:00.00</span>
+		<button type="button" id="<?php print $index; ?>-mark-out">Mark Out</button>
+		<input type="text" id="<?php print $index; ?>-mark-out-value" name="<?php print $index; ?>-mark-out-value" />
 	</span>
-	<button type="button" id="<?php print $index; ?>-mark-in">Mark In</button>
-	<input type="text" id="<?php print $index; ?>-mark-in-value" name="<?php print $index; ?>-mark-in-value" />
-
-	<button type="button" id="<?php print $index; ?>-mark-out">Mark Out</button>
-	<input type="text" id="<?php print $index; ?>-mark-out-value" name="<?php print $index; ?>-mark-out-value" />
       </div>
     <?php endforeach; ?>
   </div>
@@ -123,7 +152,7 @@ foreach ($indexes as $index) {
     <input type="radio" name="edit" id="edit-clip" value="clip" />
     <label for="edit-clip">Video Clip</label>
     <input type="radio" name="edit" id="edit-dub" value="dub" />
-    <label for="edit-clip">Audio Dub</label>
+    <label for="edit-dub">Audio Dub</label>
 
   </div>
   </form>
@@ -136,7 +165,7 @@ foreach ($indexes as $index) {
           Edit action: <?php print $job['edit']; ?>
           Status: <?php print $job['status']; ?>
           <?php if ($job['status'] == 'completed'): ?>
-            <a href="/vplaylist/index.php?collection=<?php print $job['collection']; ?>&index=<?php print $job['index']; ?>" title="<?php print $job['title']; ?>">Watch Now</a>
+            <a href="<?php print $job['target']; ?>" title="<?php print $job['title']; ?>">Watch Now</a>
             <a href="/vplaylist/editor.php?collection=<?php print $job['collection']; ?>&player=<?php print $job['index']; ?>&recorder=<?php print $recorder; ?>">Load player</a>
             <a href="/vplaylist/editor.php?collection=<?php print $job['collection']; ?>&player=<?php print $player; ?>&recorder=<?php print $job['index']; ?>">Load recorder</a>
           <?php endif; ?>

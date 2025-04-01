@@ -4,6 +4,16 @@
          url('vcr_osd_mono.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
 }
 
+@font-face {
+    font-family: 'gorton-plotter';
+    src: url('gothamrnd_medium.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'engineering-plot';
+    src: url('engineering-plot.ttf') format('truetype');
+}
+
 body {
 	background: url(stars.jpg) repeat;
 	background-position: center;
@@ -105,7 +115,7 @@ body.nocontrols {
 	min-height: 360px;
 }
 
-.player video {
+.player video, .player canvas {
 	display: inherit;
 	margin: 0 auto;
 	margin-top: 20px;
@@ -113,6 +123,7 @@ body.nocontrols {
 	border-radius: 8px;
 	box-shadow: 0 0 20px 10px black;
 	opacity: 1 !important;
+	width: 85%;
 }
 
 .player video::-internal-media-controls-overlay-cast-button {
@@ -948,6 +959,10 @@ h1 {
 }
 
 /* Video Editor */
+.video-editor {
+  margin: 20px;
+}
+
 .editor div {
   box-sizing: border-box;
   float: left;
@@ -955,14 +970,22 @@ h1 {
 
 .video-editor .player {
   width: 48%;
-  border: 1px solid gray;
+  border-bottom: 2px solid #333333;
   background: gray;
-  margin: 10px 0px 10px 10px;
+}
+
+.video-editor .recorder {
+  float: right;
 }
 
 .video-editor .player h2 {
-  width: 100%;
   text-align: center;
+}
+
+.video-editor .video-select {
+  float: right;
+  padding-right: 12px;
+  padding-top: 5px;
 }
 
 .video-editor .player-player, .video-editor .player-recorder {
@@ -970,11 +993,18 @@ h1 {
   width: 100%;
   min-height: 360px;
   background: black;
+  border-left: 4px solid gray;
+  border-right: 4px solid gray;
+  padding-bottom: 20px;
 }
 
-.video-editor .player video {
-  border: 1px solid #333333;
-  width: 85%;
+.video-editor select.load-item {
+  width: 200px;
+}
+
+.video-editor #vid_marks input[type=text] {
+  width: 88px;
+  padding: 4px;
 }
 
 .editor .control-panel {
