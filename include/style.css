@@ -4,16 +4,6 @@
          url('vcr_osd_mono.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
 }
 
-@font-face {
-    font-family: 'gorton-plotter';
-    src: url('gothamrnd_medium.otf') format('opentype');
-}
-
-@font-face {
-    font-family: 'engineering-plot';
-    src: url('engineering-plot.ttf') format('truetype');
-}
-
 body {
 	background: url(stars.jpg) repeat;
 	background-position: center;
@@ -996,6 +986,10 @@ h1 {
   border-left: 4px solid gray;
   border-right: 4px solid gray;
   padding-bottom: 20px;
+}
+
+.video-editor .player video, .video-editor .player canvas {
+  max-height: 306px;
 }
 
 .video-editor select.load-item {
