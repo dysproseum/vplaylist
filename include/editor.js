@@ -91,6 +91,93 @@ window.addEventListener("load", function() {
     recorderMarkOutValue.value = secondsToTimeCode(recorder.currentTime);
   });
 
+  // Knobs.
+  var knobPlayerSpeed = document.getElementById("player-speed");
+  var playerJogInterval;
+  knobPlayerSpeed.addEventListener("input", function(e) {
+    clearInterval(playerJogInterval);
+    if (this.value >= 0.07) {
+      player.playbackRate = this.value;
+      player.play();
+    }
+    else if (this.value <= 0) {
+      // setInterval
+      player.pause();
+      player.currentTime += parseFloat(e.target.value);
+      playerTimeCounter.innerHTML = secondsToTimeCode(player.currentTime);
+
+      var exact = player.currentTime;
+      var whole = Math.floor(exact);
+      var diff = exact - whole;
+      var degrees = diff * 360;
+      playerJog.style.transform = "rotate(" + degrees + "deg)";
+
+      playerJogInterval = setInterval(function() {
+        player.currentTime += parseFloat(e.target.value);
+        playerTimeCounter.innerHTML = secondsToTimeCode(player.currentTime);
+
+        var exact = player.currentTime;
+        var whole = Math.floor(exact);
+        var diff = exact - whole;
+        var degrees = diff * 360;
+        playerJog.style.transform = "rotate(" + degrees + "deg)";
+      }, 1000);
+    }
+  });
+
+  knobPlayerSpeed.addEventListener("click", function(e) {
+    console.log("click can switch to jog");
+  });
+
+  var knobPlayerJog = document.getElementById("player-jog");
+  knobPlayerJog.addEventListener("input", function() {
+    player.playbackRate = this.value;
+    playerJog.style.transform = "rotate(" + this.value + "deg)";
+  });
+
+  var knobRecorderSpeed = document.getElementById("recorder-speed");
+  var recorderJogInterval;
+  knobRecorderSpeed.addEventListener("input", function(e) {
+    clearInterval(recorderJogInterval);
+    if (this.value >= 0.07) {
+      recorder.playbackRate = this.value;
+      recorder.play();
+    }
+    else if (this.value <= 0) {
+      // setInterval
+      recorder.pause();
+      recorder.currentTime += parseFloat(e.target.value);
+      recorderTimeCounter.innerHTML = secondsToTimeCode(recorder.currentTime);
+
+      var exact = recorder.currentTime;
+      var whole = Math.floor(exact);
+      var diff = exact - whole;
+      var degrees = diff * 360;
+      recorderJog.style.transform = "rotate(" + degrees + "deg)";
+
+      recorderJogInterval = setInterval(function() {
+        recorder.currentTime += parseFloat(e.target.value);
+        recorderTimeCounter.innerHTML = secondsToTimeCode(recorder.currentTime);
+
+        var exact = recorder.currentTime;
+        var whole = Math.floor(exact);
+        var diff = exact - whole;
+        var degrees = diff * 360;
+        recorderJog.style.transform = "rotate(" + degrees + "deg)";
+      }, 1000);
+    }
+  });
+
+  knobRecorderSpeed.addEventListener("click", function(e) {
+    console.log("click can switch to jog");
+  });
+
+  var knobRecorderJog = document.getElementById("recorder-jog");
+  knobRecorderJog.addEventListener("input", function() {
+    recorder.playbackRate = this.value;
+    recorderJog.style.transform = "rotate(" + this.value + "deg)";
+  });
+
   var playerTimeCounter = document.getElementById("player-time-counter");
   var recorderTimeCounter = document.getElementById("recorder-time-counter");
 
@@ -209,13 +296,16 @@ window.addEventListener("load", function() {
     recorder.style.display = null;
     recorder.muted = false;
 
+    knobPlayerSpeed.value = 0;
   };
 
   var btnPreview = document.getElementById("preview");
+  canvas = document.getElementById("canvas-recorder");
   btnPreview.addEventListener("click", function() {
     previewing = true;
     btnPreview.disabled = true;
 
+    player.playbackRate = 1;
     player.muted = true;
     recorder.muted = false;
     player.style.filter = "brightness(0)";
@@ -237,7 +327,6 @@ window.addEventListener("load", function() {
 
       // set up preview canvas
       // https://stackoverflow.com/questions/24496605/how-can-i-show-the-same-html-5-video-twice-on-a-website-without-loading-it-twice
-      canvas = document.getElementById("canvas-recorder");
       context = canvas.getContext('2d');
       canvas.width = recorder.offsetWidth;
       canvas.height = recorder.offsetHeight;
@@ -272,12 +361,20 @@ window.addEventListener("load", function() {
 
   // timeupdate fires every ~200ms so add interval for faster time updates
   var playInterval;
+  var playerJog = document.querySelector(".player-jog-wrap");
   player.addEventListener("play", function() {
     if (previewing == true) {
       return;
     }
     playInterval = setInterval(function() {
       playerTimeCounter.innerHTML = secondsToTimeCode(player.currentTime);
+
+      var exact = player.currentTime;
+      var whole = Math.floor(exact);
+      var diff = exact - whole;
+      var degrees = diff * 360;
+      //console.log(exact + " - " + whole + " = " + diff + " : " + degrees);
+      playerJog.style.transform = "rotate(" + degrees + "deg)";
     }, 20);
   });
 
@@ -286,12 +383,20 @@ window.addEventListener("load", function() {
   });
 
   var recInterval;
+  var recorderJog = document.querySelector(".recorder-jog-wrap");
   recorder.addEventListener("play", function() {
     if (previewing == true) {
       return;
     }
     recInterval = setInterval(function() {
       recorderTimeCounter.innerHTML = secondsToTimeCode(recorder.currentTime);
+
+      var exact = recorder.currentTime;
+      var whole = Math.floor(exact);
+      var diff = exact - whole;
+      var degrees = diff * 360;
+      //console.log(exact + " - " + whole + " = " + diff + " : " + degrees);
+      recorderJog.style.transform = "rotate(" + degrees + "deg)";
     }, 20);
   });
 

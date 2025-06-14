@@ -64,6 +64,7 @@ foreach ($indexes as $index) {
 <link rel="stylesheet" href="include/style.css">
 <script type="text/javascript" src="include/util.js"></script>
 <script type="text/javascript" src="include/editor.js"></script>
+<script type="text/javascript" src="https://g200kg.github.io/input-knobs/input-knobs.js"></script>
 <title>vplaylist | video editor</title>
 </head>
 
@@ -129,6 +130,20 @@ foreach ($indexes as $index) {
 		<span id="<?php print $index; ?>-time-counter">00:00:00.00</span>
 		<button type="button" id="<?php print $index; ?>-mark-out">Mark Out</button>
 		<input type="text" id="<?php print $index; ?>-mark-out-value" name="<?php print $index; ?>-mark-out-value" />
+
+		 <input id="<?php print $index; ?>-speed" type="range" class="input-knob" data-src="https://raw.githubusercontent.com/g200kg/input-knobs/refs/heads/master/images/knob70.png" data-sprites="100" min="-2" max="2" step="0.01" />
+
+		<div class="<?php print $index; ?>-jog-wrap" style="width: 32px; height: 32px;">
+		  <!--?xml version="1.0" encoding="UTF-8"?-->
+		  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+		    <symbol id="circle-with-dot" viewBox="-6 -6 12 12">
+		      <circle cx="0" cy="0" r="5.875" stroke="#2e3436" fill="#babdb6" stroke-width="0.25"></circle>
+		      <circle cx="0" cy="-3.75" r="0.75" stroke="none" fill="#2e3436"></circle>
+		    </symbol>
+		    <use xlink:href="#circle-with-dot" x="0" y="0" fill="red"></use>
+		  </svg>
+		  <input type="range" id="<?php print $index; ?>-jog" style="display: none"/>
+		</div>
 	</span>
       </div>
     <?php endforeach; ?>

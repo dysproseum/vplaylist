@@ -531,8 +531,9 @@ window.onload = function(){
 	range.addEventListener("mouseup", function() {
 		seeking = false;
 	});
-	range.addEventListener("change", function(e) {
+	range.addEventListener("input", function(e) {
 		player.currentTime = this.value;
+		counter.innerHTML = secondsToClockTime(this.value);
 	});
 
 	var backlight = document.getElementById("player-backlight");
