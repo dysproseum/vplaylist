@@ -18,6 +18,12 @@ $p = $video_editor_dir . "/links.json";
 // Rsync optional, ex. files stored on a NAS.
 $rsync_target = STORE_HOSTNAME . ':' . STORE_TARGET;
 
+// Define commands.
+$ytdlp = 'yt-dlp';
+if (isset($conf['cookies'])) {
+  $ytdlp .= ' --cookies ' . $conf['cookies'];
+}
+
 // 1. Check pending requests.
 $queue = [];
 $q = new Queue($p);
@@ -52,14 +58,14 @@ foreach ($queue as $link) {
   print "\n  [Slot $id] " . $link['url'];
 
   // Get duration.
-  $cmd = "yt-dlp --get-duration " . $link['url'];
+  $cmd = "$ytdlp --get-duration " . $link['url'];
   $min_sec = exec($cmd);
   $q->setDisplayDuration($min_sec, $id);
   $duration = clock_time_to_seconds($min_sec);
   print "\n  Duration: $duration seconds";
 
   // Get title.
-  $cmd = "yt-dlp --get-title " . $link['url'];
+  $cmd = "$ytdlp --get-title " . $link['url'];
   $title = exec($cmd);
   print "\n  $title";
 
@@ -83,7 +89,7 @@ foreach ($queue as $link) {
   $elapsed = time();
   // Do we need to use cleaned up title?
   // $cmd = "yt-dlp --progress --newline -o \"$title.%(ext)s\" " . $link['url'];
-  $cmd = "yt-dlp --progress --newline " . $link['url'];
+  $cmd = "$ytdlp --progress --newline " . $link['url'];
 
   print "\nDownloading...";
   $q->setStatus('downloading', $id);
