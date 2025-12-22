@@ -28,3 +28,8 @@ $conf['external_media'] = false;
 $conf['media_hostname'] = 'user@example.com';
 $conf['store_hostname'] = 'user@example.com';
 $conf['store_target'] = '/var/www/vplaylist';
+
+// Optional: Tab-delimited cookie file.
+# Netscape HTTP Cookie File
+# host	subdomain	path	secure	expires	name	value
+// $conf['cookies'] = '/var/www/cookies.txt';
