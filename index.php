@@ -126,6 +126,9 @@ require_once 'include/header.php';
 	<div class="listing">
 	<?php foreach ($collections as $collection => $values): ?>
 		<?php
+			if (isset($values['private'])) {
+				continue;
+			}
 			$total = sizeof($values['items']);
 			$index = rand(0, $total - 1);
 			$thumbnail = 'serve.php?collection=' . $collection . '&index=' . $index . '&file=.jpg';
