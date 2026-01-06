@@ -291,7 +291,11 @@ window.onload = function(){
 		if (pause.classList.contains("pressed")) {
 			return false;
 		}
-		window.location.href="video-editor/index.php";
+
+		var urlParams = new URLSearchParams(window.location.search);
+		var index = urlParams.get('index');
+		var collection = urlParams.get('collection');
+		window.location.href="editor.php?player_collection=" + collection + "&player_id=" + index;
 	});
 
 	play.addEventListener("mousedown", function() {
