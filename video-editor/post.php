@@ -42,9 +42,12 @@ error_log($playlist);
     if (!$video_id) {
       continue;
     }
-    error_log("Found $video_id");
     // Make a request to this page?
-    $self = $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
+    $self = 'https://' .
+      $_SERVER['SERVER_NAME'] .
+      ':' . $_SERVER['SERVER_PORT'] .
+      $_SERVER['PHP_SELF'];
+    error_log("Found $video_id, requesting $self");
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $self);
@@ -55,6 +58,12 @@ error_log($playlist);
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $server_output = curl_exec($ch);
+    if ($server_output === FALSE) {
+      error_log(curl_error($ch));
+    }
+    else {
+      error_log("curl success");
+    }
     curl_close($ch);
   }
 
@@ -64,6 +73,7 @@ error_log($playlist);
 }
 
 // Check for existing links.
+// @todo use link queue?
 if (file_exists($p)) {
   $links = json_decode(file_get_contents($p), true);
 }
