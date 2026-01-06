@@ -17,6 +17,7 @@ $item = $collections[$machine_name]['items'][$index];
 if (isset($_REQUEST['file']) && $_REQUEST['file'] == '.jpg') {
   $filepath = $item['thumbnail'];
   if (!file_exists($filepath)) {
+    error_log("file not exists: $filepath");
     $filepath = dirname(__FILE__) . "/include/videotape.png";
   }
   $filesize = filesize($filepath);
