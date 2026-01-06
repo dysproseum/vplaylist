@@ -109,7 +109,7 @@ function loadPing(url) {
               break;
             case 'completed':
               width = 100;
-              var total = link.time_completed - link.timestamp;
+              var total = link.time_completed - link.time_downloading;
               output = humanReadableTime(total) + " total";
           }
 
