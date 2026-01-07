@@ -101,3 +101,9 @@ $ php generate.php new_vids
 4. Listing screen
 - with search functionality
 5. Playing screen
+
+## Requirements
+
+1. Keyboard input must bubble to the video
+
+2. Time progress must be shown without user input, without blocking the video
