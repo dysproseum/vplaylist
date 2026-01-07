@@ -31,7 +31,6 @@ if (!$q) {
   dlog("Failed to instantiate new Queue");
   exit;
 }
-$q->pruneCompleted();
 
 // 2. If job in progress, indicate progress in log file.
 $links = $q->getActiveLinks();
@@ -39,6 +38,9 @@ if (!empty($links)) {
   print ".";
   exit;
 }
+
+// Only prune when no active jobs.
+$q->pruneCompleted();
 
 // Nothing to do.
 $queue = $q->queueLink();
