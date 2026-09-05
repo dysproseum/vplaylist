@@ -6,7 +6,9 @@ global $conf;
 $config['debug'] = 0;
 
 // Unmuting failed and the element was paused instead because the user didn't interact with the document before. https://goo.gl/xX8pDD
-$conf['start_muted'] = true;
+//   false: don't autostart videos.
+//   true: autostart but mute videos.
+$conf['start_muted'] = false;
 
 // Path to directory containing video files.
 $conf['video_dir'] = '/var/www/html/vplaylist';

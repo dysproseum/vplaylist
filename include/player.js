@@ -127,12 +127,15 @@ videoPlayingListener = function() {
 	// Set persistent volume if cookie exists.
 	var volume = getCookie("volume");
 	player.volume = volume;
+	console.log({volume});
 	var muted = getCookie("muted");
-	if (muted == 1) {
+	console.log({muted});
+	if (muted == "1") {
 		player.muted = true;
 	}
 	else {
-		player.muted = false;
+		// We can't unmute the player before user interacts.
+		// player.muted = false;
 	}
 	var play = document.querySelector("#player-play");
 	play.classList.add("pressed");
@@ -141,83 +144,95 @@ videoPlayingListener = function() {
 	player.playbackRate = vidspeed.value;
 };
 
+timeUpdateListener = function() {
+	// Support input[type=range]
+	if (!seeking) {
+		range.value = player.currentTime;
+		range.max = player.duration;
+	}
+
+	var height = '';
+	if (vidHeight != 0) {
+		height = vidHeight + "p";
+	}
+
+	if (player.getVideoPlaybackQuality) {
+		var q = player.getVideoPlaybackQuality();
+		var dropped = q.droppedVideoFrames;
+		var total = q.totalVideoFrames;
+		var pcnt = 0;
+		if (total > 0) {
+			pcnt = (dropped / total * 100).toFixed(2);
+		}
+		var frames = framerate;
+		if (!Number.isInteger(framerate)) {
+			frames = frames.toFixed(2);
+		}
+		frames += "fps";
+	}
+
+	state.hidden = false;
+	state.innerHTML = frames + " " + height + " " + pcnt + "%"; // +  dropped + "/" + total;
+
+	counter.innerHTML = secondsToClockTime(player.currentTime);
+};
+
 addListener = function() {
 	player = document.querySelector('video');
 	state = document.getElementById("player-status");
 	counter = document.getElementById("player-time");
-
 	if (player) {
-		player.addEventListener('playing', videoPlayingListener);
-		player.addEventListener('ended', videoEndedListener);
-		player.addEventListener('volumechange', videoVolumeListener);
+		console.log("got player");
+		if (player.duration) {
+			console.log("player duration: " + player.duration);
 
-		addListenerMulti(player, events, function(e) {
-			if (e.type == 'timeupdate') {
-				// Support input[type=range]
-				if (!seeking) {
-				  range.value = player.currentTime;
-				  range.max = player.duration;
-				}
+			// Safe to add listeners.
+			player.addEventListener('playing', videoPlayingListener);
+			player.addEventListener('ended', videoEndedListener);
+			player.addEventListener('volumechange', videoVolumeListener);
+			player.addEventListener('timeupdate', timeUpdateListener);
 
-				var q = player.getVideoPlaybackQuality();
-				var dropped = q.droppedVideoFrames;
-				var total = q.totalVideoFrames;
-				var pcnt = 0;
-				if (total > 0) {
-				  pcnt = (dropped / total * 100).toFixed(2);
-				}
-				var frames = framerate;
-				if (!Number.isInteger(framerate)) {
-					frames = frames.toFixed(2);
-				}
-				frames += "fps";
-
-				var height = '';
-				if (vidHeight != 0) {
-				  height = vidHeight + "p";
-				}
-
-				state.hidden = false;
-				state.innerHTML = frames + " " + height + " " + pcnt + "%"; // +  dropped + "/" + total;
-
-				counter.innerHTML = secondsToClockTime(player.currentTime);
-			}
-			else {
-				if (debug) {
+			if (debug) {
+				addListenerMulti(player, events, function(e) {
 					console.log(e.type);
-				}
 
-                                var y = document.createElement('span');
-                                //y.innerHTML = " " + e.type;
-				state.append(y);
+	                                var y = document.createElement('span');
+	                                //y.innerHTML = " " + e.type;
+					state.append(y);
 
-                                setTimeout(function() {
-				  //x.hidden = true;
-                                  //state.removeChild(y);
-				}, 2500);
-
+	                                setTimeout(function() {
+					  //x.hidden = true;
+	                                  //state.removeChild(y);
+					}, 2500);
+				});
 			}
-		});
 
-		return true;
+			return true;
+		}
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 function waitForVideo() {
+	console.log('waitForVideo');
 	var result = addListener();
-	InitPanner();
+	// happens before video is loaded
 	if (!result) {
 		setTimeout(function() {
 			waitForVideo();
-		}, 5000);
+		}, 1000);
+	}
+	else {
+		// only works if user has already interacted with document
+		// will have to start muted and init on first click?
+		// InitPanner();
 	}
 }
 
 function InitPanner() {
 	if (context) {
+		console.log("no context");
 	  return;
 	}
 	// for cross browser
@@ -260,6 +275,13 @@ window.onload = function(){
 	}
 	mute_button.onclick = function(obj) {
 		var video = document.querySelector("video");
+
+		// Set persistent volume if cookie exists.
+		var volume = getCookie("volume");
+		player.volume = volume;
+		console.log({volume});
+		InitPanner();
+
 		video.muted = obj.srcElement.checked ? true : false;
 	};
 
@@ -299,8 +321,13 @@ window.onload = function(){
 	});
 
 	play.addEventListener("mousedown", function() {
+		// works but how to account for autoplay?
+		InitPanner();
+
 		this.classList.add("pressed");
 		if (!pause.classList.contains("pressed")) {
+			// We can't unmute the player before user interacts.
+			// player.muted = false;
 			player.play();
 		}
 		prev.classList.remove("pressed");
