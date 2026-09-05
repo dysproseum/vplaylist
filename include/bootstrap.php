@@ -139,10 +139,10 @@ function get_video_width($filename) {
 }
 
 function seconds_to_clock_time($seconds) {
-  $secs = $seconds % 60;
-  $hrs = $seconds / 60;
-  $mins = $hrs % 60;
-  $hrs = $hrs / 60;
+  $secs = intval($seconds) % 60;
+  $hrs = intval($seconds) / 60;
+  $mins = intval($hrs) % 60;
+  $hrs = intval($hrs) / 60;
 
   return sprintf("%02d:%02d:%02d", $hrs, $mins, $secs);
 }
