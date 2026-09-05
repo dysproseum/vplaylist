@@ -51,18 +51,23 @@ $filepath = $item['filename'];
 $filesize = filesize($filepath);
 $filename = basename($filepath);
 
-// Prepare to serve video.
-$offset = 0;
-$length = $filesize;
-$buffer_size = 1024 * 1024;
-if (isset($conf['buffer_size'])) {
-  $buffer_size = $conf['buffer_size'];
+if (!file_exists($filepath)) {
+  header('HTTP/1.1 404 Not found');
+  exit;
 }
 
 $fp = fopen($filepath, "rb");
 if (!$fp) {
   header('HTTP/1.1 404 Not found');
   exit;
+}
+
+// Prepare to serve video.
+$offset = 0;
+$length = $filesize;
+$buffer_size = 1024 * 1024;
+if (isset($conf['buffer_size'])) {
+  $buffer_size = $conf['buffer_size'];
 }
 
 // Allow seeking.

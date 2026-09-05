@@ -665,6 +665,7 @@ form#imports .icon .thumb:hover {
   width:100%;
   max-width:100%;
   border-radius:4px;
+  background: white;
 }
 
 .progress-bar span {

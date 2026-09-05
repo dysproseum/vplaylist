@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 // We know this should be the parent directory.

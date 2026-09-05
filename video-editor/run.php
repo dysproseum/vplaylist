@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 // We know this should be the parent directory.
@@ -198,6 +199,7 @@ foreach ($queue as $link) {
     $speed = 0;
     $seconds = 0;
     while ($line = fgets($proc, 4096)) {
+      if (DEBUG == 2) print($line);
       if (strstr($line, "speed=")) {
         $speed = explode('=', $line)[1];
         $speed = trim(str_replace('x', '', $speed));
