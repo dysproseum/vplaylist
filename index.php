@@ -26,8 +26,10 @@ $vid_player_id = '';
 $loop = '';
 $shuffle = false;
 $repeat = '';
-if ($conf['start_muted']) {
+$vid_autoplay = '';
+if ($conf['start_muted'] === true) {
 	$muted = 'muted';
+	$vid_autoplay = 'autoplay';
 }
 else {
 	$muted = '';
@@ -96,7 +98,7 @@ require_once 'include/header.php';
 
 <?php if ($vid_player): ?>
 	<div class="player">
-	<video autoplay <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> height="360" id="<?php print $vid_player_id; ?>">
+	<video <?php print $vid_autoplay; ?> <?php print $controls; ?> <?php print $muted; ?> <?php print $loop; ?> height="360" id="<?php print $vid_player_id; ?>">
 		<?php if (is_mobile()): ?>
 			<source src="serve.php?collection=<?php print $machine_name; ?>&index=<?php print $index; ?>&file=.mp4" type="video/mp4" />
 		<?php else: ?>
@@ -183,7 +185,7 @@ require_once 'include/header.php';
 			<a id="player-rec"><i class="fa-sharp fa-solid fa-circle"></i></a>
 		  </div>
 		  <div class="button">
-			<a id="player-play"><i class="fa-sharp fa-solid fa-play"></i></a>
+		  <a id="player-play" <?php if ($vid_autoplay) print 'class="pressed"'; ?>><i class="fa-sharp fa-solid fa-play"></i></a>
 		  </div>
 		  <div class="button">
 			<a id="player-stop"><i class="fa-sharp fa-solid fa-stop"></i></a>
@@ -302,7 +304,7 @@ require_once 'include/header.php';
 
 		<div class="thumbnail">
 		<a class="vid-link" data-id="<?php print $index; ?>" href="<?php print $vid_link; ?>">
-			<img src="<?php print $thumbnail; ?>" width="320" />
+			<img loading="lazy" src="<?php print $thumbnail; ?>" width="320" />
 		</a>
 		<a class="label label-top" href="<?php print $vid_link; ?>">
 			<?php print human_filesize($item['size']); ?>

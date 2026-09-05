@@ -13,6 +13,9 @@ function loadDoc(url) {
 	if (pause.classList.contains("pressed")) {
 		player.pause();
 	}
+	else {
+		player.play();
+	}
 
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
