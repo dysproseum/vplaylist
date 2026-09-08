@@ -19,9 +19,39 @@ vplaylist is an HTML5 video player for desktop and mobile for personal use
 
 Visit the online demo: https://dysproseum.com/vplaylist/
 
-## Server options
-- Docker
-- PHP/Apache
+## Prerequisites
+
+#### Check ffmpeg version
+
+Versions before 8.0 are tested and working:
+
+````
+ffmpeg version 4.2.7-0ubuntu0.1 Copyright (c) 2000-2022 the FFmpeg developers
+  built with gcc 9 (Ubuntu 9.4.0-1ubuntu1~20.04.1)
+````
+
+However, version 8.0 has a regression that breaks processing - [fix committed here](https://github.com/FFmpeg/FFmpeg/commit/618fc15e65f57c9ce25d4562f4b516129815608c).
+
+````
+ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 15 (Ubuntu 15.2.0-13ubuntu3)
+````
+
+There are 8.1, 8.2, and 9.0 tags now, but until there is a newer tag available in distro repositories, you will need to compile the latest source with the fix included.
+
+#### Compile ffmpeg from source
+
+To work around this, you will need to remove the distro-installed ffmpeg and compile from source.
+````
+$ sudo apt remove ffmpeg
+$ sudo apt install nasm pkg-config libdav1d-dev libsvtav1enc-dev libx264-dev libx265-dev
+
+$ git clone https://github.com/FFmpeg/FFmpeg.git
+$ cd FFmpeg
+$ ./configure --enable-libdav1d --enable-libsvtav1 --enable-libx264 --enable-libx265 --enable-gpl
+$ make
+$ sudo make install
+````
 
 ## Installation
 
