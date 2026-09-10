@@ -1,13 +1,26 @@
 <?php
 
-if (!isset($_REQUEST['collection'])) {
-  header('HTTP/1.1 404 Not found');
-  exit('No collection specified');
+// @todo check token.
+if (!isset($_REQUEST['token'])) {
+//  header('HTTP/1.1 403 Access denied');
+//  exit('No token provided');
 }
-$machine_name = $_REQUEST['collection'];
 
 require_once 'include/bootstrap.php';
 global $collections;
+
+if (!isset($_REQUEST['collection'])) {
+  header('HTTP/1.1 404 Not found');
+
+  // Instead list collections
+  foreach ($collections as $name => $val) {
+    $output[] = $name;
+  }
+  print json_encode($output, JSON_PRETTY_PRINT);
+  exit;
+}
+$machine_name = $_REQUEST['collection'];
+
 $queue_size = sizeof($collections[$machine_name]['items']);
 
 if (!isset($_REQUEST['index'])) {

@@ -2,13 +2,13 @@
 <html>
 <head>
 <link rel="stylesheet" href="include/style.css">
+<script type="text/javascript">
+  const start_muted = <?php print $conf['start_muted'] ? 1 : 0; ?>;
+  const use_ajax = <?php print $conf['use_ajax']; ?>;
+</script>
 <script src="include/util.js"></script>
 <script src="include/player.js"></script>
 <script src="include/fullscreen.js"></script>
-<script type="text/javascript">
-  const start_muted = <?php print $conf['start_muted']; ?>;
-  const use_ajax = <?php print $conf['use_ajax']; ?>;
-</script>
 <?php
   $title = "vplaylist";
   if (isset($vid_title) && $vid_title != '') {

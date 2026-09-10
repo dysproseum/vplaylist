@@ -105,7 +105,7 @@ body.nocontrols {
 	min-height: 360px;
 }
 
-.player video {
+.player video, .player canvas {
 	display: inherit;
 	margin: 0 auto;
 	margin-top: 20px;
@@ -113,6 +113,7 @@ body.nocontrols {
 	border-radius: 8px;
 	box-shadow: 0 0 20px 10px black;
 	opacity: 1 !important;
+	width: 85%;
 }
 
 .player video::-internal-media-controls-overlay-cast-button {
@@ -664,6 +665,7 @@ form#imports .icon .thumb:hover {
   width:100%;
   max-width:100%;
   border-radius:4px;
+  background: white;
 }
 
 .progress-bar span {
@@ -945,4 +947,75 @@ h1 {
   transform: rotate(-90deg);
   background: #2B1800;
   border: 1px solid #999999;
+}
+
+/* Video Editor */
+.video-editor {
+  margin: 20px;
+}
+
+.editor div {
+  box-sizing: border-box;
+  float: left;
+}
+
+.video-editor .player {
+  width: 48%;
+  border-bottom: 2px solid #333333;
+  background: gray;
+}
+
+.video-editor .recorder {
+  float: right;
+}
+
+.video-editor .player h2 {
+  text-align: center;
+}
+
+.video-editor .video-select {
+  float: right;
+  padding-right: 12px;
+  padding-top: 5px;
+}
+
+.video-editor .player-player, .video-editor .player-recorder {
+  float: left;
+  width: 100%;
+  min-height: 360px;
+  background: black;
+  border-left: 4px solid gray;
+  border-right: 4px solid gray;
+  padding-bottom: 20px;
+}
+
+.video-editor .player video, .video-editor .player canvas {
+  max-height: 306px;
+}
+
+.video-editor select.load-item {
+  width: 200px;
+}
+
+.video-editor #vid_marks input[type=text] {
+  width: 88px;
+  padding: 4px;
+}
+
+.editor .control-panel {
+  float: left;
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: gray;
+}
+
+.editor .jobs {
+  float: left;
+  color: white;
+  padding: 10px;
+}
+
+.editor .job {
+  width: 100%;
 }

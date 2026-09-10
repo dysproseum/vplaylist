@@ -139,10 +139,10 @@ function get_video_width($filename) {
 }
 
 function seconds_to_clock_time($seconds) {
-  $secs = $seconds % 60;
-  $hrs = $seconds / 60;
-  $mins = $hrs % 60;
-  $hrs = $hrs / 60;
+  $secs = intval($seconds) % 60;
+  $hrs = intval($seconds) / 60;
+  $mins = intval($hrs) % 60;
+  $hrs = intval($hrs) / 60;
 
   return sprintf("%02d:%02d:%02d", $hrs, $mins, $secs);
 }
@@ -159,6 +159,24 @@ function clock_time_to_seconds($min_sec) {
       break;
   }
   return $duration;
+}
+
+function seconds_to_time_code($seconds) {
+  dlog("seconds_to_time_code: $seconds"); // 5.68
+  $whole = intval($seconds); // 5
+  $tmp = seconds_to_clock_time($whole); // 00:00:05
+  $diff = $seconds - $whole; // 0.68
+  $parts = explode('.', $diff);
+  $decimal = substr($parts[1], 0, 2);
+  $timecode = "$tmp.$decimal"; // 00:00:05.68
+  return $timecode;
+}
+
+function time_code_to_seconds($tc) {
+  $time = explode('.', $tc);
+  $seconds = clock_time_to_seconds($time[0]);
+  $seconds += "0." . $time[1];
+  return $seconds;
 }
 
 function is_mobile() {

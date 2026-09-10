@@ -6,7 +6,9 @@ global $conf;
 $config['debug'] = 0;
 
 // Unmuting failed and the element was paused instead because the user didn't interact with the document before. https://goo.gl/xX8pDD
-$conf['start_muted'] = true;
+//   false: don't autostart videos.
+//   true: autostart but mute videos.
+$conf['start_muted'] = false;
 
 // Path to directory containing video files.
 $conf['video_dir'] = '/var/www/html/vplaylist';
@@ -28,3 +30,8 @@ $conf['external_media'] = false;
 $conf['media_hostname'] = 'user@example.com';
 $conf['store_hostname'] = 'user@example.com';
 $conf['store_target'] = '/var/www/vplaylist';
+
+// Optional: Tab-delimited cookie file.
+# Netscape HTTP Cookie File
+# host	subdomain	path	secure	expires	name	value
+// $conf['cookies'] = '/var/www/cookies.txt';

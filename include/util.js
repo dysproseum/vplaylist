@@ -13,6 +13,9 @@ function loadDoc(url) {
 	if (pause.classList.contains("pressed")) {
 		player.pause();
 	}
+	else {
+		player.play();
+	}
 
         var label = document.querySelector("#vid_title");
         label.innerText = data.filename;
@@ -124,4 +127,21 @@ function secondsToClockTime(seconds) {
   var date = new Date(0);
   date.setSeconds(seconds); // specify value for SECONDS here
   return date.toISOString().substring(11, 19);
+}
+
+function secondsToTimeCode(seconds) {
+  // account for fractions
+  var whole = parseInt(seconds);
+  var diff = seconds - whole;
+  diff = diff.toFixed(2);
+  var output = secondsToClockTime(whole);
+  output += diff.replace('0', '');
+  return output;
+}
+
+function timeCodeToSeconds(tc) {
+  var [timeStr, fraction] = tc.split('.');
+  var [h,m,s] = timeStr.split(':');
+  var output = Number(h) * 60 * 60 + Number(m) * 60 + Number(s) + Number("0." + fraction);
+  return output;
 }

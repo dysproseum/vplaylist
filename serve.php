@@ -17,6 +17,7 @@ $item = $collections[$machine_name]['items'][$index];
 if (isset($_REQUEST['file']) && $_REQUEST['file'] == '.jpg') {
   $filepath = $item['thumbnail'];
   if (!file_exists($filepath)) {
+    error_log("file not exists: $filepath");
     $filepath = dirname(__FILE__) . "/include/videotape.png";
   }
   $filesize = filesize($filepath);
@@ -50,18 +51,23 @@ $filepath = $item['filename'];
 $filesize = filesize($filepath);
 $filename = basename($filepath);
 
-// Prepare to serve video.
-$offset = 0;
-$length = $filesize;
-$buffer_size = 1024 * 1024;
-if (isset($conf['buffer_size'])) {
-  $buffer_size = $conf['buffer_size'];
+if (!file_exists($filepath)) {
+  header('HTTP/1.1 404 Not found');
+  exit;
 }
 
 $fp = fopen($filepath, "rb");
 if (!$fp) {
   header('HTTP/1.1 404 Not found');
   exit;
+}
+
+// Prepare to serve video.
+$offset = 0;
+$length = $filesize;
+$buffer_size = 1024 * 1024;
+if (isset($conf['buffer_size'])) {
+  $buffer_size = $conf['buffer_size'];
 }
 
 // Allow seeking.
