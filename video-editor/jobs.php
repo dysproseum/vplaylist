@@ -127,7 +127,7 @@ foreach ($queue as $link) {
 
     // https://creatomate.com/blog/how-to-join-multiple-videos-into-one-using-ffmpeg
     // $cmd = ffmpeg -i video1.mp4 -i video2.mp4 -filter_complex "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1" -vsync vfr output.mp4
-    $cmd = "ffmpeg -i \"$target_filename\" -i \"$source_filename\" -filter_complex \"[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1\" -vsync vfr \"$output\"";
+    $cmd = "ffmpeg -i \"$target_filename\" -i \"$source_filename\" -filter_complex \"[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1\" \"$output\"";
 
     dlog($cmd);
     exec($cmd);
@@ -233,7 +233,7 @@ foreach ($queue as $link) {
 
     // recombine
     //   assemble with tmp1 + tmp4 + tmp3
-    $cmd = "ffmpeg -i tmp1.mp4 -i tmp4.mp4 -i tmp3.mp4 -filter_complex \"[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1\" -vsync vfr \"$output\"";
+    $cmd = "ffmpeg -i tmp1.mp4 -i tmp4.mp4 -i tmp3.mp4 -filter_complex \"[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1\" \"$output\"";
     dlog($cmd);
     exec($cmd);
 
